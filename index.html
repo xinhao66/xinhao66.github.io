@@ -237,7 +237,27 @@
 <p>Servlet启动时，开始加载servlet生命周期开始。Servlet被服务器实例化后，容器运行其init方法，请求到达时运行其service方法，service方法自动派遣运行与请求对应的doXXX方法（doGet，doPost）等，当服务器决定将实例销毁的时候(服务器关闭)调用其destroy方法。</p>
 <p>17.Servlet单线程和多线程<br>、多线程模式（默认）<br>&lt;%@ page isThreadSafe=”true” %&gt;<br>容器为每个请求都会创建一个线程，而不管是否是同一个客户，但是servlet实例只有一个<br>2、单线程模式<br>&lt;%@ page isThreadSafe=”false” %&gt;<br>即同一时刻，只能有一个实例，如果有两个请求过来，那么会先执行前面的，后面的只能等待<br>这种情况，每个请求都会分发一个servlet实例，会造成线程的不安全</p>
 <p>所以，单线程模式不提倡</p>
-<p>18.Filter过滤器工作原理 （对web服务器管理的所有web资源：例如Jsp, Servlet, 静态图片文件或静态 html 文件等进行拦截，从而实现一些特殊的功能）<br>当客户端发出Web资源的请求时，Web服务器根据应用程序配置文件设置的过滤规则进行检查，若客户请求满足过滤规则，则对客户请求/响应进行拦截，对请求头和请求数据进行检查或改动，并依次通过过滤器链，最后把请求/响应交给请求的Web资源处理。请求信息在过滤器链中可以被修改，也可以根据条件让请求不发往资源处理器，并直接向客户机发回一个响应。当资源处理器完成了对资源的处理后，响应信息将逐级逆向返回。同样在这个过程中，用户可以修改响应信息，从而完成一定的任务。<br>生命周期<br>（1）实例化：Web容器在部署Web应用程序时对所有过滤器进行实例化。Web容器回调它的无参构造方法。<br>（2）初始化：实例化完成之后，马上进行初始化工作。Web容器回调init（）方法。<br>（3）过滤：请求路径匹配过滤器的URL映射时。Web容器回调doFilter（）方法–主要的工作方法。<br>（4）销毁： Web容器在卸载Web应用程序前，Web容器回调destroy（）方法。<br>1.注册Filter<br><span style="font-size:12px;"><filter><br>          <description>loginFilter过滤器</description><br>          <filter-name>loginFilter</filter-name><br>          <filter-class>com.javaweb.filter.LoginFilter</filter-class><br>          <!--配置loginFilter过滤器的初始化参数--><br>          <init-param><br>              <param-name>name</param-name><br>              <param-value>gacl</param-value><br>          </init-param><br>          <init-param><br>              <param-name>like</param-name><br>              <param-value>java</param-value><br>          </init-param><br></filter></span><br>2.映射Filter<br><span style="font-size:12px;"><filter-mapping><br>          <filter-name>loginFilter</filter-name><br>          <!--“/*”表示拦截所有的请求 --><br>          <url-pattern>/*</url-pattern><br></filter-mapping></span></p>
+<p>18.Filter过滤器工作原理 （对web服务器管理的所有web资源：例如Jsp, Servlet, 静态图片文件或静态 html 文件等进行拦截，从而实现一些特殊的功能）<br>当客户端发出Web资源的请求时，Web服务器根据应用程序配置文件设置的过滤规则进行检查，若客户请求满足过滤规则，则对客户请求/响应进行拦截，对请求头和请求数据进行检查或改动，并依次通过过滤器链，最后把请求/响应交给请求的Web资源处理。请求信息在过滤器链中可以被修改，也可以根据条件让请求不发往资源处理器，并直接向客户机发回一个响应。当资源处理器完成了对资源的处理后，响应信息将逐级逆向返回。同样在这个过程中，用户可以修改响应信息，从而完成一定的任务。<br>生命周期<br>（1）实例化：Web容器在部署Web应用程序时对所有过滤器进行实例化。Web容器回调它的无参构造方法。<br>（2）初始化：实例化完成之后，马上进行初始化工作。Web容器回调init（）方法。<br>（3）过滤：请求路径匹配过滤器的URL映射时。Web容器回调doFilter（）方法–主要的工作方法。<br>（4）销毁： Web容器在卸载Web应用程序前，Web容器回调destroy（）方法。<br>1.注册Filter</p>
+<p>span style=”font-size:12px;” filter</p>
+<p>description loginFilter过滤器 description</p>
+<p>filter-name loginFilter    filter-name</p>
+<p>filter-class com.javaweb.filter.LoginFilter filter-class</p>
+<p>配置loginFilter过滤器的初始化参数</p>
+<p>init-param</p>
+<p>param-name name param-name</p>
+<p>param-value gacl param-value</p>
+<p>init-param</p>
+<p>init-param</p>
+<p>param-name like param-name</p>
+<p>param-value java param-value</p>
+<p>init-param</p>
+<p>filter span</p>
+<p>2.映射Filter</p>
+<p>span style=”font-size:12px;” filter-mapping</p>
+<p>filter-name loginFilter filter-name</p>
+<p>/*表示拦截所有的请求</p>
+<p>url-pattern /* url-pattern</p>
+<p>filter-mapping span</p>
 
       
 
