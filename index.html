@@ -156,6 +156,283 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-面试题汇总" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/27/面试题汇总/">面试题补充</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/27/面试题汇总/" class="archive-article-date">
+  	<time datetime="2019-08-27T03:16:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>1.数据库优化经验<br>可以从 硬件 系统配置 数据表结构 sql语句几个方面优化<br>具体实现优化方向<br>1.1SQL语句及索引的优化<br>首先要根据需求写出结构良好的SQL，然后根据SQL在表中建立有效的索引。但是如果索引太多，不但会影响写入的效率，对查询也有一定的影响。</p>
+<p>1.2合理的数据库是设计<br>根据数据库三范式来进行表结构的设计。设计表结构时，就需要考虑如何设计才能更有效的查询。<br>数据库三范式：<br>第一范式：数据表中每个字段都必须是不可拆分的最小单元，也就是确保每一列的原子性；<br>第二范式：满足一范式后，表中每一列必须有唯一性，都必须依赖于主键；<br>第三范式：满足二范式后，表中的每一列只与主键直接相关而不是间接相关(外键也是直接相关)，字段没有冗余。<br>注意：没有最好的设计，只有最合适的设计，所以不要过分注重理论。三范式可以作为一个基本依据，不要生搬硬套。</p>
+<p>有时候可以根据场景合理地反规范化：<br>A：分割表。<br>B：保留冗余字段。当两个或多个表在查询中经常需要连接时，可以在其中一个表上增加若干冗余的字段，以 避免表之间的连接过于频繁，一般在冗余列的数据不经常变动的情况下使用。<br>C：增加派生列。派生列是由表中的其它多个列的计算所得，增加派生列可以减少统计运算，在数据汇总时可以大大缩短运算时间。</p>
+<p>数据库五大约束：<br>A：PRIMARY key:设置主键约束；<br>B：UNIQUE：设置唯一性约束，不能有重复值；<br>C：DEFAULT 默认值约束<br>D：NOT NULL：设置非空约束，该字段不能为空；<br>E：FOREIGN key :设置外键约束。</p>
+<p>字段类型选择：<br>A：尽量使用TINYINT、SMALLINT、MEDIUM_INT作为整数类型而非INT，如果非负则加上UNSIGNED<br>B：VARCHAR的长度只分配真正需要的空间<br>C：使用枚举或整数代替字符串类型<br>D：尽量使用TIMESTAMP而非DATETIME<br>E：单表不要有太多字段，建议在20以内<br>F：避免使用NULL字段，很难查询优化且占用额外索引空间</p>
+<p>1.3系统配置的优化<br>例如：MySQL数据库my.cnf</p>
+<p>1.4 硬件优化<br>更快的IO、更多的内存。一般来说内存越大，对于数据库的操作越好。但是CPU多就不一定了，因为他并不会用到太多的CPU数量，有很多的查询都是单CPU。另外使用高的IO（SSD、RAID），但是IO并不能减少数据库锁的机制。所以说如果查询缓慢是因为数据库内部的一些锁引起的，那么硬件优化就没有什么意义。</p>
+<p>1.5代码优化<br>A：尽量少用（或者不用）sqlserver 自带的函数<br>select id from t where substring(name,1,3) = ’abc’<br>select id from t where datediff(day,createdate,’2005-11-30′) = 0<br>可以这样查询：<br>select id from t where name like ‘abc%’<br>select id from t where createdate &gt;= ‘2005-11-30’ and createdate &lt; ‘2005-12-1’</p>
+<p>B：连续数值条件，用BETWEEN不用IN：SELECT id FROM t WHERE num BETWEEN 1 AND 5<br>C：Update 语句，如果只更改1、2个字段，不要Update全部字段，否则频繁调用会引起明显的性能消耗<br>D：尽量使用数字型字段，若只含数值信息的字段尽量不要设计为字符型<br>E：不建议使用 select * from t ，用具体的字段列表代替“<em>”，不要返回用不到的任何字段。尽量避免向客户 端返回大数据量，若数据量过大，应该考虑相应需求是否合理<br>F：表与表之间通过一个冗余字段来关联，要比直接使用JOIN有更好的性能<br>G：select count(</em>) from table；这样不带任何条件的count会引起全表扫描 </p>
+<p>1.6合理使用索引<br>索引一般情况下都是高效的。但是由于索引是以空间换时间的一种策略，索引本身在提高查询效率的同时会影响插入、更新、删除的效率，频繁写的表不宜建索引。<br>如何选择索引字段<br>A：字段出现在查询条件中，并且查询条件可以使用索引<br>B：通常对数字的索引和检索要比对字符串的索引和检索效率更高<br>C：语句执行频率高，一天会有几千次以上<br>D：通过字段条件可筛选的记录集很小 </p>
+<p>2.什么是事务，事务的四个特性？隔离级别？<br>事务（Transaction），是访问并可能更新数据库中各种数据项的一个程序执行单元(unit)。一个事务可以是一条SQL语句，一组SQL语句或整个程序。要操作的数据库表类型要求是INNODB.</p>
+<p>四个特性：原子性（atomicity）。一个事务是一个不可分割的工作单位，事务中包括的诸操作要么都做，要么都不做。<br>一致性（consistency）。事务必须是使数据库从一个一致性状态变到另一个一致性状态。一致性与原子性是密切相关的。<br>隔离性（isolation）。一个事务的执行不能被其他事务干扰。即一个事务内部的操作及使用的数据对并发的其他事务是隔离的，并发执行的各个事务之间不能互相干扰。<br>持久性（durability）。持久性也称永久性（permanence），指一个事务一旦提交，它对数据库中数据的改变就应该是永久性的。接下来的其他操作或故障不应该对其有任何影响。</p>
+<p>隔离级别：数据库事务的隔离级别有4个，<br>由低到高依次为Read uncommitted、Read committed、Repeatable read、Serializable，<br>这四个级别可以逐个解决脏读、不可重复读、幻读这几类问题</p>
+<p>Read uncommitted：不能解上述三种异常<br>Read committed  ：可以读没有提交的数据：可以解决脏读<br>Repeatable read： 可重复读。给数据加锁：可以解决不可重复读<br>Serializable：不允许并发。<br>事务级别越高，效率越低！<br>通常使用：Read committed</p>
+<p>三种常见的事务异常：<br>脏读：读了另外一个事务的还没有提交的数据<br>不可重复读：同一个事务前后读到的数据不一致<br>幻读：读的过程中，另外一个事务可能添加或者删除数据，影响了当前事务的读取</p>
+<p>3.数据库锁及解锁方法？<br>常见数据库锁     （保证数据安全，处理高并发访问）<br>乐观锁：乐观锁就如同他的名字一样，当其他人（线程）去取数据的时候，总是认为别人不会修改数据，总不会发生并发问题，所以因此没有上锁，只有在线程提交数据时会通过检查版本号的形式检测数据有没有被修改过，基于数据版本（Version）记录机制实现（总是假设是最好的情况）</p>
+<p>悲观锁：悲观锁和乐观锁就是相反的存在，他总是认为别人（别的线程）会对数据进行修改，所以都会加锁（读锁，写锁等等）一次只能允许一个线程对数据进行修改，其他线程会被阻塞挂起， java中的synchronized关键字的实现思想就是悲观锁 （总是假设是最坏的情况）<br>A.并发性区别<br>1.因为悲观锁是在事务执行中加锁，当并发量高时，就有可能会对其他事务进程造成影响，造成其他事务进程执行时间过程，导致事务超时<br>2.乐观锁是在对数据进行检查时才加锁，锁的时间会少很多，而只有锁住数据的时候会影响其它事务。<br>B.加锁时机不同：<br>1.悲观锁，从数据开始修改时就将数据锁住，直到更改完成才释放锁<br>2.乐观锁，直到数据修改完准备提交时才上锁，完成后释放 </p>
+<p>注意：悲观锁里面又包括行级锁(排它锁(读锁)、共享锁(写锁)、更新锁、意向锁)和页级锁及表级锁(共享锁、意向锁、排它锁)</p>
+<p>解锁方法：<br>1.第一种<br>使用命令 找到锁的进程：<br>show processlist;<br>kill id ;<br>2.第二种<br>UNLOCK TABLES;（开启表锁）<br>3.第三种</p>
+<p>锁表方法<br>锁定数据表，避免在备份过程中，表被更新<br>1.增加读锁定<br> LOCK TABLES tbl_name READ;<br>2.为表增加一个写锁定：<br>LOCK TABLES tbl_name WRITE;</p>
+<p>4.jdbc调用存储过程:<br>经常使用的4种:</p>
+<pre><code>1. 返回结果集的proc
+
+2. 输出参数
+
+3.使用带有返回状态的存储过程 
+
+4.受影响行数</code></pre><p>以下为mysql的存储过程 sqlServer同理</p>
+<p>案例1: 返回结果集的proc</p>
+<p>存储过程:</p>
+<p>drop procedure if exists proc_selectEmployee;</p>
+<p>create procedure proc_selectEmployee(in carid varchar(20))</p>
+<p>begin<br>    select * from employee where cardID = carid;<br>end</p>
+<p>call proc_selectEmployee(‘SZ65380’);</p>
+<p>5.存储过程是什么，有什么优缺点？<br>存储过程是一组予编译的SQL语句<br>它的优点：1.允许模块化程序设计，就是说只需要创建一次过程，以后在程序中就可以调用该过程任意次。<br>2.允许更快执行，如果某操作需要执行大量SQL语句或重复执行，存储过程比SQL语句执行的要快。        　           3.更好的安全机制，对于没有权限执行存储过程的用户，也可授权他们执行存储过程。<br>4.减少网络流量，例如一个需要数百行的SQL代码的操作有一条执行语句完成，不需要在网络中发送数百行代码。　<br>它的缺点：不易维护，一旦逻辑变了修改起来麻烦<br>2.如果写此存储过程的人离职了，对于接手她代码的人估计是一场灾难，因为别人还要去读懂你程序逻辑，<br>还要读懂你存储逻辑。不利于扩展。<br>3.最大的缺点！ 虽然存储过程可以减少代码量，提高开发效率。但是有一点非常致命的就是太耗性能。连一个 ++ 操作都要消耗内存，更别说更复杂运算了。在高并发场景下很可能直接让你cpu 分分钟100%；</p>
+<p>6.JDBC操作数据库的主要步骤<br>（1）加载驱动类；<br>（2）获得连接对象；<br>（3）获得语句对象；<br>（4）执行SQL语句，如果是查询语句，需要处理结果集；<br>     关闭结果集。语句对象。数据库连接对象。</p>
+<p>7.String不是基本数具类型。Java中的基本数据类型只有8个：boolean、char、byte、short、int、long、float、double；除了基本数据类型（primitive type）和枚举类型（enumeration type），剩下的都是引用类型（reference type）。</p>
+<p>8.int和integer区别<br>Integer是int的包装类，int则是java的一种基本数据类型 ；<br>2、Integer的默认值是null，int的默认值是0；<br>3、Integer变量必须实例化后才能使用，而int变量不需要 ；<br>4、Integer实际是对象的引用，当new一个Integer时，实际上是生成一个指针指向此对象；而int则是直接存储数据值 。</p>
+<p>9.什么是java虚拟机<br>Java虚拟机是能移值到不同硬件平台上的软件系统。</p>
+<p>10.’==’与’equals’方法区别<br>equals：用于判断两个变量是否是对同一个对象的引用，即判断存放在堆中的内容是否相同<br>==:用来比较两个变量的值是否相等，也就是比较变量中对应的内存中存储的值是否相同</p>
+<p>11.ArrayList和LinkedList区别<br>ArrayList底层使用时数组。LinkedList使用的是链表。(ArrayList基于动态数组实现的非线程安全的集合；LinkedList基于链表实现的非线程安全的集合)<br>数组查询具有所有查询特定元素比较快。而插入和删除和修改比较慢(数组在内存中是一块连续的内存，如果插入或删除是需要移动内存)。<br>链表不要求内存是连续的，在当前元素中存放下一个或上一个元素的地址。查询时需要从头部开始，一个一个的找。所以查询效率低。插入时不需要移动内存，只需改变引用指向即可。所以插入或者删除的效率高。<br>ArrayList使用在查询比较多，但是插入和删除比较少的情况，而LinkedList使用在查询比较少而插入和删除比较多的情况。</p>
+<p>12.线程安全与非线程安全<br>线程安全是指在多线程环境下也不会出现数据不一致，而非线程安全就有可能出现数据不一致的情况。<br>线程安全效率低，线程不安全效率高。例如(StringBuilder是线程不安全的，效率较高.而StringBuffer是线程安全的，效率较低)</p>
+<p>13.Set、list、Map区别<br>List  (List是有序的，可以重复的)<br>1.可以允许重复的对象。<br>2.可以插入多个null元素。<br>3.是一个有序容器，保持了每个元素的插入顺序，输出的顺序就是插入的顺序。<br>4.常用的实现类有 ArrayList、LinkedList 和 Vector。ArrayList 最为流行，它提供了使用索引的随意访问，而 LinkedList 则对于经常需要从 List 中添加或删除元素的场合更为合适。<br>Set  (Set是无序的，不可以重复的)<br>1.不允许重复对象</p>
+<ol start="2">
+<li>无序容器，你无法保证每个元素的存储顺序，TreeSet通过 Comparator  或者 Comparable 维护了一个排序顺序。</li>
+<li>只允许一个 null 元素</li>
+<li>Set 接口最流行的几个实现类是 HashSet、LinkedHashSet 以及 TreeSet。最流行的是基于 HashMap 实现的 HashSet；TreeSet 还实现了 SortedSet 接口，因此 TreeSet 是一个根据其 compare() 和 compareTo() 的定义进行排序的有序容器。<br>map</li>
+<li>Map不是collection的子接口或者实现类。Map是一个接口。</li>
+<li>Map 的 每个 Entry 都持有两个对象，也就是一个键一个值，Map 可能会持有相同的值对象但键对象必须是唯一的。</li>
+<li>TreeMap 也通过 Comparator  或者 Comparable 维护了一个排序顺序。</li>
+<li>Map 里你可以拥有随意个 null 值但最多只能有一个 null 键。</li>
+<li>Map 接口最流行的几个实现类是 HashMap、LinkedHashMap、Hashtable 和 TreeMap。（HashMap、TreeMap最常用）</li>
+</ol>
+<p>14.List,Set,Map存取元素各有什么特点<br>一丶存放<br>List存放元素是有序，可重复<br>Set存放元素无序，不可重复<br>Map元素键值对形式存放，键无序不可重复，值可重复</p>
+<p>二丶取出<br>List取出元素for循环，foreach循环，Iterator迭代器迭代<br>Set取出元素foreach循环，Iterator迭代器迭代<br>Map取出元素需转换为Set，然后进行Iterator迭代器迭代，或转换为Entry对象进行Iterator迭代器迭代</p>
+<p>15.字节流和字符流的区别<br>1)缓冲区<br>字节流在操作时本身不会用到缓冲区，是对文件本身进行操作。<br>字符流在操作的时候使用到了缓冲区，所以在操作字符流的时候，不关闭流是没办法对写入 数据进行保存的。<br>2)读写单位不同        字节流是以字节（8bit）为单位进行读写，字符流是根据字符进行读写，在读写的时候根据码表映射，有时候可能会一次性读取多个字节<br>3)处理对象不同<br>字节流能处理所有对象的类型，字符流一般只能处理字符类数据</p>
+<p>16.什么是servlet？<br>Servlet（Server Applet），全称Java Servlet， 是用Java编写的服务器端程序。而这些Sevlet都要实现Servlet这个接口。其主要功能在于交互式地浏览和修改数据，生成动态Web内容。Servlet运行于支持Java的应用服务器中。<br>HttpServlet 重写doGet和doPost方法或者你也可以重写service方法完成对get和post请求的响应。<br>生命周期：<br>servlet有良好的生存期的定义，包括加载和实例化、初始化、处理请求以及服务结束。这个生存期由javax.servlet.Servlet接口的init,service和destroy方法表达。</p>
+<p>加载Servlet的class—-&gt;实例化Servlet—–&gt;调用Servlet的init完成初始化—-&gt;响应请求（Servlet的service方法）—–&gt;Servlet容器关闭时(Servlet的destory方法)</p>
+<p>Servlet启动时，开始加载servlet生命周期开始。Servlet被服务器实例化后，容器运行其init方法，请求到达时运行其service方法，service方法自动派遣运行与请求对应的doXXX方法（doGet，doPost）等，当服务器决定将实例销毁的时候(服务器关闭)调用其destroy方法。</p>
+<p>17.Servlet单线程和多线程<br>、多线程模式（默认）<br>&lt;%@ page isThreadSafe=”true” %&gt;<br>容器为每个请求都会创建一个线程，而不管是否是同一个客户，但是servlet实例只有一个<br>2、单线程模式<br>&lt;%@ page isThreadSafe=”false” %&gt;<br>即同一时刻，只能有一个实例，如果有两个请求过来，那么会先执行前面的，后面的只能等待<br>这种情况，每个请求都会分发一个servlet实例，会造成线程的不安全</p>
+<p>所以，单线程模式不提倡</p>
+<p>18.Filter过滤器工作原理 （对web服务器管理的所有web资源：例如Jsp, Servlet, 静态图片文件或静态 html 文件等进行拦截，从而实现一些特殊的功能）<br>当客户端发出Web资源的请求时，Web服务器根据应用程序配置文件设置的过滤规则进行检查，若客户请求满足过滤规则，则对客户请求/响应进行拦截，对请求头和请求数据进行检查或改动，并依次通过过滤器链，最后把请求/响应交给请求的Web资源处理。请求信息在过滤器链中可以被修改，也可以根据条件让请求不发往资源处理器，并直接向客户机发回一个响应。当资源处理器完成了对资源的处理后，响应信息将逐级逆向返回。同样在这个过程中，用户可以修改响应信息，从而完成一定的任务。<br>生命周期<br>（1）实例化：Web容器在部署Web应用程序时对所有过滤器进行实例化。Web容器回调它的无参构造方法。<br>（2）初始化：实例化完成之后，马上进行初始化工作。Web容器回调init（）方法。<br>（3）过滤：请求路径匹配过滤器的URL映射时。Web容器回调doFilter（）方法–主要的工作方法。<br>（4）销毁： Web容器在卸载Web应用程序前，Web容器回调destroy（）方法。<br>1.注册Filter<br><span style="font-size:12px;"><filter><br>          <description>loginFilter过滤器</description><br>          <filter-name>loginFilter</filter-name><br>          <filter-class>com.javaweb.filter.LoginFilter</filter-class><br>          <!--配置loginFilter过滤器的初始化参数--><br>          <init-param><br>              <param-name>name</param-name><br>              <param-value>gacl</param-value><br>          </init-param><br>          <init-param><br>              <param-name>like</param-name><br>              <param-value>java</param-value><br>          </init-param><br></filter></span><br>2.映射Filter<br><span style="font-size:12px;"><filter-mapping><br>          <filter-name>loginFilter</filter-name><br>          <!--“/*”表示拦截所有的请求 --><br>          <url-pattern>/*</url-pattern><br></filter-mapping></span></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/27/面试题汇总/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<!-- 来必力City版安装代码 -->
+
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
+
+
+  
+    <article id="post-JavaEE面试题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/27/JavaEE面试题/">JavaEE面试题</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/27/JavaEE面试题/" class="archive-article-date">
+  	<time datetime="2019-08-27T03:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p> Java EE面试题<br>第一部分：Servlet/JSP快速入门<br>1.请列举至少6种javaEE技术，并简述其作用。<br>解析：<br>javaEE是一系列的技术，主要包扩13种。对于开发人员来说，了解几种主要的技术是非常必要的，例如JDBC、JSP、Servlet、XML、JNDI、JMS、JTA等。<br>参考答案：<br>(1)JDBC(Java Database Connectivity):用来访问数据库的API。<br>(2)JavaServlet :是一种小型的Java程序，扩展了web服务器的功能。<br>(3)JSP(Java Server Pages):JSP页面由HTM代码和嵌入其中的Java代码组成，用来实现动态视图。<br>(4)JNDI(Java Name and Directory Interface): JNDI API被用于访问名字和目录服务。<br>(5)EJB(Enterprise JavaBean):实现业务逻辑的组件，可以构成分布式系统。<br>(6)RMI(Remote Method Invoke):调用远程对象方法。<br>(7)Java IDL/CORBA:将Java和CORBA集成在一起。<br>(8)XML(Extensible Markup Language):可以用它来定义其他标记语言的语言。<br>(9)JMS(Java Message Service):用于和消息中间件相互通信的API。<br>(10)JTA(Java Transaction Achitecture):一种标准的API，可以访问各种事务管理器。<br>(11)JTS(Java Transaction Service):是CORBA OTS事务监控的基本实现。<br>(12)JavaMail:用于存取邮件服务的API。<br>(13)JAF(JavaBeans Activation Framework):JavaMail利用JAF来处理MIME编码的邮件附件。<br>2.在web.xml文件中配置Servlet时，主要配置哪些信息？<br>解析：  使用IDE开发Servlet时，配置信息可以通过可视化方式定义。然而对于web应用开发员来说，了解Servlet的配置非常必要，能够在必要的时候手动进行修改。<br>参考答案：  配置Servlet时，主要配置<servlet>以及&lt; servlet -mapping&gt;，如下所示：<br>        <servlet><br>            <servlet-name>IndexServlet</servlet-name><br>            <servlet-class>com.oracle.servlet.IndexServlet</servlet-class><br>      </servlet><br>        <servlet-mapping><br>            <servlet-name>IndexServlet</servlet-name><br>            <url-pattern>/IndexServlet</url-pattern><br>      </servlet-mapping><br>其中<servlet-class>是Servlet源文件的名字，<servlet-name>是自定义的名字，往往使用类名。<url-pattern>是其中非常重要的信息，用来配置访问Servlet的逻辑路径。必须以/开头。<br><servlet-class>com.oracle.FirstServlet</servlet-class><br></url-pattern></servlet-name></servlet-class></servlet><br><servlet-mapping><br><servlet-name>FristServlet</servlet-name><br><url-pattern>/frist<url-pattern><br><servlet-mapping><br>其中，<servlet-class>是Servlet源文件的名字，<servlet-name>是自定义的名字，往往使用类名。<url-pattern>是非常重要的信息，用来配置访问Servlet的逻辑路径，必须以/开头。</url-pattern></servlet-name></servlet-class></servlet-mapping></url-pattern></url-pattern></servlet-mapping></p>
+<ol start="3">
+<li>如果通过一个链接访问Servlet，默认调用Servlet中的那个方法提供服务？<br>解析  度与不同的HTTP请求方法Servlet中都定于了对应的doXXXX方法接受请求。一超级链接的方式提交请求，默认的GET方式，所以将调用Servlet中的doGet方法。程序员应该熟悉每种用户请求对应的HTTP方式。</li>
+<li>如果一个表单<form>没有显示指定method属性值，那么默认使用什么方法提交请求？<br>解析  表单提交时Web应用中常见的请求方式，一般情况下，建议使用POST方式提交请求，因为这种方式请求参数在请求体重传递，不会显示在URL中。但是，如果在HTML的<form>标记中没有使用method属性指定提交方式，默认是GET方式。<br>参考答案   默认使用GET方式。</form></form></li>
+<li>请求接口中的哪个方法可以返回请求参数的值？哪个方法可以把请求参数的多个值同时返回？<br>解析  Web应用中复杂重要的的功能往往通过表单提交实现，用户利用表单可以输入很多信息，这些信息被称为请求参数。在Web应用开发中，获得请求参数几乎是使用最多的功能，程序员应该熟练掌握获得请求参数有关的所有方法。<br>参考答案  请求接口中的getParameter 方法可以返回摸一个请求参数的值，getParaneterValues方法可以把摸个请求参数的多个值同时返回，封装到一个数组中，例如复框的多个值。</li>
+<li>响应接口中的哪个方法可以设置内容类型？用简单代码演示。<br>解析  响应可以封装服务器端返回到客户端的数据。而这些数据的格式和编码都需要使用响应中的方法进行设置。如果设置错误，客户端浏览器将无法显示。<br>参考答案   响应中的soracleontentType方法可以设置内容类型，如下所示:<pre><code>//设置响应的内容类型
+Respose.soracleontentType(“text/htmllcharset=gb2312”);</code></pre>上述代码中设置响应的内容类型是text或者html，编码格式是gb2312.</li>
+<li>简述JSP的运行过程<br>解析 很多初级开发员对JSP的理解比较肤浅，不熟悉JSP的运行过程，JSP出错时很难排错，开发员必须熟悉JSP的运行过程，这样才能编写出优良的JSP并能顺利调试。<br>参考答案<br>（1）容器将JSP翻译成符合Servlet规范的类。<br>（2）容器编译JSP生成的类。<br>（3）容器初始化JSP实例；<br>（4）将请求和相应对象传递给JSP实例的服务方法，提供服务。</li>
+<li>JSP中的&lt;% %&gt;和&lt;% =%&gt;有什么区别？<br>解析  JSP从表面上看就是HTML代码中混合了Java代码，而为了区别Java代码和HTML代码，规范中定义了一些符号，即脚本元素。初级开发员应该从熟悉这些脚本元素开始，逐步熟悉JSP的开发。<br>参考答案  &lt;% %&gt;称为脚本片段，可以包含任何符合语法的Java代码，可以同时包含多行代码。而&lt;% =%&gt;称为表达式，=号后面是一个表达式，这个表达式的值将被输出到浏览器中，表达式后面不用使用分号结束，而且每个&lt;% =%&gt;只能包含一个表达式。<br>9．JDBC编程中主要有哪几种语句对象？有什么区别？<br>解析 JDBC主要用来操作数据库，操作数据库本质上是通过执行SQL语句完成。所以，JDBC编程中，能够用来执行SQL语句的语句对象非常重要，每种语句对象都存在一些区别，开发员应该熟悉并掌握。<br>参考答案 JDBC中主要有以下3种语句对象：<br>（1）Statement:Statement是所有语句对象的父接口，定义了语句对象的规范。<br>（2）PreparedStatement：预编译的语句对象，将待执行的语句进行了预编译，可以在执行时动态指定SQL语句中的参数。<br>（3）CallableStatement：可以用来调用数据库的存储过程。<br>10、简述使用JDBC操作数据库的主要步骤。<br>解析  不论使用什么数据库软件，JDBC操作数据库的步骤都基本相同。开发员一定需要注意的是，JDBC的连接对象、语句对象、结果集等都是高开销对象，使用完毕一定要在finally语句中进行关闭处理，否则将降低应用的性能。<br>参考答案<br>（1）加载驱动类；<br>（2）获得连接对象；<br>（3）获得语句对象；<br>（4）执行SQL语句，如果是查询语句，需要处理结果集；<br>（5）关闭结果集。语句对象。数据库连接对象。</li>
+<li>说明MVC模式的含义，并用图表示web应用中MVC模式中每部分之间的关系<br>解析  对于web开发员来说，正确理解MVC模式非常关键。目前，大多数web应用都是基于MVC模式进行架构，也有很多MVC框架能够帮助开发员快速搭建MVC应用。值得注意的是，使用JSP,Servlet,JavaBean可以构建MVC模式的应用，但是MVC是一种架构思想，并不仅局限于JSP,Servlet,JavaBean这个范围内，可以使用很多其他技术实现。<br>参考答案  MVC本来应用于桌面程序中，M是指数据模型 , V是指用户界面 , C则是控制器，至今已被广泛使用。使用MVC的目的是将M和V实现代码分离，从而使同一个程序可以使用不同的表现形式。C存在的目的则是确保M和V的同步，一旦M改变，V应该同步更新。MVC模式是近些年被JavaEE平台广泛使用的设计模式。Web应用中的MVC模式与桌面程序中的MVC模式有所不同。由于web应用大多基于请求响应模式，因此往往做不到“一旦M改变，V应该同步更新”。MVC每部分之间的关系如下</li>
+</ol>
+<p>第二部分   详解Servlet组件开发<br>1 . 请说明Servlet的声明周期<br>解析   Servlet作为服务器端的组件，需要在容器中才能运行，容器管理Servlet的生命周期。对于web开发员来说，了解Servlet的声明周期才能更好地进行Servlet编程。<br>参考答案<br>阶段一：初始化<br>客户端第一次访问Servlet，或者容器加载应用时(配置<load-on-startup>),容器调用Servlet类的构造方法，实例化一个Servlet对象，该对象存在于服务器端内存中，容器将启动多线程并发访问该对象。实例化结束后，将对Servlet实例进行初始化，先调用init(Servloracleonfig)方法，在调用init()方法<br>阶段二:提供服务<br>Servlet初始化成功后，容器调用Servlet接口中定义的service(ServletRequest req,ServletResponse res)方法。Service将请求和响应对象转换成HttpServletRequest req,HttpServletResponse resp)方法。HttpServlet中的service方法，将请求根据请求方式转发给对应的doXXX方法，如doGet、doPost<br>阶段三   销毁<br>Servlet提供服务结束，或者一段时间后，容器将销毁Servlet实例。销毁Servlet实例前，容器先调用Servlet接口中定义的destroy方法，允许完成一些自定义的操作。</load-on-startup></p>
+<ol start="2">
+<li>什么是Servlet的初始化参数?如何配置？如何在程序中获得？<br>解析  如果摸个Servlet需要一些参数，可以再web.xml中今夕配置，而不必要硬编码到源代码中，这样可以方便地进行修改。值得注意的事，Servlet的初始化参数只能在当前的Servlet中使用，其他Servlet中无法使用。<br>参考答案  Servlet的初始化参数指的是初始化Servlet实例时的参数，可以再web.xml中尽享配置，如下所示：<servlet>
+<servlet-name>TestServlet</servlet-name>
+<servlet-class>com.oracleTestServlet</servlet-class>
+<init-param>
+<param-name>level</param-name>
+<param-value>2.1</param-value>
+</init-param>
+</servlet>
+上述配置中，使用<init-param>为TestServlet配置了一个名字为level的初始化参数，值为2.1.可以使用多个<init-param>元素配置多个初始化参数。在TestServlet中，可以直接调用getInitParameter(“level”)方法返回该参数的值。</init-param></init-param></li>
+<li>请列出请求接口中至少三个获得请求头的方法。<br>解析  当用户向服务器端请求时，HTTP请求头的信息也随之被发送到服务器。请求接口中定义了获得请求头的方法，实际应用中常常需要获得某些请求头的值，根据请求头的值判断客户端的情况进行编程。开饭元应该熟悉各种请求头的含义，以及获得请求头的方法。<br>参考答案   getHeader方法可以根据请求头名字获得请求头值；getIntHeader方法用来返回整型请求头的值；getDateHeader方法用来返回日期类型请求头的值。</li>
+<li>响应接口中addHeader方法和setHeader方法有什么区别？<br>解析  响应封装了服务器端发送给客户端的信息，响应接口中定义了操作响应头的方法，有些方法容易混淆，开发员应该辨别清楚。<br>参考答案  addHeader方法用来向响应中添加一个头，如果盖头的名字已经存在，name允许一个头包含多个值：setHeader方法向响应中添加一个头信息，如果头寸在，则覆盖已有的值。</li>
+<li>Servlet跳转到JSP常常有两种方法：一种称为响应重定向，一种称为请求转发。请用代码展示两种方法，并说明其区别。<br>解析  Servlet作为MVC中的控制器，主要的作用就是接受客户端请求，获得请求信息后调用业务逻辑，然后根据业务逻辑的处理结果跳转到不同的视图显示给用户。开发员必须掌握常用的两种跳转方法，即响应重定向和请求转发。实际工作中常用的是请求转发，很多MVC框架默认也是使用请求转发.<br>参考答案<br>响应重定向response.sendRedirect(“index.jsp”);<br>请求转发：request.getRequestDispantcher(“index.jsp”).forward(request,respinse);<br>响应重定向相当于让客户端向重定向的资源重新发送一个请求。当前请求中的信息无法传递到下一个资源。而请求转发显得刚玉吧当前的请求转发到下一个资源。当前请求中的信息将可以转递到下一个资源。</li>
+<li>请求接口中的提供了处理属性的方法，请列举每个方法并说明其作用。<br>解析 控制器调用业务逻辑后，往往需要把一些处理的结果返回到视图上进行显示。这种时候，属性的概念就至关重要。请求属性是最常用的一种属性，实在请求范围内有效的属性。开发员一定要正确理解每种范围的属性并能够正确使用。<br>参考答案 请求接口中有三个和属性有关的方法，分别是：setAttribute(String,Object),可以将一个对象设置一个名字，存储到请求中：getAttribute(String),可以根据属性的名字返回属性值：removeAttribute(String),可以根据属性的名字删除属性。</li>
+<li>cookie有什么作用？如何使用Servlet 的API返回请求中的cookie？如何将cookie保存到客户端？<br>解析 cookie是保存在客户端的小文本，合理地使用cookie能够增强用户体验。然而，开发员使用cookie时，一定不要把涉及用户隐私的内容保存到cookie中，如银行账号的密码等。另外，cookie可以被用户人为禁止或删除，这也是使用cookie时需要考虑的问题。<br>参考答案 cookie用来将一些信息保存到客户端，已被用户下次访问同一应用时，能够自动将这些信息发送到服务器端。服务器端通过使用cookie编程，能够提高用户体验。请求接口中提供了goracleookie方法返回所有的cookie，响应接口提供了addCookie方法能够将cookie对象返回到客户端。</li>
+<li>如何获得会话对象？请用简单代码展示。<br>解析 web应用中，常常需要使用会话对象。会话是指客户端对服务器端一次连续的访问过程。开发人员应该熟悉会话相关的操作。<br>参考答案 可以通过请求对象获得会话对象，如request.getSession()。如果当前存在会话，直接返回使用：如果不存在，则创建一个新的会话返回。还有一个重载的getSession方法，具有一个boolean类型的参数，其中request.getSession(true)和request.get<br>Session()完全相同，而request.getSession(false)意思是如果存在会话对象就返回使用，如果不存在则返回null。</li>
+<li>有哪几种方式可以设置会话有效时间？<br>解析 会话对象都被存储在容器中，如果很长时间不使用，就应该被销毁，以保证内存的有效使用。容器总是会为会话设置默认的有效时间，大多数是30分钟，也可以自己定义会话的有效时间。<br>参考答案 有两种方法可以设置会话的有效时间，一种是在web.xml中配置，如下所示：<session-config>
+  <session-timeout>40</session-timeout>
+</session-config>
+使用这种方式设置的有效时间，是对当前应用中所有会话都有效，单位是分钟。
+还有一种方式是使用HttpSession中的setMaxInterval(int)方法，这个方法能够设定最大不活动时间，超过这个时间会话没有被访问，即被容器销毁。这个方法只能够控制调用该方法的会话对象，不会对所有会话对象生效。</li>
+<li>什么是URL重写？能解决什么问题？<br>解析  大多数容器实现会话，都是基于cookie机制实现的。然而，cookie可能被用户人为地设置失效，这种情况下，会话页将无效。为了能够在cookie失效时依然使会话有效，可以使用URL重写策略。如果使用某些MVC框架编程，如Struts，这些问题都已经在框架层面得到了解决。<br>参考答案  URL重写就是使用响应接口中的encodeURL(path)方法，把指定的path重新编码，将名字是JSESSIONID的cookie的值强制加到path对应的URL中，传递到服务器端，这样就能够保证即使cookie被阻止，服务器端永远能得到会话对象的ID值，使得会话有效。</li>
+<li>会话接口中提供了处理会话属性的方法，请列举每个方法并说明其作用。<br>解析   如果某些对象需要在会话范围内有效，那么就可以考虑使用会话范围的属性。保存在会话范围内的属性，在当前会话中一直有效。然而，由于会话的生命中期较长，所以属性也将随着会话一直存在于内存中。只有当必须使用会话属性时再考虑使用，能用请求属性解决的场合就使用请求属性，开发员必须能够正确选择不同范围属性进行使用。<br>参考答案  会话接口中有三个和属性有关的方法，分别是：setAttribute（String，Object），可以将一个对象设置一个名字，存储在会话中；getAttritute（String），可以跟据属性的名字返回属性值；removeAttribute（String），可以根据属性的名字删除属性。</li>
+<li>什么是上下文对象？如何获得上下文对象？<br>解析   上下文是一个全局的概念，每个应用都有一个唯一的上下文对象。上下文接口中定义了一系列的方法，开发员应该熟悉这个接口的常用方法。<br>参考答案   当容器启动时，会加载容器中的每一个应用，并且针对每一个应用创建一个对象，称为上下文对象。每个应用都只有一个唯一的上下文对象，Servlet  API 中提供了Servloracleontext 接口来表示上下文对象。要在Servlet中获得上下文对象非常简单，直接使用getServloracleontext（）方法就可以返回当前的上下文对象，在JSP中可以直接使用application内置对象使用上下文。</li>
+<li>如何配置上下文参数？在程序中如何获得上下文参数？<br>解析   如果在应用中的很多地方，都需要使用某一个参数，那么就可以配置一个上下文参数。上下文参数与Servlet初始化参数不同的是，上下文参数能够在应用所有资源里使用，而Servlet初始化参数在当前Servlet中使用。<br>参考答案   在web.xml中可以使用<context-param>配置上下文参数，如下所示：<pre><code>&lt;context-param&gt;
+   &lt;param-name&gt;path&lt;/param-name&gt;
+   &lt;param-value&gt;/WEB-INF/props&lt;/param-value&gt;
+&lt;/context-param&gt;</code></pre>要获得上下文参数，可以使用Servloracleontext接口中的getInitParameter方法返回。<br>14、上下文接口中提供了处理属性的方法，请列举每个方法并说明其作用？<br>解析：除了请求属性、会话属性外，还可以使用上下文属性。如果某个对象在上下文范围内使用，就可以考虑使用上下文属性存储。上下文的生命周期很长，应用加载时初始化，直到应用重新加载才被销毁，所以只有必须使用上下文属性时方可使用，否则应该尽量使用请求属性。<br>参考答案：上下文接口中有三个和属性有关的方法，分别是setAttribute(String ,Object),可以将一个对象设置一个名字，存储到上下文范围中：getAttribute(String)，可以根据属性的名字返回属性值：removeAttribute(String)，可以根据属性的名字删除属性。<br>15、说明请求属性、会话属性、上下文属性的区别？<br>解析：属性在Web应用开发中占有举足轻重的地位，是用来在组件之间传递对象的主要方式。主要有三个对象可以储存属性，即请求、会话、上下文。由于请求生命周期最短，所以应该尽量使用请求属性，而只有在必须用会话属性或者必须用上下文属性时菜考虑使用这两种属性。<br>参考答案：请求属性是请求范围内的属性，除了请求转发外，只在当前的请求中有效：会话属性是会话范围内的属性，只要会话没有失效，就一直随着当前的会话所在：上下文属性是上下文范围的属性，只要容器没有重新加载应用，就一直随着上下文对象存在。应该尽量使用请求属性实现功能，只有在必须用会话属性或者必须用上下文属性时才考虑使用这两种属性。<br>16、请说明ServloracleontextEvent什么场景下被触发，以及如何处理？<br>解析：事件处理在很多时候非常有效，开发人员应该熟悉Servlet中得常用时间类别，并熟悉每种事件触发的条件。<br>参考答案：当上下文对象被初始化或者被销毁时，将触发ServloracleontextEvent，要处理该事件，可以自定义事件处理类实现ServloracleontextListener接口；然后覆盖该接口中的方法，实现处理逻辑。<br>17、请说明HttpSessionEvent什么场景下会被触发，以及如何处理？<br>解析：会话事件在很多场合可以使用，开发人员应该熟悉会话事件的触发条件以及处理方法等。<br>参考答案：当会话对象有变化的时候，将触发HttpSessionEvent事件发生，例如会话被创建、会话被销毁、会话被活化、要处理该事件，有两个接口可以监听，分别是HttpSessionListener和HttpSessionActivationListener。其中前者监听会话创建和销毁的情况，后者监听会话活化和钝化的情况。<br>18、如何在web.xml中配置监听器，使监听器生效？<br>解析  监听器必须在web.xml中配置才能生效。<br>参考答案  在web.xml中，可以使用<listenner>配置监听器，如下所示：<pre><code>&lt;listener&gt;
+&lt;listener-class&gt;com.oracle.listener.CounterListener&lt;/listener-class&gt;
+&lt;/listener&gt;</code></pre>19、简述监听器的开发配置步骤。<br>解析  每种监听器的开发和配置步骤都非常相似，开发员应该做到熟练掌握。<br>参考答案<br>(1)根据需求分析需要使用哪种监听器。<br>(2)创建类实现监听器接口，并实现接口中必要的方法，实现监听功能。<br>(3)在web.xml中使用<listener>配置监听器。<br>20、过滤器有什么作用 ？<br>解析  过滤器是web应用中非常重要的概念，甚至在Strust2框架中也作为核心控制器使用。<br>参考答案  在web应用中，往往需要一些通用的处理和控制，如果把这些通用的处理编写在每一个需要的资源文件中，代码就很冗余，且不好管理。只要需要修改，就得修改所有文件中的相关代码，造成维护困难。过滤器就是用来执行这些通用处理的程序，往往可以用来实现图像转换、数据压缩、登录验证、权限控制等。<br>21、Filter接口中定义了哪几个方法？分别有什么作用？<br>解析 Filter接口是所有过滤器都必须实现的接口，了解这个接口中的方法对开发员胜任过滤器开发非常重要。<br>参考答案 Filter接口中有以下三个方法：<br>(1)init(FilterConfig filterConfig):该方法是对filter对象进行初始化的方法，仅在容器初始化filter对象结束后被调用一次。<br>(2)doFilter(ServletRequest request,ServletResponse response,FilterChain chain):该方法是filter进行过滤操作的方法，是最重要的方法。过滤器实现类必须实现该方法。方法体中可以对request和response进行预处理。其中FilterChain可以将处理后的request和response对象传递到过滤链上的下一个资源。<br>(3)destroy():该方法在容器销毁过滤器对象前被调用。<br>22、简述过滤器的开发配置步骤<br>解析  开发员应该熟练掌握过滤器的开发配置步骤。<br>参考答案<br>(1)创建类实现Filter接口。<br>(2)实现Filter接口中的方法，重点实现doFilter方法对请求和响应进行过滤。<br>(3)在web.xml中配置过滤器，使用<filter>配置过滤器的类和名字，使用<filter-mapping>配置过滤器需要过滤的资源路径。</filter-mapping></filter></listener></listenner></context-param></li>
+<li>过滤器的配置中，<dispatcher>元素是什么含义？有几个可选值？<br>解析：<dispatcher>元素师Servlet2.4以后新增的配置能够用来指定转发方式<br>参考答案： <dispatcher>可以配置能够被过滤的URL的请求方式，有以下四个值可以使用；<br>（1）       请求方式，是一种默认的方式。即不配置disoatcher选项时，默认过滤REQUEST方式请求的URL，包括在地址栏输入URL，表单提交，超级链接，响应重定向，但是如果指定了其他dispatcher值，REQUEST也必须显式指定才能生效。<br>（2）       FORWARD:转发方式，表示可以过滤请求转发方式访问的URL.<br>（3）       INCLUDE:包含方式，表示可以过滤动态包含的URL。<br>（4）       ERROR:错误方式，表示可以过滤错误页面</dispatcher></dispatcher></dispatcher></li>
+</ol>
+<p>第三部分  详解JSP组件开发<br>1.列举至少5个JSPN内置对象，并说明其类型<br>解析  内置对象是JSP中非常重要的概念，是真正的Servlet API中的对象，不过是容器翻译JSP时进行声明创建的，所以在JSP中不需要声明创建就可以直接使用。Web开发员起码需要能够熟练使用JSP中常用的内置对象。<br>参考答案<br>（1）request:HttpServletRequest<br>（2）response:HttpServletResponse<br>（3）session:HttpSession<br>（4）application:Servloracleontext<br>（5）pageCountext: pageCountext<br>（6）out:JspWriter<br>2.说明&lt;%@include%&gt;和<a href="jsp:include/" target="_blank" rel="noopener">jsp:include/</a>的区别<br>解析  JSP中的指令和标准动作中都有一个名字为include的元素，都是包含的意思，二者具体含义却不同，分别是静态和动态包含，开发员应该熟悉二者区别，避免混淆。<br>参考答案    &lt;%@include%&gt;是指令，是静态包含，在翻译期将把被包含的资源翻译到包含资源中，源代码合二为一。而<a href="jsp:include/" target="_blank" rel="noopener">jsp:include/</a>是动作，是动态包含，在运行期动态访问被包含的资源，将生成的响应合二为一进行显示。<br>3.列举page指令中至少三种常用属性，并说明其含义。<br>解析    page指令时JSP中最常用的指令之一，开发员应该熟悉page指令的常用属性<br>参考答案<br>（1）import：用来导入需要使用的类。<br>（2）pageEncoding:指定JSP页面的编码。<br>（3）errorPage:指定错误页面。<br>4、<a href="jsp:forward" target="_blank" rel="noopener">jsp:forward</a>的含义是什么？<br>解析：请求转发是经常使用的跳转方式，在JSP中有更为简单的方式进行请求转发，就是使用标准动作forward。<br>参考答案 <a href="jsp:forward" target="_blank" rel="noopener">jsp:forward</a>可以在JSP中实现请求转发，类似在Servlet中使用RequestDispatcher的forward方法进行请求转发<br>5、列举与JavaBean相关的三个标准动作，并说明其含义。<br>解析：JavaBean可以实现MVC中的Model部分，然而它并不是一个真正的组件，而是有编程规范的Java类。为了能够便捷使用<br>JavaBean，JSP规范定义了一系列标准动作。<br>参考答案：与JavaBean相关的有以下三个标准动作。<br>（1）<a href="jsp:useBean" target="_blank" rel="noopener">jsp:useBean</a>：用来获得或者创建JavaBean实例。<br>（2）<a href="jsp:setProperty" target="_blank" rel="noopener">jsp:setProperty</a>：用来为JavaBean的属性赋值。<br>（3）<a href="jsp:getProperty" target="_blank" rel="noopener">jsp:getProperty</a>：用来显示JavaBean的属性值。<br>6、什么是EL？EL的主要作用是什么？<br>解析：随着JavaEE技术的发展，人们越来越希望JSP中的动态部分能够更加简练。可以使用&lt;%=%&gt;表达式在JSP中动态输出内容，<br>然而总是过于繁琐，因此出现了EL，可以很大程度简化JSP中的表达式。然而，在实际使用中，EL总是和JSTL配合使用才能发<br>挥更大作用<br>参考答案：EL是Expression Language 的简称，即表达式语言，主要用来替代表达式&lt;%=%&gt;,使得JSP更为简单。EL常常结合JSTL<br>一起使用，发挥更强大的作用。<br>7、列举EL中4个与属性相关的内置对象，并说明其含义。<br>解析：EL中定义了一系列的内置对象，其中与属性有关的内置对象特别常用，开发员应该熟练掌握。<br>参考答案：<br>（1）pageScope：可以获得PageContext范围的属性<br>（2）requestScope：获得请求范围的属性<br>（3）sessionScope：获得会话范围的属性<br>（4）applicationScope：获得上下文范围的属性<br>8、如果web.xml中定义了一个名字为rate的上下文参数，在JSP中如何使用EL进行输出？<br>解析 EL中定义了11个内置对象，分别能够输出不同的信息，其中initParam能够用来输出上下文参数<br>参考答案： ${initParam.rate}<br>9、EL中的内置对象pageContext，与其他内置对象有什么不同？<br>解析    EL的11个内置对象中，pageContext是一个非常特殊的内置对象。其他内置对象都只能输出特定的信息，例如requestScope只能输出请求范围的属性，并不是一个真正的请求对象。而pageContext是一个真正的PageContext类型对象，可以返回任意属性。<br>参考答案    pageContext内置对象非常特殊，它是一个真正的PageContext类型的对象，只要PageContext中存在getXXX方法，就可以使用${pageContext.XXX}将getXXX方法的返回值进行输出。而其他的内置对象都没有这个特点，只能输出特定的信息。<br>10、EL中的.与[]有什么区别？<br>解析    EL中的.和[]有类似的功能，特别容易混淆，开发员应该熟练掌握。<br>参考答案    EL中，使用.和[]都可以用来获得数据，然而某些情况下只能使用[]，而不能使用圆点，有以下三种情况只能使用[]：<br>（1）通过数组或集合的索引返回值，只能使用[]；<br>（2）属性值中包括-或者.等非字母或数字的字符，只能使用[]；<br>（3）属性值不是常量，而是变量时，只能使用[]。<br>11、JSP中的自定义标记有什么作用？<br>解析    自定义标记是JSP1.2版本开始支持的功能，可以将JSP文件中需要使用的Java功能定义成标记，在JSP文件中多次调用。自定义标记能够使得JSP文件结构简练，可读性强，可维护性也增强。<br>参考答案    使用自定义标记，能够使得JSP文件结构简练，减少冗余代码，能够在多个地方使用自定义标记，达到重复使用的目的，同时也使得动态功能更容易管理、维护。<br>12、简述开发自定义标记的主要步骤。<br>解析    开发自定义标记有基本的步骤，开发员应该做到熟悉。<br>参考答案<br>（1）根据需求设计需求开发的标记。<br>（2）在tld文件中描述标记的基本信息，包括标记名称、标记的属性、标记体的特征以及标记的处理器类等。<br>（3）根据tld描述的信息开发标记处理器类，实现标记的功能。<br>13、如何使用自定义标记？<br>解析    即使有的应用中不需要自行开发标记库，然而开发员至少需要能够熟练掌握自定义标记的使用方法。<br>参考答案<br>（1）将自定义标记相关的tld文件引入到工程中，可以存放到WEB-INF目录下。<br>（2）将自定义标记相关的jar文件引入到工程中，可以存放到WEB-INF\lib目录下。<br>（3）在JSP文件中，使用taglib指令指定标记库的uri，并指定使用该标记库的前缀。<br>（4）在JSP中需要使用标记的地方，利用前缀引用标记，传递属性即可使用。</p>
+<p>14.简述tld文件的主要作用。<br>解析 tld 文件在标记库中有着举足轻重的作用，开发人员至少要了解tld文件中的主要信息。<br>参考答案 tld文件是标记库描述文件，主要描述了标记库的信息。主要包括标记名称、标记体的情况、标记中的属性、标记对应的处理器类。另外还会指定一个唯一的uri值，在jsp中使用标记库的时就通过这个uri进行引用。<br>15.JSTL是什么？有什么作用？<br>解析 目前标记库有很多，除了JSTL外，还有很多第三方提供的标记库，然而作用和使用步骤大同小异。开发员应该首先掌握标记库的含义以及使用，这样对其他标记库也能很快的熟练使用。<br>参考答案 JSTL是原sun公司定义的一套标准标签库，提供了一些在Web应用中常用的标签，例如迭代数组或集合的标签。使用JSTL能够使JSP代码更为简练，减少JSP中的代码量。这些标签能在多个场合重复使用，提高了开发效率。<br>16.如何使用JSTL<br>解析 使用JSTL和使用自定义的标记类似，也可以说，使用任何标记库的步骤都类似，无非是每个标记的作用、名字以及属性等不用而已。<br>参考答案<br>（1）首先引入JSTL的tld文件和相关的jar文件。<br>（2）在JSP中使用taglib指令指定要使用的tld的uri值，并自定义一个前缀。<br>（3）在需要使用标记的地方，使用前缀引用标记，设置必要的属性即可。<br>17.假设存在一个会话属性list，list是泛型为Customer的集合对象，Customer中包含custname、age、address三个属性。请示用JSTL中的迭代标记遍历该list，将集合中的数据显示到表格的行中。<br>解析 JSTL中有很多标记，开发员应该熟悉常用的标记的使用，例如迭代标记就是常用    标记之一。<br>参考答案<br>    &lt;c:forEach Item=”${sessionScope.list}” var=”cust”&gt;<br>        <tr><br>        <td>${cust.custname}</td><br>        <td>${cust.age}</td><br>        <td>${cust.address}</td><br>        </tr><tr><br>    <br>18.如何在web.xml中配置异常处理<br>解析 异常处理一直是应用开发中面对的一个问题。在Web应用中，也可以使用try/catch/finally处理异常，同时，还可以在web.xml中进行配置，对某种异常进行统一处理<br>参考答案 在web.xml中配置异常处理的方式如下：<br>    <error-page><br>    <exception-type>com.oracle.exception.RegisterException</exception-type><br>    <location>/register.jsp</location><br>    </error-page><br>上述配置后，当发生了RegisterException却没有被捕获时，跳转到register页面进行处理。</tr></p>
+<p>第四部分 高级主题<br>1.Log4j有什么作用？<br>解析：Log4j目前使用最多的日志处理组件，程序员应该掌握Log4j<br>的使用。<br>参考答案：Log4j是Apache的一个开源项目，使用Log4j可以便捷地控制（      ）目的地，包括控制台，文件，GUI组件以及NT事件记录器等。同时，Log4j可以控制（      ）日志信息的输出格式，也能够通过定义每一条日志信息的级别，更加细致控制日志的（       ）程。<br>2.Log4j主要由哪三部分组成？每部分的主要作用是什么？<br>解析：掌握Log4j的使用，可以从了解Log4j的主要组件入手。<br>参考答案：Log4j包含三个主要组成部分，即Logger、Appender以及Layout。其中（      ）是日志记录器，是Log4j的核心组件；一个Logger可以指定多个Appender，Appender（      ）定日志信息的输出目的地，可以是文件、控制台或消息文件等；一个Appender又可以指定（       ）个Layout，Layout用来指定日志信息的格式，可以使HTML、简单文本等。<br>3.列举至少3种Log4j的输出目的地，并说明其含义。<br>解析：能够将诶之输出到不同目的地，是Log4j的一大特征。<br>参考答案<br>（1）org.apache. log4j.ConsoleAppender:将日志信息输出到控制台，如果Logger没有使（     ）addAppender显式添加Appender，默认使用ConsoleAppender。<br>（2）org.apache. log4j.FileAppender:将日志信息输出到一个文件。<br>（3）org.apache. log4j.DailyRollingFileAppender：将日志信息输出到一个日志文件，并且（     ）据指定的模式，可以按照一定的日期将日志信息输出到一个新的日志文件。<br>4.使用properties文件配置Log4j属性，要求日志级别为debug，目的地为文件（      ）式为HTML。<br>解析：使用Log4j进行日志管理，往往都在属性文件中配置相关的属性，开发员必须（      ）Log4j属性的配置，才能够顺利的使用Log4j。<br>参考答案：<br>       log4j.rootLogger=debug.appender1<br>       log4j.appender.appender1=org.apache.log4j.FileAppender<br>log4j.appender.appender1.Threshold=debug<br>log4j.appender.appender1.ImmediateFlush=true<br>log4j.appender.appender1.File=log.html<br>log4j.appender.appender1.Append=true<br>log4j.appender.appender1.layout=org.apache.log4j.HTMLLayout<br>log4j.appender.appender1.layout.LocationInfo=true<br>log4j.appender.appender1.layout.Title=Log Message<br>5.在web应用中使用Log4j记录日志，往往有哪些方法加载属性文件？<br>解析  web应用中使用Log4j，首先需要考虑的的问题是如何加载属性文件：<br>参考答案  web应用中加载Log4j的属性文件往往有以下两种方式：<br>（1）定义一个Servlet，并使用<load-on-startup>在web.xml中配置这个servlet，使得应用<br>加载时就初始化这个Servlet，从而可以在这个Servlet的init方法中加载Log4j属性文件。只要加载了应用，就会初始化Servlet，就会调用init方法，从而就会加载属性文件。<br>（2）定义一个上下文事件监听器，在监听器的contextInitialized方法中加载Log4j属性文件。<br>这样能够保证只要加载了应用，就会触发上下文时间，从而调用监听器中的contextInitialized方法，加载Log4j属性文件。<br>6.Ajax是什么含义？有什么作用？<br>解析  ajax并不是一个新技术，而是一系列已有技术的一个新的使用方法。目前，人们越来越关注用户体验，web应用开发员也应该注重这方面的技术发展。<br>参考答案  ajax是“Asynchronous JavaScript and XML”的简称，即异步的JavaScript和XML。Ajax就是能够在web浏览器中实现与桌面应用类似客户端技术。例如，使用ajax技术后，服务器端不会每次都返回一个完整的页面，而会只返回一部分文本，只刷新页面的一部分，不需要等待整个页面刷新；使用ajax可以异步提交请求，不需要必须等待服务器端相应后才进行其他操作。可以说，Ajax试图在web应用中实现桌面应用的功能和交互性，<br>并能够使用和桌面应用中类似的友好界面和漂亮空间。<br>7.Ajax中的XMLHttpRequest对象有哪些作用？<br>解析  XMLHttpRequest对象是Ajax技术的核心对象，使用Ajax技术都是从XMLHttpRequest对象开始。<br>参考答案  XMLHttpRequest对象是Ajax技术的核心对象，使用Ajax技术都是从XMLHttpRequest对象开始。在ajax<br>应用程序中，XMLHttpRequest对象负责将用户信息以异步方式发送到服务器端，并接收服务器相应的信息和数据。<br>8.什么是DOM？有什么作用？<br>解析：DOM是独立于脚本和语言的概念，很多语言都对DOM进行了实现，DOM能够对标记语言进行结构化的表示。<br>参考答案：DOM是Document Object Model的简称，即文档对象模型，是用于HTML和XML文档的API。DOM提供了文档的结构化表示，把网页和脚本或编程语言连接了起来，可以修改文档的内容和视觉表现。使用Ajax编程时，从服务器返回的内容需要更新到客户端页面中，就可以使用DOM对象操作浏览器内容，进行局部刷新。<br>9.JSF框架的主要特点是什么？<br>解析：JSF框架已经是JavaEE规范的一部分，是非常有发展前景的框架，开发人员可以关注。<br>参考答案：JSF是一种已组件为中心来开发JavaWeb应用的框架。JSF提供了一组用户界面组件，这些组件是可重用的，开发员可以利用这些组件方便地构建Web应用的用户界面；<br>JSF框架支持开发自定义的用户界面组件，而且这些自定义用户界面组件同样可以重用。另外，使用JSF框架，可以方便地进行输入检验、国际化编程等。</load-on-startup></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/27/JavaEE面试题/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<!-- 来必力City版安装代码 -->
+
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
+
+
+  
     <article id="post-SprintBoot" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -1599,6 +1876,716 @@ public void addInterceptors(InterceptorRegistry registry) {
 
 
   
+    <article id="post-JavaOOP" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/30/JavaOOP/">JavaOOP相关</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/30/JavaOOP/" class="archive-article-date">
+  	<time datetime="2019-07-30T03:00:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>  JavaOOP<br>      1.第一章(对象和封装)<br>      1.1.构造函数<br>      1.构造函数是用来创建对象的   实例化对象<br>      2.构造函数的作用是用来初始化对象的属性<br>      3.一个类，系统默认提供无参的构造函数<br>      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值<br>      5.当编写了一个有参的构造函数以后，无参的构造函数就没了<br>      6.如果想要用无参构造函数new对象   就必须手动添加<br>      7.当一个类中存在多种构造函数的时候，这些构造函数就构成了重载<br>      1.2.this,super关键字<br>      1.this代表当前对象的引用，谁调用这个方法  this就代表谁<br>      2.this()调用调用本类的无参构造函数<br>      3.super代表父类对象的引用，super用来调用父类的属性和方法<br>      4.super()调用父类的无参构造函数<br>      1.3.重载<br>      一个类中，多个方法功能相同，方法名相同，参数列表不一样。与返回值无关<br>      public void show();<br>      public int show();<br>      这两个方法不构成重载   因为两个方法不能同时存在于同一个类中<br>      示例：<br>      public class Math{<br>      public void add(int a,int b)<br>      public void add(int a,int b,int c)<br>      }<br>      1.4.static关键字<br>      static关键字修饰静态成员，java类中不存在静态类<br>      static只用来修饰成员(属性，方法)</p>
+<pre><code>什么时候应该用静态的属性呢？
+当这个属性跟对象没有关系，跟类有关系的时候
+比如创建一个Person类  所有的Person都来自中国
+那么这个时候可以将Person里面的country属性静态
+
+什么时候应该用静态的函数呢？
+当这个方法内部没有使用到任何实例成员的时候。
+实例成员：需要通过new对象的方式调用的属性和方法都是实例成员
+
+静态的调用方式：
+通过类名点的方式去调用
+
+以下是通过实例去调用静态的Country
+
+
+结果发现执行结果正常。黄色的提示说的是静态的成员应该(建议)用静态方式调用
+1.说明在Java中，静态成员既可以用实例的方式去调用（对象.）
+也可以用静态的方式去调用 （类名.）
+2.静态跟类有关系  跟对象没有关系
+因为被静态修饰的成员是在类加载的时候就已经进入内存了
+
+而非静态成员  是在new对象的时候才被加载进内存。
+3.被静态修饰的方法只能调用静态方法和静态成员
+里面不能有实例成员
+1.5.封装
+如果一个属性用public修饰，那么外界就可以随意访问并修改
+这样就容易造成数据的不准确性
+
+所以我们将属性私有，然后提供公开的方法提供外界进行操作
+因为方法内部可以对传入的参数进行限制。
+
+
+测试类：
+
+1.6.toString方法
+在Dog类中创建一个方法
+
+测试类：
+
+说明输出一个对象的时候默认调用这个对象toString方法 
+
+重点:toString方法经常用来测试数据    方便打印对象的各个属性值
+当然，这个toString存在于Object类中   子类需要重写
+
+1.7.快速创建类（超级重点）
+Alt+Shift+s
+
+1.7.1.将所有属性私有
+1.7.2.提供set/get方法
+setters and getters
+1.7.3.提供有参和无参的构造函数
+constructor using fields
+1.7.4.提供toString方法
+
+toString
+
+本章总结：
+现实世界是“面向对象”的,面向对象就是采用“现实模拟”的方法设计和开发程序
+面向对象设计是目前计算机软件开发中最流行的技术。面向对象设计的过程就是抽象的
+过程。
+类是对某一类事物的描述,是抽象的、概念上的定义。对象是实际存在的该事物的个体
+是具体的、现实的。
+如果同一个类中包含了两个或两个以上的方法,它们的方法名相同,方法参数个数或参数
+类型不同,则称该方法被重载了,这个过程称为方法重载
+构造方法用于创建类的对象。构造方法的主要作用就是在创建对象时执行一些初始化操作
+
+
+2.第二章(继承)
+2.1.为什么使用继承
+
+多个类中，具有多个属性和功能相同的部分，那么这个时候可以将这些共性部分抽取到父类中，然后让这些类去继承父类。这样就避免了子类的代码冗余问题。
+2.2.继承中构造函数的执行顺序
+子类的构造函数会默认先调用父类的无参构造函数
+如果父类没有无参构造，则子类必须手动调用父类的有参构造函数。   子类使用super关键字来去调用父类的方法
+所以，在子类构造的时候，一定会先执行父类构造，然后再执行子类构造函数
+子类继承父类  使用extends关键字
+
+
+以上代码为何报错？
+Dog类里面默认有一个无参构造函数，而这个无参构造函数默认调用父类的无参构造函数  但此时父类没有无参的构造函数
+解决方案:
+1.可以给父类添加一个无参构造函数
+2.在子类的无参构造函数中手动调用父类的有参构造函数
+3.给子类添加一个有参构造函数  手动调用父类有参构造函数
+
+2.3.protected关键字
+public   所有类都可以用
+private   本类可以用
+protected  本类和子类可以用
+
+2.4.关于继承中的重写
+子类不满意父类写的方法  这个时候可以重写父类的方法
+Java中   不存在虚方法。只有普通方法和抽象方法
+普通方法  子类可以重写   抽象方法  子类必须重写
+重写的规则：在父子类中，子类重写父类方法
+方法名返回值  参数列表都一致  只有方法体不一致
+2.5.抽象类和抽象方法
+父类其实定义出来其实只是给子类去继承 属性和功能的
+而真正每个子类的功能实现都不一样，也就意味着所有的子类都会去重写父类的某些方法。
+比如动物类里面的eat()方法  Dog和Cat每个动物吃的都不一样
+所以都会去重写父类的eat方法   所以父类的eat方法方法体实现没有任何意义。所以干脆这个方法就变成抽象方法  。强制性要求子类去重写这个方法。
+抽象方法用abstract修饰。
+抽象方法只能在抽象类中或者接口中。
+一个继承一个抽象类，必须实现这个抽象类中的所有抽象方法，除非这个子类也是一个抽象类。
+以后  所有的父类全部用抽象类。
+抽象方法没有方法体实现。
+抽象类不能实例化(不能new   Pet())
+抽象类中是有构造函数的 但是这些构造函数都是给子类用的
+2.6.final关键字
+被final修饰的方法不能被重写
+被final修饰的类不能被继承
+被final修饰的变量不能被修改
+本章总结：
+继承是Java中实现代码重用的重要手段之一。Java中只支持单继承。即一个类只能有一个
+直接父类。java.lang. Object类是所有Java类的祖先。
+在子类中可以根据实际求对从父类继承的方法进行重新编写,称为方法的重写或覆盖
+子类中重写的方法和父类中被重写的方法必须具有相同的方法名、参数列表,返回值类型
+必须和被重写方法的返回值类型相同或是其子类
+抽象类不能实例化。抽象类中可以有零到多个抽象方法。非抽象类若继承抽象类,则必须
+重写父类的所有抽象方法
+子类必须重写父类所有的抽象方法才能实例化。否则子类还是一个抽象类。
+用find修饰的类,不能再被继承。用 final t修饰的方法.不能被子类重写。用fnl修饰的变
+量将变成常量,只能在初始化时进行赋值,不能在其他地方修改。
+
+3.第三章(多态)
+3.1.为什么使用多态
+一个事物体现的多种形态
+提高代码的扩展性
+3.2.多态的核心
+父类 f =  new 子类();
+父类的引用指向了子类的对象
+Pet   p =  new Dog();
+3.3.instanceof关键字
+多态有一个缺陷，就是父类的引用没有办法调用子类的特有方法，所以这个时候我们需要做强转。但是在转换的过程中容易出错，所以需要判断。
+用来判断一个引用属于哪个类型。
+例子:
+Pet p = new Dog();
+if(p instanceof Dog){
+((Dog)p).砍价（）;
+}
+避免强转出错。
+3.4.多态的两种应用场景（重点）
+3.4.1.父类引用作为方法参数
+主人喂养宠物。
+
+主人喂养猪，猫  狗等等 
+这个时候没有必要给每一个宠物都编写一个喂养的方法
+这样就不利于代码扩展。
+所以就将父类引用作为方法的参数  去接收各个子类对象
+3.4.2.父类引用作为方法返回值
+主人领养宠物。
+同上。领养猪，领养狗  猫  其实就是领养宠物 
+所以：
+
+3.5.编译看左边，运行看右边(重点)
+父类引用指向子类对象
+Pet p = new Dog();
+p.show()
+编译是否报错  就看Pet类里面有没有show方法
+运行时期，真正执行结果看Dog类里面的show方法
+编译看左边，运行看右边
+特殊情况:  成员变量和静态方法除外！！！
+
+
+
+4.第四章(接口  interface)
+4.1.什么是接口
+接口是一套规范，只要是满足这个规范的设备，就可以将它们组装到一起，从而实现该设备的功能。
+4.2接口的定义
+1.接口就是一种约定和能力；
+4.2.接口实现java多继承；
+4.3.接口中所有方法都是抽象方法；
+4.4.接口中所有变量都是静态常量。
+4.5.类只能继承一个父类，但可以实现多个接口，一个类里面如果实现了一个接口就必须实现接口的全部方法，否则必须定义成抽象类。Java通过实现接口达到了多重继承的效果。
+语法：[修饰符]interface接口名extends父接口1,父接口2,{
+//常量定义
+//方法定义
+}
+Class 类名 extrnds 父类名 implements 接口1，接口2，{
+//类成员
+}
+注意事项
+4.6.接口的命名规则与类相同。
+4.7.接口中可以定义常量，不能定义变量。
+4.8.接口中所有的方法都是抽象方法。
+4.9.和抽象类一样，接口也不能实例化，接口中不能有构造函数。
+4.10.接口之间可以通过extends实现继承关系，一个接口可以继承多个接口，但接口不能继承类。
+4.11.接口的实现必须实现接口的全部方法，否则必须定义为抽象类。
+4.12.一个类只能有一个直接父类，但可以通过implements实现多个接口。当类在继承父类的同时实现了多个接口时，extends关键字必须位于implements之前。
+示例：USB接口：
+4.13.定义一个接口类，定义方法
+
+4.13.1.子类继承并且实现接口的所有方法
+
+
+
+测试输出结果
+
+4.14接口中的属性都是全局静态常量,接口中的方法都是全局抽象方法。接口中没有构造方法
+
+4.15类只能继承一个父类,但可以实现多个接口。一个类如果实现了一个接口,则必须实现接口中的全部方法,否则必须将其定义为抽象类,Java通过实现接口达到了多重继承的效果。
+
+4.16.接口表示一种约定,接口表示一种能力。接口体现了约定和实现相分离的原则
+
+4.17.抽象类利于代码复用,接口利于代码维护
+
+4.18.通过面向接口编程,可以降低代码间的耦合性,提高代码的可扩展性和可维护性
+
+4.19.面向接口编程意味着:开发系统时,主体构架使用接口.接口构成系统的骨架,这样就可以通过更换实现接口的类来实现更换系统
+
+5.1.0C#中接口的成员主要是方法和属性。接口中不能包含常量、变量、构造方法和任何静态成
+员。定义接口时显式指定任何修饰符是非法的。
+
+5.第五章（异常）
+5.1.什么是异常
+异常就是在程序运行过程中所有发生的不正常事件，如所需要的文件找不到.网络连接不通或中断.算术运算出错(如被零除).数组下标越界.装载了一个不存在的类.对null对象操作.类型转换异常.异常会中断正在运行的程序。
+5.2.1.异常的分类
+1.Throwable
+    --Error     错误     
+    --Exception 异常     
+
+2.Exception
+    --RuntimeException   编译时期可以不处理
+    --其他异常    编译时期必须处理
+
+
+5.3.    异常是在大多数正常的执行情况下，
+    突然发生了非正常情况，这些情况程序员可以提前
+    做好处理准备。
+    这些异常情况在编译时期不报错，可以在编译时期预料
+    可能会发生哪些异常，然后对这些代码进行异常的处理。
+
+    错误一般都是由于代码严重错误造成的，这个是必须
+    在编译时期就改好。
+5.4.常见的异常类型
+1.Exception 说明：异常结构的根类；
+2.ArithmeticException 说明：算术错误异常，比如零作除数
+3.ArrayIndexOutBoundsException 说明：数组下标越界
+4.NullPointerException 说明：尝试访问null对象成员
+5.ClassNotFoundException 说明：不能加载所需的类
+6.InputMismatchException 说明:欲得到的数据类型与实际输入的类型不匹配
+7.IllealArgumentException 说明:方法接收到非法参数
+8.ClassCastException 说明:对象强制类型转换出错
+9.NumberFormatException 说明:数字格式转换异常，如把、“abc”转换成数字。
+示例：
+
+
+
+5.5.    分类：
+    1.在编译时期，必须处理的异常
+    2.运行时期，可能会发生的异常
+5.5.1.2.异常的处理
+    通常  异常处理有两种方法
+    1.try catch   内部自己消化。
+    2.throws   声明异常类
+
+3.throw和throws的区别和用法
+throws用来声明异常类  在方法上面声明
+throw是抛出异常对象！！！
+
+throw如果抛出是RuntimeException对象
+编译不报错   可以不处理。
+
+如果抛出的非RuntimeException对象 
+编译报错    必须处理。
+
+5.6.自定义异常类
+    想要成为一个异常类
+    要么实现Throwable（可抛性）接口 
+    要么继承Exception类
+
+由于Exception是所有异常的爸爸
+那么但凡发生异常  都会被他抓到
+导致并不能去发现具体的异常
+
+try一旦被catch抓捕到异常，
+那么try发生异常代码后面的所有代码不再执行
+
+finally只有一种情况不执行  就是Java虚拟机停了。
+
+5.7.使用log4j记录日志
+示例：
+
+5.8.总结：
+5.8.1.异常是由Java应用程序抛出和处理的非严重错误，它可以分为Checked异常和运行异常两大类。
+5.8.2.Checked异常必须捕获或者声明抛出，否则无法通过编译，运行时异常不要求必须捕获或者声明抛出。
+5.8.3.Java的异常处理是通过五个关键字来实现的: try. Catch. Finally . throw .和throws。
+5.8.4.即使在try块，catch块中存在return语句，finally块中语句也会被执行。Finally块中语句不被执行的唯一，在异常处理代码中执行Systrm.in
+5.8.5.可以在一个try语句块后面跟多个catch语句块，分别处理不同的异常。但排列顺序必须是从特殊到一般，最后一个一般为Exception类。
+5.8.6.Log4是一个优秀的日志记录工具，常用的使用方式是配置log4j.properties文件，从而看着日志的输出级别，目的地和输出格式。
+6.第六章(集合框架)
+6.1.    数组的局限性  声明的时候必须给大小  不灵活
+    声明过大浪费空间  声明小了不够用
+    如果并不知道程序运行时会需要多少对象，或者需要
+    更复杂方式存储对象——可以使用Java集合框架    
+6.2.Array数组   Arrays数组工具类
+6.3. Collection接口  Collections 集合工具类
+
+
+ArrayList
+add(Object obj)
+add(int index,Object obj)
+addAll(int index,Collection c)
+addAll(Collection c)
+clone() 集合复制
+contains(Object obj) 是否包含一个元素
+containsAll(Collection c)是否包含一个集合
+size()
+isEmpty()  集合里面元素是否为空
+indexOf(Object obj)  查找该元素在集合中的下标
+lastIndexOf(Object o)返回此列表中最后一次出现的指定元素的索引
+toArray()
+get(int index)   根据角标获得元素
+set(int index,Object obj) 替换该角标元素
+remove(int index) 根据角标删除
+remove(Object o)  删除传入的元素
+removeRange(int fromIndex,int toIndex)
+
+6.4.LinkedList
+特有方法:
+addFirst(Object obj)  添加该元素到第一个位置
+addLast(Object obj)
+getFirst() 
+getLast()
+removeFirst()
+removeLast()
+
+
+6.5.HashMap
+map.containsKey(key)
+map.containsValue(value)
+map.put(key, value)
+map.values()  获取这个map集合所有的值  返回是一个集合
+Iterator
+7.第七章(多线程)
+7.1.什么是进程？
+进程是程序的一次动态执行过程，它对应了从代码加载，执行至执行完毕的一个完整过程，这个过程也是进程本身从产出.发展至消亡的过程。
+7.1.1.进程的特点：
+1.进程是程序运行程序的基本单位.
+2.每一个进程都有一个自己独立的一块内存空间.一组系统资源.
+3.每一个进程的内部数据和状态都是完全独立的.
+7.2.什么是线程？
+线程是进程中执行运算的最小单位，可以完成一个独立的顺序控制流程。每个进程中，必须至少建立一个线程（这个线程称为主线程）来作为这个程序运行的入口点。如果在一个进程中同时运行了多个线程，用来完成不同的工作，则称为“多线程”。
+7.3.多线程的好处
+1.充分利用CPU的资源：执行单线程程序时，若程序阻塞，CPU可能会处于空闲状态，这将造成计算机资源的浪费，而使用多线程可以在某个线程处理休眠或者阻塞状态时运行其他线程，这样，大大提高了资源利用率。
+2.简化编程模型：一个既长又复杂的进程可以考虑分为多个线程，成为几个独立的运行部分，如使用时.分.秒来描述当前时间，如果写成单线程程序可能需要多重循环判断，而如果使用多线程，时.分.秒各使用一个线程控制，每个线程仅只需要实现简单的流程，简化了程序逻辑，这样更有利于开发人员对程序的理解和维护。
+3.带来良好的用户体验：由于多个线程可以交替执行，减少了避免了因程序阻塞或意外情况造成的响应过慢现象，降低了用户等待的机率
+7.4.Thread类的常用用法
+构造方法及其说明：
+1.Thread()  说明：分配新的Thread对象.
+2.Thread(Runnable target) 说明：分配新的Thread对象.target为run()方法被调用的对象。
+3.Thread(Runnable target，String name) 说明：分配新的Thread对象，target为run()方法被调用的对象，name为新线程的名称。
+4.Void run() 说明：执行任务操作的方法。
+5.Void start() 说明：使该线程开始执行，Java虚拟机调用该线程的run()方法。
+6.Void sleep (long millis) 说明：在指定的毫秒内让当前正在执行的线程休眠(暂停执行)
+7.String getName() 说明：返回线程的名称。
+8.Int getPriority()  说明：返回线程的优先级。
+9.Void setPriority(int newPriority) 说明：更改线程的优先级。
+10.Static Thread currentThread()  说明：返回当前正在执行的线程对象的引用。
+11.Boolean isAlive() 说明：测试线程是否处于活动状态。
+12.Void join() 说明：等待该线程终止。
+13.Void interrupt() 说明：中断线程。
+14.Void yield() 说明：暂停当前正在执行的线程对象，并且执行其他线程。
+7.5.主线程
+两种重要体现：
+1.它是产出其他子线程的线程。
+2.通常它必须最后完成执行，因为它执行各种关闭动作。
+3.没有优先级的情况下都是先执行的。
+示例：
+
+
+7.6.继承Thread类创建线程
+1.定义MyThread类继承Thread类
+2.重写Run()方法，在Run方法中实现数据输出
+3.创建线程对象，调用start()方法启动线程
+示例：
+
+7.7.实现Runnable接口创建线程
+1.定义MyRunnable类实现Runnable接口，并实现Runnable接口的Run()方法，在Run()方法中实现输出数据
+2.创建MyRunnable类的对象myRunnable
+3.创建一个Thread类的对象
+4.调用myThread对象的start()方法
+示例：
+
+
+7.8.线程状态
+7.8.1.创建状态
+在程序中用构造方法创建了一个线程对象后,新的线程对象就处于创建状态。此时它已经获
+取了相应的资源,但还没有处于可运行状态,这时可以通过Thed类的方法来设置线程对象的黑性
+如设置线程名{ setname().设置线程优先级({ setpriority()等
+7.8.2.就绪状态
+线程创建之后,就可以通过调用star()方法启动线程,即进入就绪状态。此时,线程将进入线程队列排队,等待CPU资源,这表明它已经具备了运行条件,在未获得CPU资源时,仍不能真正执行。
+举例来说,去医院看病,某主任的专家号每天只有20个,挂上号的患者还需在分诊处等待叫号这里每个挂到专家号的患者可以看成一个就结状态的线程
+7.8.3.阻塞状态
+一个正在运行的线程因某种原因不能继续运行时,进入阳塞状态。阳塞状态是一种“不可运行的状态,而处于这种状态的线程在得到一个特定的事件之后会转回可运行状态。
+举例来说,轮到小张看病了,医生为查明原因要求他去做个化验,医生得到化验结果后才能继续诊断,如果把医生给小张看病看作一个线程.则该线程此时即处于阻塞状态。
+可能使线程暂停执行的条件如下
+1.由于线程优先级比较低,因此它不能获得CPU资源。
+2.使用 sleep()方法使线程休眠。
+3.通过调用wait()方法,使线程等待
+4.通过调用 yield(方法,线程显式出让CPU控制权
+5.线程由于等待一个文件,/O事件被阻塞
+7.8.4.死亡状态
+一个线程的Run()方法运行完毕，线程则进入死亡状态。处于死亡状态的线程不具有继承运行的能力。
+7.9.线程的优先级
+当同一时刻有一个或多个线程处于运行状态时,它们需要排队等待CPU资源。每个线程会自动获得一个线程的优先级( Priority),优先级的高低反映线程的重要或紧急程度。
+那么此刻,一般情况下优先级高的线程获得CPU资源的概率较大,但这个结果不是绝对的,线程优先级调度是一个复杂的过程
+每个线程的优先级介于 Thread. MIN PRIORITY和 Thread. MAX PRIORITY之间
+线程的优先级可以通过 getpriority()方法获取, setpriority (int grade)方法更改,后者的参数表示
+要设置的优先级,它必须是一个1-10的整数
+示例：
+
+7.10.线程的休眠
+Sleep()方法可以让当前线程休眠(停止执行)mills毫秒，线程由运行状态进入不可运行状态，睡眠时间过后线程将再次进入可运行状态，调用Sleep()方法需要处理InterruptedException异常。
+示例：
+
+本章总结：
+1.多线程允许程序员编写可最大程度利用CPU的高效程序
+2.在Java程序启动时,一个线程立刻运行,该线程通常称为程序的主线程。主线程的重要性
+体现在以下两个方面
+它是产生其他子线程的线程
+通常它必须最后完成执行,因为它执行各种关闭动作
+3.可通过两种方式创建线程
+3.1.声明一个继承了 Thread类的子类,在此子类中,实现 Thread类的Run()方法
+3.2.声明一个实现 Runnable接口的类,然后实现Run()方法
+5.每一个线程创建和死亡之前,均会处于创建,就绪.运行、阻塞.死亡状态之
+5.在山Java实现的多线程应用程序中,可以通过调用 Thread类中的方法来实现对线程对象的操作,
+5.1调整线程的优先级,Java线程有优先级,在同等情况下,优先级高的线程会获得较多
+的运行机会。Java线程的优先级用1-10的整数表示
+5.2线程睡眠: sleep( long millis)方法使线程转到阻塞状态
+5.3线程的强制运行,join()方法可以强制某一线程运行
+5.4线程礼让:yield()方法,暂停当前正在执行的线程对象,把执行机会让给相同或者更
+高优先级的线程。
+6.当多个线程对象操纵同一共享资源时,要使用 synchronized关键字来进行资源的同步处理
+可以使用同步方法和同步代码块来实现线程同步
+8.第八章(File I/O)
+8.1.操作文件或目录的属性
+程序的主要任务就是操作数据，通过允许程序读取文件的内容或向文件写入数据，可以使程序应用更为广泛，一般情况下，当数据位于内存中并且属于特定的类型时，程序才能够操作它们
+8.1.1.使用File类操作文件或目录属性
+8.2.Java的流
+按照不同的分类方式，可以将流分为不同的类型
+1、按照流的流向进行划分，可分为输入流和输出流
+输入流:只能从中读取数据，而不能向其中写入数据
+输出流:只能向其中写入数据，而不能从中读取数据
+2、按照所操作的数据单元的不同，流又可划分成字节流和字符流
+字节流操作的最小数据单位为8位的字节，而字节流操作的最小数据单位是18 位的字符
+字节流和字符流的区分非常简单，字节流建议用于二进制数据，而字符流用于文本，它们的用法几乎是完全一样的。
+8.3.读写文本文件
+8.3.1.使用字节流读取文本文件
+1、字节输入流InputStream类
+字节输入流InputStream的作用就是讲文件中的数据输入到内部存储器中
+无参的read() 方法从输入流批量读取若干个字节，在从文件或键盘读数据时，采用read(byte[ ]b)或read(byte[ ]b、int、off、int len)方法可以减少进行物理读文件或键盘的次数，提高输入/输出操作效率
+2、字节输入流FileInputStream类
+实际应用中，通常是用InputStream的子类FileInputStream 类来实现文本文件内容的读取
+3、使用FileInputStream 读取文件
+(1)、引入相关的类。
+Import  java.io.IOException;
+Import     java.io.InputStream;
+Import      java.io.FileInputStream;
+(2)、创建一个文件输入流对象
+InputStream is=new FileInoutStream(“C:\\test.txt”);
+(3)、利用文件输入流的方法读取文本文件的数据
+Is.available();  //可读取的字节数
+Is.read();     //读取文件的数据
+(4)、关闭文件输入流对象
+Is.close();
+示例：
+
+
+8.3.2.使用字节流写文本文件
+1、字节输出流OutputStream类
+字节输出流OutputStream 类的作用是吧内存中的数据输出到文件中
+2、字节输出流FileOutputStream类
+实际应用中，通常是用OutputStream的子类FileOutputStream 类来实现文本文件内容的读取
+3、使用FileOutputStream 写文本文件
+1、引入相关的类。
+Import  java.io.IOException;
+Import     java.io.OutputStream;
+Import      java.io.FileOutputStream;
+2、创建一个文件输出流对象
+OutputStream os=new FileOutStream(“C:\\test.txt”);
+4、利用文件输出流的方法吧数据写入文本文件中
+String str=”好好学习Java”;
+Byte[ ] words=str.getBytes();
+//利用weite方法将数据写入文件中去
+os.write(words,,words.length);
+4、关闭文件输入流对象
+os.close();
+示例:
+
+
+8.4.二进制文件的读写
+8.4.1.使用字节流类DataInputStream读二进制文件
+DataInputStream类是FileInputStream的子类，它是FileInputStream类读取二进制文件的实现步骤其实与用FileInputStream类读取文本文件的步骤极其相似，而且还要用到FileInputStream类。
+步骤如下:
+(1).引入相关类
+Import java.io.FileInputStream;
+Import java.io.DataInputStream;
+(2).构造一个数据输入流对象
+FileInputStream fis=new FileInputStream(“path”);
+DataInputStream dis=new DataInputStream(fis);
+(3).利用数据输入流类的方法读取二进制文件
+dis.read();
+(4).关闭数据输入流
+dis.close();
+8.4.2.使用字节流DataOutputStream写二进制文件
+DataOutputStream类是FileOutputStream的子类，它是FileOutputStream类的扩展，利用DataOutputStream类写二进制文件的实现步骤其实与用FileOutputStream类写文本文件的步骤极其相似，而且还要用到FileOutputStream类。
+步骤如下:
+1.引入相关类
+Import java.io.FileOutputStream;
+Import java.io.DataOutputStream;
+2.构造一个数据输入流对象
+FileOutputStream fos=new FileOutputStream(“path”);
+DataOutputStream dos=new DataOutputStream(fis);
+3.利用数据输入流类的方法写二进制文件
+dos.write(1);
+4.关闭数据输入流
+dos.close();
+8.5.操作文件或目录的属性
+程序的主要任务就是操作数据，通过允许程序读取文件的内容或向文件写入数据，可以使程序应用更为广泛，一般情况下，当数据位于内存中并且属于特定的类型时，程序才能够操作它们
+8.5.1.使用File类操作文件或目录属性
+8.6.Java的流
+按照不同的分类方式，可以将流分为不同的类型
+1、按照流的流向进行划分，可分为输入流和输出流
+输入流:只能从中读取数据，而不能向其中写入数据
+输出流:只能向其中写入数据，而不能从中读取数据
+2、按照所操作的数据单元的不同，流又可划分成字节流和字符流
+字节流操作的最小数据单位为8位的字节，而字节流操作的最小数据单位是18 位的字符
+字节流和字符流的区分非常简单，字节流建议用于二进制数据，而字符流用于文本，它们的用法几乎是完全一样的。
+8.7.读写文本文件
+8.7.1.使用字节流读取文本文件
+4、字节输入流InputStream类
+字节输入流InputStream的作用就是讲文件中的数据输入到内部存储器中
+无参的read() 方法从输入流批量读取若干个字节，在从文件或键盘读数据时，采用read(byte[ ]b)或read(byte[ ]b、int、off、int len)方法可以减少进行物理读文件或键盘的次数，提高输入/输出操作效率
+5、字节输入流FileInputStream类
+实际应用中，通常是用InputStream的子类FileInputStream 类来实现文本文件内容的读取
+6、使用FileInputStream 读取文件
+(5)、引入相关的类。
+Import  java.io.IOException;
+Import     java.io.InputStream;
+Import      java.io.FileInputStream;
+(6)、创建一个文件输入流对象
+InputStream is=new FileInoutStream(“C:\\test.txt”);
+(7)、利用文件输入流的方法读取文本文件的数据
+Is.available();  //可读取的字节数
+Is.read();     //读取文件的数据
+(8)、关闭文件输入流对象
+Is.close();
+示例：
+
+
+8.7.2.使用字节流写文本文件
+5、字节输出流OutputStream类
+字节输出流OutputStream 类的作用是吧内存中的数据输出到文件中
+6、字节输出流FileOutputStream类
+实际应用中，通常是用OutputStream的子类FileOutputStream 类来实现文本文件内容的读取
+7、使用FileOutputStream 写文本文件
+1、引入相关的类。
+Import  java.io.IOException;
+Import     java.io.OutputStream;
+Import      java.io.FileOutputStream;
+2、创建一个文件输出流对象
+OutputStream os=new FileOutStream(“C:\\test.txt”);
+8、利用文件输出流的方法吧数据写入文本文件中
+String str=”好好学习Java”;
+Byte[ ] words=str.getBytes();
+//利用weite方法将数据写入文件中去
+os.write(words,,words.length);
+4、关闭文件输入流对象
+os.close();
+示例:
+
+
+8.8.二进制文件的读写
+8.8.1.使用字节流类DataInputStream读二进制文件
+DataInputStream类是FileInputStream的子类，它是FileInputStream类读取二进制文件的实现步骤其实与用FileInputStream类读取文本文件的步骤极其相似，而且还要用到FileInputStream类。
+步骤如下:
+(5).引入相关类
+Import java.io.FileInputStream;
+Import java.io.DataInputStream;
+(6).构造一个数据输入流对象
+FileInputStream fis=new FileInputStream(“path”);
+DataInputStream dis=new DataInputStream(fis);
+(7).利用数据输入流类的方法读取二进制文件
+dis.read();
+(8).关闭数据输入流
+dis.close();
+8.8.2.使用字节流DataOutputStream写二进制文件
+DataOutputStream类是FileOutputStream的子类，它是FileOutputStream类的扩展，利用DataOutputStream类写二进制文件的实现步骤其实与用FileOutputStream类写文本文件的步骤极其相似，而且还要用到FileOutputStream类。
+步骤如下:
+1.引入相关类
+Import java.io.FileOutputStream;
+Import java.io.DataOutputStream;
+2.构造一个数据输入流对象
+FileOutputStream fos=new FileOutputStream(“path”);
+DataOutputStream dos=new DataOutputStream(fis);
+3.利用数据输入流类的方法写二进制文件
+dos.write(1);
+4.关闭数据输入流
+dos.close();
+8.9.输入流  读    读入
+8.10.输出流  写    写出
+8.11.InputStream   字节流
+8.12.Reader          字符流
+8.13.OutputStream  字节流
+8.14.Writer         字符流
+8.15.FileInputStream常见方法:
+8.15.1.available()  剩余可读字节
+8.15.2.read()       读取下一个字节
+复制文本文件题目示例
+
+操作文件或者目录属性题目示例
+
+
+替换文本文件内容题目示例：
+
+
+8.16.本章总结
+1.Flie类用于访问文件或者目录的属性
+2.流是指一连串的字符，是以先进的方式发送信息的通道。程序和数据源之间是通过流联系起来的
+3.流可以分为输入流和输出流，也可以分为字节流和字符流
+4.FilelnputStream和FileOutStream以字节流的方式读写文本
+5.BufferdReader和BufferdWriter以字符流的方式读写文件，而且效率更高
+6.DataInputStream和DataOutputStream可以用于二进制
+9.第九章(总复习)
+9.1.结构图</code></pre>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/30/JavaOOP/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<!-- 来必力City版安装代码 -->
+
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
+
+
+  
     <article id="post-JavaJQuery" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -2863,716 +3850,6 @@ pattern        规定验证input域的模式（正则表达式）
 
 
   
-    <article id="post-JavaOOP" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/30/JavaOOP/">JavaOOP相关</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/30/JavaOOP/" class="archive-article-date">
-  	<time datetime="2019-07-30T03:00:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-30</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>  JavaOOP<br>      1.第一章(对象和封装)<br>      1.1.构造函数<br>      1.构造函数是用来创建对象的   实例化对象<br>      2.构造函数的作用是用来初始化对象的属性<br>      3.一个类，系统默认提供无参的构造函数<br>      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值<br>      5.当编写了一个有参的构造函数以后，无参的构造函数就没了<br>      6.如果想要用无参构造函数new对象   就必须手动添加<br>      7.当一个类中存在多种构造函数的时候，这些构造函数就构成了重载<br>      1.2.this,super关键字<br>      1.this代表当前对象的引用，谁调用这个方法  this就代表谁<br>      2.this()调用调用本类的无参构造函数<br>      3.super代表父类对象的引用，super用来调用父类的属性和方法<br>      4.super()调用父类的无参构造函数<br>      1.3.重载<br>      一个类中，多个方法功能相同，方法名相同，参数列表不一样。与返回值无关<br>      public void show();<br>      public int show();<br>      这两个方法不构成重载   因为两个方法不能同时存在于同一个类中<br>      示例：<br>      public class Math{<br>      public void add(int a,int b)<br>      public void add(int a,int b,int c)<br>      }<br>      1.4.static关键字<br>      static关键字修饰静态成员，java类中不存在静态类<br>      static只用来修饰成员(属性，方法)</p>
-<pre><code>什么时候应该用静态的属性呢？
-当这个属性跟对象没有关系，跟类有关系的时候
-比如创建一个Person类  所有的Person都来自中国
-那么这个时候可以将Person里面的country属性静态
-
-什么时候应该用静态的函数呢？
-当这个方法内部没有使用到任何实例成员的时候。
-实例成员：需要通过new对象的方式调用的属性和方法都是实例成员
-
-静态的调用方式：
-通过类名点的方式去调用
-
-以下是通过实例去调用静态的Country
-
-
-结果发现执行结果正常。黄色的提示说的是静态的成员应该(建议)用静态方式调用
-1.说明在Java中，静态成员既可以用实例的方式去调用（对象.）
-也可以用静态的方式去调用 （类名.）
-2.静态跟类有关系  跟对象没有关系
-因为被静态修饰的成员是在类加载的时候就已经进入内存了
-
-而非静态成员  是在new对象的时候才被加载进内存。
-3.被静态修饰的方法只能调用静态方法和静态成员
-里面不能有实例成员
-1.5.封装
-如果一个属性用public修饰，那么外界就可以随意访问并修改
-这样就容易造成数据的不准确性
-
-所以我们将属性私有，然后提供公开的方法提供外界进行操作
-因为方法内部可以对传入的参数进行限制。
-
-
-测试类：
-
-1.6.toString方法
-在Dog类中创建一个方法
-
-测试类：
-
-说明输出一个对象的时候默认调用这个对象toString方法 
-
-重点:toString方法经常用来测试数据    方便打印对象的各个属性值
-当然，这个toString存在于Object类中   子类需要重写
-
-1.7.快速创建类（超级重点）
-Alt+Shift+s
-
-1.7.1.将所有属性私有
-1.7.2.提供set/get方法
-setters and getters
-1.7.3.提供有参和无参的构造函数
-constructor using fields
-1.7.4.提供toString方法
-
-toString
-
-本章总结：
-现实世界是“面向对象”的,面向对象就是采用“现实模拟”的方法设计和开发程序
-面向对象设计是目前计算机软件开发中最流行的技术。面向对象设计的过程就是抽象的
-过程。
-类是对某一类事物的描述,是抽象的、概念上的定义。对象是实际存在的该事物的个体
-是具体的、现实的。
-如果同一个类中包含了两个或两个以上的方法,它们的方法名相同,方法参数个数或参数
-类型不同,则称该方法被重载了,这个过程称为方法重载
-构造方法用于创建类的对象。构造方法的主要作用就是在创建对象时执行一些初始化操作
-
-
-2.第二章(继承)
-2.1.为什么使用继承
-
-多个类中，具有多个属性和功能相同的部分，那么这个时候可以将这些共性部分抽取到父类中，然后让这些类去继承父类。这样就避免了子类的代码冗余问题。
-2.2.继承中构造函数的执行顺序
-子类的构造函数会默认先调用父类的无参构造函数
-如果父类没有无参构造，则子类必须手动调用父类的有参构造函数。   子类使用super关键字来去调用父类的方法
-所以，在子类构造的时候，一定会先执行父类构造，然后再执行子类构造函数
-子类继承父类  使用extends关键字
-
-
-以上代码为何报错？
-Dog类里面默认有一个无参构造函数，而这个无参构造函数默认调用父类的无参构造函数  但此时父类没有无参的构造函数
-解决方案:
-1.可以给父类添加一个无参构造函数
-2.在子类的无参构造函数中手动调用父类的有参构造函数
-3.给子类添加一个有参构造函数  手动调用父类有参构造函数
-
-2.3.protected关键字
-public   所有类都可以用
-private   本类可以用
-protected  本类和子类可以用
-
-2.4.关于继承中的重写
-子类不满意父类写的方法  这个时候可以重写父类的方法
-Java中   不存在虚方法。只有普通方法和抽象方法
-普通方法  子类可以重写   抽象方法  子类必须重写
-重写的规则：在父子类中，子类重写父类方法
-方法名返回值  参数列表都一致  只有方法体不一致
-2.5.抽象类和抽象方法
-父类其实定义出来其实只是给子类去继承 属性和功能的
-而真正每个子类的功能实现都不一样，也就意味着所有的子类都会去重写父类的某些方法。
-比如动物类里面的eat()方法  Dog和Cat每个动物吃的都不一样
-所以都会去重写父类的eat方法   所以父类的eat方法方法体实现没有任何意义。所以干脆这个方法就变成抽象方法  。强制性要求子类去重写这个方法。
-抽象方法用abstract修饰。
-抽象方法只能在抽象类中或者接口中。
-一个继承一个抽象类，必须实现这个抽象类中的所有抽象方法，除非这个子类也是一个抽象类。
-以后  所有的父类全部用抽象类。
-抽象方法没有方法体实现。
-抽象类不能实例化(不能new   Pet())
-抽象类中是有构造函数的 但是这些构造函数都是给子类用的
-2.6.final关键字
-被final修饰的方法不能被重写
-被final修饰的类不能被继承
-被final修饰的变量不能被修改
-本章总结：
-继承是Java中实现代码重用的重要手段之一。Java中只支持单继承。即一个类只能有一个
-直接父类。java.lang. Object类是所有Java类的祖先。
-在子类中可以根据实际求对从父类继承的方法进行重新编写,称为方法的重写或覆盖
-子类中重写的方法和父类中被重写的方法必须具有相同的方法名、参数列表,返回值类型
-必须和被重写方法的返回值类型相同或是其子类
-抽象类不能实例化。抽象类中可以有零到多个抽象方法。非抽象类若继承抽象类,则必须
-重写父类的所有抽象方法
-子类必须重写父类所有的抽象方法才能实例化。否则子类还是一个抽象类。
-用find修饰的类,不能再被继承。用 final t修饰的方法.不能被子类重写。用fnl修饰的变
-量将变成常量,只能在初始化时进行赋值,不能在其他地方修改。
-
-3.第三章(多态)
-3.1.为什么使用多态
-一个事物体现的多种形态
-提高代码的扩展性
-3.2.多态的核心
-父类 f =  new 子类();
-父类的引用指向了子类的对象
-Pet   p =  new Dog();
-3.3.instanceof关键字
-多态有一个缺陷，就是父类的引用没有办法调用子类的特有方法，所以这个时候我们需要做强转。但是在转换的过程中容易出错，所以需要判断。
-用来判断一个引用属于哪个类型。
-例子:
-Pet p = new Dog();
-if(p instanceof Dog){
-((Dog)p).砍价（）;
-}
-避免强转出错。
-3.4.多态的两种应用场景（重点）
-3.4.1.父类引用作为方法参数
-主人喂养宠物。
-
-主人喂养猪，猫  狗等等 
-这个时候没有必要给每一个宠物都编写一个喂养的方法
-这样就不利于代码扩展。
-所以就将父类引用作为方法的参数  去接收各个子类对象
-3.4.2.父类引用作为方法返回值
-主人领养宠物。
-同上。领养猪，领养狗  猫  其实就是领养宠物 
-所以：
-
-3.5.编译看左边，运行看右边(重点)
-父类引用指向子类对象
-Pet p = new Dog();
-p.show()
-编译是否报错  就看Pet类里面有没有show方法
-运行时期，真正执行结果看Dog类里面的show方法
-编译看左边，运行看右边
-特殊情况:  成员变量和静态方法除外！！！
-
-
-
-4.第四章(接口  interface)
-4.1.什么是接口
-接口是一套规范，只要是满足这个规范的设备，就可以将它们组装到一起，从而实现该设备的功能。
-4.2接口的定义
-1.接口就是一种约定和能力；
-4.2.接口实现java多继承；
-4.3.接口中所有方法都是抽象方法；
-4.4.接口中所有变量都是静态常量。
-4.5.类只能继承一个父类，但可以实现多个接口，一个类里面如果实现了一个接口就必须实现接口的全部方法，否则必须定义成抽象类。Java通过实现接口达到了多重继承的效果。
-语法：[修饰符]interface接口名extends父接口1,父接口2,{
-//常量定义
-//方法定义
-}
-Class 类名 extrnds 父类名 implements 接口1，接口2，{
-//类成员
-}
-注意事项
-4.6.接口的命名规则与类相同。
-4.7.接口中可以定义常量，不能定义变量。
-4.8.接口中所有的方法都是抽象方法。
-4.9.和抽象类一样，接口也不能实例化，接口中不能有构造函数。
-4.10.接口之间可以通过extends实现继承关系，一个接口可以继承多个接口，但接口不能继承类。
-4.11.接口的实现必须实现接口的全部方法，否则必须定义为抽象类。
-4.12.一个类只能有一个直接父类，但可以通过implements实现多个接口。当类在继承父类的同时实现了多个接口时，extends关键字必须位于implements之前。
-示例：USB接口：
-4.13.定义一个接口类，定义方法
-
-4.13.1.子类继承并且实现接口的所有方法
-
-
-
-测试输出结果
-
-4.14接口中的属性都是全局静态常量,接口中的方法都是全局抽象方法。接口中没有构造方法
-
-4.15类只能继承一个父类,但可以实现多个接口。一个类如果实现了一个接口,则必须实现接口中的全部方法,否则必须将其定义为抽象类,Java通过实现接口达到了多重继承的效果。
-
-4.16.接口表示一种约定,接口表示一种能力。接口体现了约定和实现相分离的原则
-
-4.17.抽象类利于代码复用,接口利于代码维护
-
-4.18.通过面向接口编程,可以降低代码间的耦合性,提高代码的可扩展性和可维护性
-
-4.19.面向接口编程意味着:开发系统时,主体构架使用接口.接口构成系统的骨架,这样就可以通过更换实现接口的类来实现更换系统
-
-5.1.0C#中接口的成员主要是方法和属性。接口中不能包含常量、变量、构造方法和任何静态成
-员。定义接口时显式指定任何修饰符是非法的。
-
-5.第五章（异常）
-5.1.什么是异常
-异常就是在程序运行过程中所有发生的不正常事件，如所需要的文件找不到.网络连接不通或中断.算术运算出错(如被零除).数组下标越界.装载了一个不存在的类.对null对象操作.类型转换异常.异常会中断正在运行的程序。
-5.2.1.异常的分类
-1.Throwable
-    --Error     错误     
-    --Exception 异常     
-
-2.Exception
-    --RuntimeException   编译时期可以不处理
-    --其他异常    编译时期必须处理
-
-
-5.3.    异常是在大多数正常的执行情况下，
-    突然发生了非正常情况，这些情况程序员可以提前
-    做好处理准备。
-    这些异常情况在编译时期不报错，可以在编译时期预料
-    可能会发生哪些异常，然后对这些代码进行异常的处理。
-
-    错误一般都是由于代码严重错误造成的，这个是必须
-    在编译时期就改好。
-5.4.常见的异常类型
-1.Exception 说明：异常结构的根类；
-2.ArithmeticException 说明：算术错误异常，比如零作除数
-3.ArrayIndexOutBoundsException 说明：数组下标越界
-4.NullPointerException 说明：尝试访问null对象成员
-5.ClassNotFoundException 说明：不能加载所需的类
-6.InputMismatchException 说明:欲得到的数据类型与实际输入的类型不匹配
-7.IllealArgumentException 说明:方法接收到非法参数
-8.ClassCastException 说明:对象强制类型转换出错
-9.NumberFormatException 说明:数字格式转换异常，如把、“abc”转换成数字。
-示例：
-
-
-
-5.5.    分类：
-    1.在编译时期，必须处理的异常
-    2.运行时期，可能会发生的异常
-5.5.1.2.异常的处理
-    通常  异常处理有两种方法
-    1.try catch   内部自己消化。
-    2.throws   声明异常类
-
-3.throw和throws的区别和用法
-throws用来声明异常类  在方法上面声明
-throw是抛出异常对象！！！
-
-throw如果抛出是RuntimeException对象
-编译不报错   可以不处理。
-
-如果抛出的非RuntimeException对象 
-编译报错    必须处理。
-
-5.6.自定义异常类
-    想要成为一个异常类
-    要么实现Throwable（可抛性）接口 
-    要么继承Exception类
-
-由于Exception是所有异常的爸爸
-那么但凡发生异常  都会被他抓到
-导致并不能去发现具体的异常
-
-try一旦被catch抓捕到异常，
-那么try发生异常代码后面的所有代码不再执行
-
-finally只有一种情况不执行  就是Java虚拟机停了。
-
-5.7.使用log4j记录日志
-示例：
-
-5.8.总结：
-5.8.1.异常是由Java应用程序抛出和处理的非严重错误，它可以分为Checked异常和运行异常两大类。
-5.8.2.Checked异常必须捕获或者声明抛出，否则无法通过编译，运行时异常不要求必须捕获或者声明抛出。
-5.8.3.Java的异常处理是通过五个关键字来实现的: try. Catch. Finally . throw .和throws。
-5.8.4.即使在try块，catch块中存在return语句，finally块中语句也会被执行。Finally块中语句不被执行的唯一，在异常处理代码中执行Systrm.in
-5.8.5.可以在一个try语句块后面跟多个catch语句块，分别处理不同的异常。但排列顺序必须是从特殊到一般，最后一个一般为Exception类。
-5.8.6.Log4是一个优秀的日志记录工具，常用的使用方式是配置log4j.properties文件，从而看着日志的输出级别，目的地和输出格式。
-6.第六章(集合框架)
-6.1.    数组的局限性  声明的时候必须给大小  不灵活
-    声明过大浪费空间  声明小了不够用
-    如果并不知道程序运行时会需要多少对象，或者需要
-    更复杂方式存储对象——可以使用Java集合框架    
-6.2.Array数组   Arrays数组工具类
-6.3. Collection接口  Collections 集合工具类
-
-
-ArrayList
-add(Object obj)
-add(int index,Object obj)
-addAll(int index,Collection c)
-addAll(Collection c)
-clone() 集合复制
-contains(Object obj) 是否包含一个元素
-containsAll(Collection c)是否包含一个集合
-size()
-isEmpty()  集合里面元素是否为空
-indexOf(Object obj)  查找该元素在集合中的下标
-lastIndexOf(Object o)返回此列表中最后一次出现的指定元素的索引
-toArray()
-get(int index)   根据角标获得元素
-set(int index,Object obj) 替换该角标元素
-remove(int index) 根据角标删除
-remove(Object o)  删除传入的元素
-removeRange(int fromIndex,int toIndex)
-
-6.4.LinkedList
-特有方法:
-addFirst(Object obj)  添加该元素到第一个位置
-addLast(Object obj)
-getFirst() 
-getLast()
-removeFirst()
-removeLast()
-
-
-6.5.HashMap
-map.containsKey(key)
-map.containsValue(value)
-map.put(key, value)
-map.values()  获取这个map集合所有的值  返回是一个集合
-Iterator
-7.第七章(多线程)
-7.1.什么是进程？
-进程是程序的一次动态执行过程，它对应了从代码加载，执行至执行完毕的一个完整过程，这个过程也是进程本身从产出.发展至消亡的过程。
-7.1.1.进程的特点：
-1.进程是程序运行程序的基本单位.
-2.每一个进程都有一个自己独立的一块内存空间.一组系统资源.
-3.每一个进程的内部数据和状态都是完全独立的.
-7.2.什么是线程？
-线程是进程中执行运算的最小单位，可以完成一个独立的顺序控制流程。每个进程中，必须至少建立一个线程（这个线程称为主线程）来作为这个程序运行的入口点。如果在一个进程中同时运行了多个线程，用来完成不同的工作，则称为“多线程”。
-7.3.多线程的好处
-1.充分利用CPU的资源：执行单线程程序时，若程序阻塞，CPU可能会处于空闲状态，这将造成计算机资源的浪费，而使用多线程可以在某个线程处理休眠或者阻塞状态时运行其他线程，这样，大大提高了资源利用率。
-2.简化编程模型：一个既长又复杂的进程可以考虑分为多个线程，成为几个独立的运行部分，如使用时.分.秒来描述当前时间，如果写成单线程程序可能需要多重循环判断，而如果使用多线程，时.分.秒各使用一个线程控制，每个线程仅只需要实现简单的流程，简化了程序逻辑，这样更有利于开发人员对程序的理解和维护。
-3.带来良好的用户体验：由于多个线程可以交替执行，减少了避免了因程序阻塞或意外情况造成的响应过慢现象，降低了用户等待的机率
-7.4.Thread类的常用用法
-构造方法及其说明：
-1.Thread()  说明：分配新的Thread对象.
-2.Thread(Runnable target) 说明：分配新的Thread对象.target为run()方法被调用的对象。
-3.Thread(Runnable target，String name) 说明：分配新的Thread对象，target为run()方法被调用的对象，name为新线程的名称。
-4.Void run() 说明：执行任务操作的方法。
-5.Void start() 说明：使该线程开始执行，Java虚拟机调用该线程的run()方法。
-6.Void sleep (long millis) 说明：在指定的毫秒内让当前正在执行的线程休眠(暂停执行)
-7.String getName() 说明：返回线程的名称。
-8.Int getPriority()  说明：返回线程的优先级。
-9.Void setPriority(int newPriority) 说明：更改线程的优先级。
-10.Static Thread currentThread()  说明：返回当前正在执行的线程对象的引用。
-11.Boolean isAlive() 说明：测试线程是否处于活动状态。
-12.Void join() 说明：等待该线程终止。
-13.Void interrupt() 说明：中断线程。
-14.Void yield() 说明：暂停当前正在执行的线程对象，并且执行其他线程。
-7.5.主线程
-两种重要体现：
-1.它是产出其他子线程的线程。
-2.通常它必须最后完成执行，因为它执行各种关闭动作。
-3.没有优先级的情况下都是先执行的。
-示例：
-
-
-7.6.继承Thread类创建线程
-1.定义MyThread类继承Thread类
-2.重写Run()方法，在Run方法中实现数据输出
-3.创建线程对象，调用start()方法启动线程
-示例：
-
-7.7.实现Runnable接口创建线程
-1.定义MyRunnable类实现Runnable接口，并实现Runnable接口的Run()方法，在Run()方法中实现输出数据
-2.创建MyRunnable类的对象myRunnable
-3.创建一个Thread类的对象
-4.调用myThread对象的start()方法
-示例：
-
-
-7.8.线程状态
-7.8.1.创建状态
-在程序中用构造方法创建了一个线程对象后,新的线程对象就处于创建状态。此时它已经获
-取了相应的资源,但还没有处于可运行状态,这时可以通过Thed类的方法来设置线程对象的黑性
-如设置线程名{ setname().设置线程优先级({ setpriority()等
-7.8.2.就绪状态
-线程创建之后,就可以通过调用star()方法启动线程,即进入就绪状态。此时,线程将进入线程队列排队,等待CPU资源,这表明它已经具备了运行条件,在未获得CPU资源时,仍不能真正执行。
-举例来说,去医院看病,某主任的专家号每天只有20个,挂上号的患者还需在分诊处等待叫号这里每个挂到专家号的患者可以看成一个就结状态的线程
-7.8.3.阻塞状态
-一个正在运行的线程因某种原因不能继续运行时,进入阳塞状态。阳塞状态是一种“不可运行的状态,而处于这种状态的线程在得到一个特定的事件之后会转回可运行状态。
-举例来说,轮到小张看病了,医生为查明原因要求他去做个化验,医生得到化验结果后才能继续诊断,如果把医生给小张看病看作一个线程.则该线程此时即处于阻塞状态。
-可能使线程暂停执行的条件如下
-1.由于线程优先级比较低,因此它不能获得CPU资源。
-2.使用 sleep()方法使线程休眠。
-3.通过调用wait()方法,使线程等待
-4.通过调用 yield(方法,线程显式出让CPU控制权
-5.线程由于等待一个文件,/O事件被阻塞
-7.8.4.死亡状态
-一个线程的Run()方法运行完毕，线程则进入死亡状态。处于死亡状态的线程不具有继承运行的能力。
-7.9.线程的优先级
-当同一时刻有一个或多个线程处于运行状态时,它们需要排队等待CPU资源。每个线程会自动获得一个线程的优先级( Priority),优先级的高低反映线程的重要或紧急程度。
-那么此刻,一般情况下优先级高的线程获得CPU资源的概率较大,但这个结果不是绝对的,线程优先级调度是一个复杂的过程
-每个线程的优先级介于 Thread. MIN PRIORITY和 Thread. MAX PRIORITY之间
-线程的优先级可以通过 getpriority()方法获取, setpriority (int grade)方法更改,后者的参数表示
-要设置的优先级,它必须是一个1-10的整数
-示例：
-
-7.10.线程的休眠
-Sleep()方法可以让当前线程休眠(停止执行)mills毫秒，线程由运行状态进入不可运行状态，睡眠时间过后线程将再次进入可运行状态，调用Sleep()方法需要处理InterruptedException异常。
-示例：
-
-本章总结：
-1.多线程允许程序员编写可最大程度利用CPU的高效程序
-2.在Java程序启动时,一个线程立刻运行,该线程通常称为程序的主线程。主线程的重要性
-体现在以下两个方面
-它是产生其他子线程的线程
-通常它必须最后完成执行,因为它执行各种关闭动作
-3.可通过两种方式创建线程
-3.1.声明一个继承了 Thread类的子类,在此子类中,实现 Thread类的Run()方法
-3.2.声明一个实现 Runnable接口的类,然后实现Run()方法
-5.每一个线程创建和死亡之前,均会处于创建,就绪.运行、阻塞.死亡状态之
-5.在山Java实现的多线程应用程序中,可以通过调用 Thread类中的方法来实现对线程对象的操作,
-5.1调整线程的优先级,Java线程有优先级,在同等情况下,优先级高的线程会获得较多
-的运行机会。Java线程的优先级用1-10的整数表示
-5.2线程睡眠: sleep( long millis)方法使线程转到阻塞状态
-5.3线程的强制运行,join()方法可以强制某一线程运行
-5.4线程礼让:yield()方法,暂停当前正在执行的线程对象,把执行机会让给相同或者更
-高优先级的线程。
-6.当多个线程对象操纵同一共享资源时,要使用 synchronized关键字来进行资源的同步处理
-可以使用同步方法和同步代码块来实现线程同步
-8.第八章(File I/O)
-8.1.操作文件或目录的属性
-程序的主要任务就是操作数据，通过允许程序读取文件的内容或向文件写入数据，可以使程序应用更为广泛，一般情况下，当数据位于内存中并且属于特定的类型时，程序才能够操作它们
-8.1.1.使用File类操作文件或目录属性
-8.2.Java的流
-按照不同的分类方式，可以将流分为不同的类型
-1、按照流的流向进行划分，可分为输入流和输出流
-输入流:只能从中读取数据，而不能向其中写入数据
-输出流:只能向其中写入数据，而不能从中读取数据
-2、按照所操作的数据单元的不同，流又可划分成字节流和字符流
-字节流操作的最小数据单位为8位的字节，而字节流操作的最小数据单位是18 位的字符
-字节流和字符流的区分非常简单，字节流建议用于二进制数据，而字符流用于文本，它们的用法几乎是完全一样的。
-8.3.读写文本文件
-8.3.1.使用字节流读取文本文件
-1、字节输入流InputStream类
-字节输入流InputStream的作用就是讲文件中的数据输入到内部存储器中
-无参的read() 方法从输入流批量读取若干个字节，在从文件或键盘读数据时，采用read(byte[ ]b)或read(byte[ ]b、int、off、int len)方法可以减少进行物理读文件或键盘的次数，提高输入/输出操作效率
-2、字节输入流FileInputStream类
-实际应用中，通常是用InputStream的子类FileInputStream 类来实现文本文件内容的读取
-3、使用FileInputStream 读取文件
-(1)、引入相关的类。
-Import  java.io.IOException;
-Import     java.io.InputStream;
-Import      java.io.FileInputStream;
-(2)、创建一个文件输入流对象
-InputStream is=new FileInoutStream(“C:\\test.txt”);
-(3)、利用文件输入流的方法读取文本文件的数据
-Is.available();  //可读取的字节数
-Is.read();     //读取文件的数据
-(4)、关闭文件输入流对象
-Is.close();
-示例：
-
-
-8.3.2.使用字节流写文本文件
-1、字节输出流OutputStream类
-字节输出流OutputStream 类的作用是吧内存中的数据输出到文件中
-2、字节输出流FileOutputStream类
-实际应用中，通常是用OutputStream的子类FileOutputStream 类来实现文本文件内容的读取
-3、使用FileOutputStream 写文本文件
-1、引入相关的类。
-Import  java.io.IOException;
-Import     java.io.OutputStream;
-Import      java.io.FileOutputStream;
-2、创建一个文件输出流对象
-OutputStream os=new FileOutStream(“C:\\test.txt”);
-4、利用文件输出流的方法吧数据写入文本文件中
-String str=”好好学习Java”;
-Byte[ ] words=str.getBytes();
-//利用weite方法将数据写入文件中去
-os.write(words,,words.length);
-4、关闭文件输入流对象
-os.close();
-示例:
-
-
-8.4.二进制文件的读写
-8.4.1.使用字节流类DataInputStream读二进制文件
-DataInputStream类是FileInputStream的子类，它是FileInputStream类读取二进制文件的实现步骤其实与用FileInputStream类读取文本文件的步骤极其相似，而且还要用到FileInputStream类。
-步骤如下:
-(1).引入相关类
-Import java.io.FileInputStream;
-Import java.io.DataInputStream;
-(2).构造一个数据输入流对象
-FileInputStream fis=new FileInputStream(“path”);
-DataInputStream dis=new DataInputStream(fis);
-(3).利用数据输入流类的方法读取二进制文件
-dis.read();
-(4).关闭数据输入流
-dis.close();
-8.4.2.使用字节流DataOutputStream写二进制文件
-DataOutputStream类是FileOutputStream的子类，它是FileOutputStream类的扩展，利用DataOutputStream类写二进制文件的实现步骤其实与用FileOutputStream类写文本文件的步骤极其相似，而且还要用到FileOutputStream类。
-步骤如下:
-1.引入相关类
-Import java.io.FileOutputStream;
-Import java.io.DataOutputStream;
-2.构造一个数据输入流对象
-FileOutputStream fos=new FileOutputStream(“path”);
-DataOutputStream dos=new DataOutputStream(fis);
-3.利用数据输入流类的方法写二进制文件
-dos.write(1);
-4.关闭数据输入流
-dos.close();
-8.5.操作文件或目录的属性
-程序的主要任务就是操作数据，通过允许程序读取文件的内容或向文件写入数据，可以使程序应用更为广泛，一般情况下，当数据位于内存中并且属于特定的类型时，程序才能够操作它们
-8.5.1.使用File类操作文件或目录属性
-8.6.Java的流
-按照不同的分类方式，可以将流分为不同的类型
-1、按照流的流向进行划分，可分为输入流和输出流
-输入流:只能从中读取数据，而不能向其中写入数据
-输出流:只能向其中写入数据，而不能从中读取数据
-2、按照所操作的数据单元的不同，流又可划分成字节流和字符流
-字节流操作的最小数据单位为8位的字节，而字节流操作的最小数据单位是18 位的字符
-字节流和字符流的区分非常简单，字节流建议用于二进制数据，而字符流用于文本，它们的用法几乎是完全一样的。
-8.7.读写文本文件
-8.7.1.使用字节流读取文本文件
-4、字节输入流InputStream类
-字节输入流InputStream的作用就是讲文件中的数据输入到内部存储器中
-无参的read() 方法从输入流批量读取若干个字节，在从文件或键盘读数据时，采用read(byte[ ]b)或read(byte[ ]b、int、off、int len)方法可以减少进行物理读文件或键盘的次数，提高输入/输出操作效率
-5、字节输入流FileInputStream类
-实际应用中，通常是用InputStream的子类FileInputStream 类来实现文本文件内容的读取
-6、使用FileInputStream 读取文件
-(5)、引入相关的类。
-Import  java.io.IOException;
-Import     java.io.InputStream;
-Import      java.io.FileInputStream;
-(6)、创建一个文件输入流对象
-InputStream is=new FileInoutStream(“C:\\test.txt”);
-(7)、利用文件输入流的方法读取文本文件的数据
-Is.available();  //可读取的字节数
-Is.read();     //读取文件的数据
-(8)、关闭文件输入流对象
-Is.close();
-示例：
-
-
-8.7.2.使用字节流写文本文件
-5、字节输出流OutputStream类
-字节输出流OutputStream 类的作用是吧内存中的数据输出到文件中
-6、字节输出流FileOutputStream类
-实际应用中，通常是用OutputStream的子类FileOutputStream 类来实现文本文件内容的读取
-7、使用FileOutputStream 写文本文件
-1、引入相关的类。
-Import  java.io.IOException;
-Import     java.io.OutputStream;
-Import      java.io.FileOutputStream;
-2、创建一个文件输出流对象
-OutputStream os=new FileOutStream(“C:\\test.txt”);
-8、利用文件输出流的方法吧数据写入文本文件中
-String str=”好好学习Java”;
-Byte[ ] words=str.getBytes();
-//利用weite方法将数据写入文件中去
-os.write(words,,words.length);
-4、关闭文件输入流对象
-os.close();
-示例:
-
-
-8.8.二进制文件的读写
-8.8.1.使用字节流类DataInputStream读二进制文件
-DataInputStream类是FileInputStream的子类，它是FileInputStream类读取二进制文件的实现步骤其实与用FileInputStream类读取文本文件的步骤极其相似，而且还要用到FileInputStream类。
-步骤如下:
-(5).引入相关类
-Import java.io.FileInputStream;
-Import java.io.DataInputStream;
-(6).构造一个数据输入流对象
-FileInputStream fis=new FileInputStream(“path”);
-DataInputStream dis=new DataInputStream(fis);
-(7).利用数据输入流类的方法读取二进制文件
-dis.read();
-(8).关闭数据输入流
-dis.close();
-8.8.2.使用字节流DataOutputStream写二进制文件
-DataOutputStream类是FileOutputStream的子类，它是FileOutputStream类的扩展，利用DataOutputStream类写二进制文件的实现步骤其实与用FileOutputStream类写文本文件的步骤极其相似，而且还要用到FileOutputStream类。
-步骤如下:
-1.引入相关类
-Import java.io.FileOutputStream;
-Import java.io.DataOutputStream;
-2.构造一个数据输入流对象
-FileOutputStream fos=new FileOutputStream(“path”);
-DataOutputStream dos=new DataOutputStream(fis);
-3.利用数据输入流类的方法写二进制文件
-dos.write(1);
-4.关闭数据输入流
-dos.close();
-8.9.输入流  读    读入
-8.10.输出流  写    写出
-8.11.InputStream   字节流
-8.12.Reader          字符流
-8.13.OutputStream  字节流
-8.14.Writer         字符流
-8.15.FileInputStream常见方法:
-8.15.1.available()  剩余可读字节
-8.15.2.read()       读取下一个字节
-复制文本文件题目示例
-
-操作文件或者目录属性题目示例
-
-
-替换文本文件内容题目示例：
-
-
-8.16.本章总结
-1.Flie类用于访问文件或者目录的属性
-2.流是指一连串的字符，是以先进的方式发送信息的通道。程序和数据源之间是通过流联系起来的
-3.流可以分为输入流和输出流，也可以分为字节流和字符流
-4.FilelnputStream和FileOutStream以字节流的方式读写文本
-5.BufferdReader和BufferdWriter以字符流的方式读写文件，而且效率更高
-6.DataInputStream和DataOutputStream可以用于二进制
-9.第九章(总复习)
-9.1.结构图</code></pre>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/30/JavaOOP/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<!-- 来必力City版安装代码 -->
-
-  <!-- 这一句是适配样式 -->
-  <section class="duoshuo" id="comments">
-    <!-- 以下是 来必力City版安装代码 -->
-    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
-      <script type="text/javascript">
-       (function(d, s) {
-           var j, e = d.getElementsByTagName(s)[0];
-           if (typeof LivereTower === 'function') { return; }
-           j = d.createElement(s);
-           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-           j.async = true;
-           e.parentNode.insertBefore(j, e);
-       })(document, 'script');
-      </script>
-    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
-    </div>
-  </section>
-
-
-  
     <article id="post-鱼的记忆不止七秒" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -3962,409 +4239,6 @@ server {
 
 
   
-    <article id="post-人生三累：忙不完、说不出、没人懂" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/13/人生三累：忙不完、说不出、没人懂/">人生三累：忙不完、说不出、没人懂</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/13/人生三累：忙不完、说不出、没人懂/" class="archive-article-date">
-  	<time datetime="2019-07-13T03:00:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <pre><code>这个世上最难的就是感同身受。</code></pre><p>　　如果两个人没有相同的经验，即使是自己的至亲，也很难能做感同身受。</p>
-<p>　　很多时候为了去理解对方的感受，试图尝试为问自己：“如果我是他，我会有何感受。”</p>
-<p>　　但是这样的感受其实带有自己的主观思想在里面，每个人都有着属于他自己的性格。有的人乐观、善良，有的人敏感、多愁善感，所以面对同样一个困难都有着不同的感官。</p>
-<p>　　前些时间播放的电视剧《我们都要好好的》里，刘涛扮演的妻子寻找，患有抑郁症，但是丈夫不知道这个情况。因为在丈夫向前上台领奖的时候，没有接听到她的电话而情绪失控吞下了许多药物，差点自杀。</p>
-<p>　　寻找出院后，向前带着寻找看权威的心理医生郭子健。寻找对医生讲述了当时发生的情况，事发当晚她一直联系不上向前，就不停地吃药，才导致了意外的发生，紧接着寻找又向医生倾诉了自己内心的痛苦，可向前却在一旁累得呼呼大睡。</p>
-<p>　　向前随后醒来，电话就一直响个不停，他只好去阳台接电话，郭子健发现寻找的抑郁症已经到达高速发展的阶段，很快就会出现自杀倾向，而且郭子健也看出向前对她的病情置若罔闻，郭子健建议寻找不要带儿子，担心她会影响儿子对这个世界的认知。</p>
-<p>　　回家的路上，寻找因为对自己的病情而忧虑陷入了沉思，向前见此情况就跟寻找进行了一番交流。</p>
-<p>　　向前：“医生也找，病也看了，接下来就按照医生给的方案去治疗就可以痊愈了。”</p>
-<p>　　寻找：“如果我真的死了呢？”</p>
-<p>　　向前：“至于吗。我就不明白了！生活越来越好了，怎么就把你逼到这个份上了呢？”</p>
-<p>　　最终，寻找提出了离婚。</p>
-<p>　　寻找好友弯弯劝她：让她多理解向前，向前不但能挣钱，还不会沾花惹草，弯弯同时也倾诉自己家生活的不容易，觉得寻找身在福中不知福。</p>
-<p>　　但是，寻找需要的是陪伴和关爱。结婚七年，可他一年有300天都在外面工作，偶尔在家休息一下都是在家里不断的接听电话，一点都不在乎她的感受。</p>
-<p>　　丈夫已经完全变得不理解她的所思、所想 、所言、所为，更不了解身患抑郁症的她正在经历着怎么样的痛苦。</p>
-<p>　　对于寻找而言她需要的是爱，是陪伴。但向前却认为，没有钱何谈爱？</p>
-<p>　　此时，遭受着抑郁症的折磨，早已不堪重负，即将全面崩溃。</p>
-<p>　　但是，丈夫向前看来，只是比较沉默了，心情不高兴，在耍小脾气。他以为在妻子送一束花妻子就会感到开心；他以为，给妻子买一栋房子，妻子就会想开了。</p>
-<p>　　殊不知因为不能感同身受，不能理解妻子的苦楚，总以为自己认为是好的给予对方。让这段感情渐行渐远，成为最熟悉的陌生人。</p>
-<p>　　生活中，我们很难做到感同身受，但是我们是否能去想想我们能为对方做的事情，当自己另一半深处险境的时候，告诉她：“不论怎么样，我都在你身边陪着你，为你遮风挡雨。”给予对方更多的关心和疼爱。</p>
-<p>　　前段时间，王源因为抽烟而上了热搜，一直被粉丝捧在娱乐圈里长大孩子，一下子成为了人们眼中所以为的“问题少年”。</p>
-<p>　　他在综艺节目《我是唱作人》里，强忍住泪水唱完了歌曲然后道歉，最后唔着脸哭着下了舞台。</p>
-<p>　　在唱《世界上没有真正的感同身受》之前，王源问了观众一个问题：</p>
-<p>　　“大家看舞台，亮吗？”</p>
-<p>　　观众回答：“亮。”</p>
-<p>　　“但是，我看你们其实很黑。”</p>
-<p>　　在采访中，王源曾提到：“有时候，你非常难过、无助，你觉得自己已经快崩溃了，身边的人能安慰你几句，但是他们永远都无法体会你有多难。详细说，别人肯定会觉得，我卖惨什么的。我觉得没有必要，这就是我的经历，所以说这么多，你们也不能感同身受，对吧？”</p>
-<p>　　是的，我们很难去站在王源位置去感受那种高处不胜寒的压力，13岁开始出道，15岁便拥有着上千万的粉丝量，到今天的七千多万的粉丝。他的面临着社会对他的高期待，犯一点错误便会有各种新闻铺天盖地而来。</p>
-<p>　　也许，《世界上没有真正的感同身受》这个首歌，也想表达他对目前那种高处不胜寒的一种倾诉。</p>
-<p>　　这个世界，真正了解自己的只有自己，很多人只能与你共欢乐，却无法与你共痛苦，不是因为他们不愿意，而是他们没有亲身体会。</p>
-<p>　　就如一禅小和尚所说的：</p>
-<p>　　“为什么你难过的时候没人懂自己呢？”</p>
-<p>　　“即使你的内心已经兵荒马乱天翻地覆了，但是在别人看来，你只是比平时沉默了一点，没人会觉得奇怪，这种战争，注定是单枪匹马的”</p>
-<p>　　“那为什么连平时自己关系的人也不见了？”</p>
-<p>　　“你笑，全世界陪你一起笑；你哭，就只有你一人哭。别人只期待分担你的快乐，却懒得理你的痛苦。这世间本就是各人下雪，各有各的隐晦与皎洁。”</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/13/人生三累：忙不完、说不出、没人懂/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<!-- 来必力City版安装代码 -->
-
-  <!-- 这一句是适配样式 -->
-  <section class="duoshuo" id="comments">
-    <!-- 以下是 来必力City版安装代码 -->
-    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
-      <script type="text/javascript">
-       (function(d, s) {
-           var j, e = d.getElementsByTagName(s)[0];
-           if (typeof LivereTower === 'function') { return; }
-           j = d.createElement(s);
-           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-           j.async = true;
-           e.parentNode.insertBefore(j, e);
-       })(document, 'script');
-      </script>
-    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
-    </div>
-  </section>
-
-
-  
-    <article id="post-C#" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/13/C#/">C#C语言</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/13/C#/" class="archive-article-date">
-  	<time datetime="2019-07-13T03:00:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>1.第一章（深入.NET框架）<br>1.1.什么是.NET框架<br>.NET框架是运行在操作系统上，是.NET最基础的框架<br>.NET框架主要包括CLR，FCL，ADD.NET,XML,ASP.NET,WinForms和Web Service等等。<br>1.2.CLR包含哪两个组成部分<br>1.由CLS（公共语言规范）和CTS（通用类型系统）两个部分组成。<br>2.FCL：框架类库。<br>1.3.封装的好处<br>1.保证数据的安全性；<br>2.提供清晰的对外接口；<br>3.类内部可以任意修改，不影响其他类。<br>类图是表示类的结构及类与类之间关系的图表<br>1.4.数据类型<br>1.4.1.值类型和引用类型<br>1.每个值类型的对象都有一个一个独立的内存区来保存自己的值类型数据所在的内存区称为栈（Stack）来源于System.ValueType,主要包括基本数据类型(int,float,double)等等<br>2.引用类型来源于System.Object，在C#中引用数据类型主要包括数组，类和接口和结构等等。<br>1.5.结构<br>1.5.1.结构的定义<br>1.结构中可以有字段也可以有方法<br>2.定义时，结构中的字段不能被赋值<br>语法：<br>访问修饰符 struct 结构名{//结构体}<br>1.5.2.结构的使用<br>1.5.3.装箱<br>1.值类型–&gt;引用类型是装箱<br>1.5.4.拆箱<br>1.引用类型–&gt;值类型 是拆箱<br>1.可以不用new，直接定义结构的对象即可<br>2.声明结构对象后，必须给结构的成员赋初始值<br>1.6.类和对象<br>1.6.1.概念<br>1.由对象归纳为类，是归纳对象共性的过程<br>2.在类的基础上，将状态和行为实体化为对象的过程称为实例化</p>
-<p>1.6.2.属性<br>1.对于类的属性，通过get set访问器进行访问和设置，用来保障类中数据的安全。<br>2.只写属性：只包含set访问器<br>3.只读属性：只包含get访问器<br>4.读写属性：同时包含set和get访问器</p>
-<p>2.第二章（深入C#数据类型）<br>上一章回顾<br>2.1.NET框架主要组成部分<br>2.2.FCL 框架类库<br>2.3.2.3.CLR公共语言运行时<br>2.4.CTS通用类型系统<br>2.5.CLS公共语言规范<br>2.6.值类型<br>2.7.引用类型<br>2.8.值传递<br>值方式传递值类型，数据没有发生改变。值方式传递引用类型   数据改变。<br>2.8.1.引用传递<br>引用方式传递值类型，数据改变。引用方式传递引用类型，数据改变。<br>2.8.2.ref<br>方法里面又没有加ref   又传递的值类型数据<br>2.8.3.值类型和引用类型区别</p>
-<p>2.9.1.测试发现<br>            int zhangsan = 18;<br>            int lisi = zhangsan;<br>            lisi = 19;<br>            Console.WriteLine(zhangsan);<br>zhangsan还是18  值没有发生改变<br>int double float boolean   基本数据类型<br>也就是说基本数据类型都是值类型<br>            int[] zhangsan = new int[]{ 180, 120 };<br>            int[] lisi = zhangsan;<br>            lisi[0] = 190;<br>            Console.WriteLine(zhangsan[0]);<br>上诉例子发现张三的身高也发生变化了<br>两个引用指向了同一个对象<br>数组是引用类型<br>new出来的是引用类型   Object Class  类是引用类型<br>2.10.结构用struct修饰 </p>
-<p>2.10.1.类是用class修饰</p>
-<p>2.11.结构和class的区别：</p>
-<p>1.结构是值类型 class是引用类型<br>2.结构里面的属性不能给初始值<br>2.11.1.注意事项<br>string类是一个比较特殊的情况<br>虽然是引用类型  但是值不会发生改变<br>int a = 1;<br>float b = a;<br>2两碗装1两面<br>这种可以<br>float a = 1;<br>int b = (int)a;<br>1两碗装2两面<br>这种不可以<br>小的转大的     自动转换<br>大的转小的       强制转换<br>2.12.值类型–&gt;引用类型    包装   装箱<br>Object i = 1;  装箱</p>
-<p>2.13.引用类型–&gt;值类型    拆箱<br>int j = (int)i; 拆箱<br>示例：</p>
-<p>2.<br>3.<br>3.第三章（使用集合组织相关数据）<br>3.1.ArrayList集合<br>1.ArrayList类属于System.Collections命名空间，这个命名空间包含接口和类，这些接口和类定义各种对象的集合。ArrayList就属于集合的一种，因此在使用之前一定要引入命名空间System.Collections。<br>2.ArrayList的常用方法及属性<br>2.1属性名称：Count 说明：获取ArrayList中实际包含的元素数<br>2.2返回值类型:int; 方法名称:Add（Object value）;说明:将对象添加到ArrayList的结尾处。<br>2.3返回值类型:Void ;方法名称:RemoveaAt(int index);说明:移除ArrayList指定索引处的元素。<br>2.4返回值类型:Void ; 方法名称:RemoveaAt(Object value);说明:从ArrayList中移除特定的对象。<br>2.5返回值类型:Void ; 方法名称:Clear();说明:从ArrayList中移除使用元素。<br>3.1.1给ArrayList添加数据<br>1.返回值:值是一个int整型，用于返回所添加的元素的索引。<br>2.参数:如果ArrayList中添加的元素都是值类型，这些类型就都会装箱处理转换为Object引用类型，然后保存。因此，ArrayList中的所有元素都是对象的引用。<br>3.示例：<br>3.1创建Student类</p>
-<p>3.2创建集合保存学生信息</p>
-<p>使用方法遍历打印信息<br>分别是 for (int i = 0; i &lt; come.Count; i++)<br>            {<br>                Student s = (Student)come[i];<br>                s.show(); //调用方法<br>            }<br> foreach (Student item in come)<br>            {<br>                item.show();<br>            }<br>Hashtable cba = new Hashtable();<br>            cba.Add(hao.UseName, hao);<br>            cba.Add(hao1.UseName, hao1);<br>            cba.Add(hao2.UseName, hao2);</p>
-<p>3.3删除ArrayList元素<br>Remove();<br>移除元素<br>Stu.Remove(se2);<br>RemoveAt();</p>
-<p>通过索引删除元素<br>Stu.RemoveAt(0);<br>都是只能删除一个元素</p>
-<p>Clear();方法可以删除集合中所有元素，当执行Clear();方法时，Count属性被设置成为“0”。<br>3.1.1.ArrayList集合动态维护，访问元素时需要进行类型转换。<br>3.1.2.ArrayList集合删除数据时可以通过索引或者对象名称访问其中的元素。</p>
-<p>3.2.Hashtable集合<br>3.2.1.Hashtable的常用方法和属性<br>1.属性名称:Count；说明:获取包含在Hashtable中键/值对的数目;<br>2.属性名称:Keys;说明:获取包含在Hashtable中键的集合;<br>3.属性名称:Values;说明:获取包含在Hashtable中值的集合。<br>4.返回值类型:Void;方法名称:Add(Object key,Object value)说明:将带有指定键和值的元素添加到Hashtable中。<br>5.返回值类型:Void;方法名称:Remove(Object Key)说明:从Hashtable中移除带有特定键的元素。<br>6.返回值类型:Void;方法名称:Clear()说明:从Hashtable中移除所有元素。<br>3.3.泛型集合<br>3.3.1.泛型集合List<t><br>1.语法:List<t>对象名=new List<t>();<br>2.命名空间:System.Collection.Generic。<br>3.语法说明：<t>中的T可以对集合的元素类型进行约束，T表示集合中管理的元素类型。<br>4.List<t>与ArrayList的区别<br>相同点:1.通过索引访问集合中的元素;<br>       2.添加元素方法相同;<br>     3.删除元素方法相同。<br>不同点:List<t>:1.对所保存的元素进行类型约束;<br>             2.添加/读取值类型元素不需要装箱和拆箱;<br>      ArrayList:1.可以增加任何类型;<br>              2.添加/读取值类型元素需要拆箱和装箱。<br>3.3.2.泛型集合Dictionary&lt;k,v&gt;<br>1.语法:Dictionary&lt;K,V&gt;对象名=new Dictionary&lt;K,V&gt;();<br>说明:&lt;K,V&gt;中的K表示集合中Key的类型，V表示Value的类型<br>。它们的含义和List<t>是相同的。<br>例如:Dictionary&lt;string,SE&gt;engineers=new Dictionary&lt;string,SE&gt;();<br>  engineers集合的Key类型是string型，Values是SE类型。<br>2.Dictionary&lt;K,V&gt;和Hashtable的区别<br>相同点:1.通过Key获取Value;<br>      2.添加元素方法相同;<br>      3.删除元素方法相同;<br>      4.遍历方法相同。<br>不同点:Dictionary&lt;K,V&gt;:1.对所保存的元素进行类型约束;<br>                    2.添加/读取值类型元素时不需要装箱和拆箱；<br>       Hashtable:1.可以增加任何类型;<br>                2.添加/读取值类型元素时需要装箱和拆箱；</t></t></t></t></t></t></t></p>
-<p>3.4.泛型类<br>语法： Public class 类名<t><br>       {<br>       //结构体<br>}<br>说明:T指类型参数，代表具体的数据类型，可以是类类型，也可以是基本数据类型。<br>示例：<br>1.创建经理类</t></p>
-<p>2.创建员工类</p>
-<p>3.枚举性别</p>
-<p>4.调用测试输出</p>
-<p>3.4.1.泛型的优点<br>1.性能高。普通集合的数据，需要装箱和拆箱，而泛型不需要类型转换。<br>2.类型安全。泛型集合对它所存储的对象进行了类型的约束，不是它所允许储存的类型无法添加到集合中去。<br>3.实现代码的重用。泛型就相当于模板，由于它支持任何的数据类型，开发人员不必为每种特定的数据类型编写一套方法，所以它具有极大的可重用性。泛型编程是未来编程的主流技术之一。<br>4.第四章（深入类的方法）<br>前一章内容回顾<br>3.5.ArrayList<br>3.6.HashTable<br>3.7.List和Dictionary<br>3.7.1.集合的遍历<br>List遍历:foreach for<br>Dictionary:<br>Dictionary&lt;TKey,TValue&gt; dic = new ….<br>Foreach(TValue value in dic.Values){</p>
-<p>}<br>3.7.2.泛型集合和dgv的绑定</p>
-<p>3.7.2.1.List集合</p>
-<p>Dgv.dataSource = new bindingList<t>(list)<br>3.7.2.2.Dictionary</t></p>
-<p>Dictionary&lt;TKey,TValue&gt; dic = new ….<br>bindingSource bs = new bindingSource();<br>bs.dataSource = dic.Values;<br>Dgv.dataSource = bs;<br>3.8.构造函数</p>
-<p>3.9.什么是构造函数</p>
-<p>Student s = new Student();<br>Student()是调用Student这个类的无参构造方法<br>这个无参构造方法是系统默认提供的<br>3.9.1.构造方法演示过程<br>3.9.1.1.创建Student类</p>
-<p>3.9.1.2.创建测试类<br>3.9.1.3.查看结果<br>结果发现我们自己编写的无参构造方法在newStudent的时候的确调用了 证明new Student() 这句话是在调用类里面的无参构造函数<br>3.10.构造函数的作用<br>用来构造(实例化)对象<br>错误:未将对象引用设置到对象的实例。<br>上诉错误就是因为对象没有实例化造成的<br>3.11.构造函数的语法<br>方法名和类名一致，没有返回值<br>Public Student(){<br>}<br>3.12.有参的构造函数<br>需求:想要在创建Student对象的同时就直接初始化对象属性</p>
-<p>由于构造对象的方式(需求)都不一样，所以仅仅一个无参构造方法没有办法满足需求，所以提供多种方式去实例化对象<br>当new对象的同时就初始化对象的属性，所以就有了有参的构造函数<br>例子:<br>Public Student(string Name,int Age){<br>This.Name = Name;<br>This.Age = Age;<br>}<br>this代表当前对象的引用  如果参数名和属性名一样的话，这个this必须写  用来区分</p>
-<p>3.12.1.重载<br>3.13.什么是重载？<br>在一个类中，多个方法名字相同，参数列表不一致。这个时候这些方法就构成了重载<br>3.14.为什么要用重载<br>多个方法功能都一致，就没有必要叫不同的名字。我们使用重载，就是为了方便调用者去调用。当调用者调用你写的方法的时候，只需要去关注传入的参数<br>试想:如果Console.WirteLine()如果没有重载<br>那么意味着这个方法只有一个   参数只能传一种<br>因为不管是打印字符串类型还是bool类型还是int类型<br>都属于打印功能   所以没有必要叫不同的名字<br>3.14.1.重载的特点<br>1.方法名相同;<br>2.方法参数类型不同或者参数个数不同;<br>3.在同一个类里面。<br>注意：有参方法是无参方法的重载<br>示例<br>1.创建老师类</p>
-<p>2.创建学生类</p>
-<p>3.输出结果</p>
-<p>3.15.重载的语法<br>多个方法名相同，参数列表不一致，跟返回值无关<br>3.16.示例<br>Public void show()<br>Public void show(int a)<br>Public void show()  3<br>Public int show()    4<br>3和4是不可能存在于同一个类中  因为方法名和参数完全一致，仅仅只是返回值不一样  没有办法区分<br>3.16.1.1.构造方法和重载的应用<br>3.17.有参构造方法示例<br>创建两个类  Student   和Teacher<br>Sutdent里面4个属性  Teacher3个属性<br>分别给这两个类创建有参构造函数   编写show方法<br>在测试类中创建两个对象   分别调用show方法<br>实现:<br>创建学生类:</p>
-<p>创建Teacher:</p>
-<p>测试结果：</p>
-<p>3.17.1.1.1.类之间的通信</p>
-<p>调用者跟底层实现隔离开了<br>耦合性:如果耦合性太强，程序代码不利于后期扩展<br>分层:</p>
-<p>3.17.1.1.1.1.作业:<br>1.创建两个类  Student   和Teacher<br>Sutdent里面4个属性  Teacher3个属性<br>分别给这两个类创建有参构造函数   编写show方法<br>在测试类中创建两个对象   分别调用show方法</p>
-<p>2.完成顾客点餐<br>3.第五章的窗体搭建<br>4.云题库一套<br>5.Word   wps    熟悉文档结构图操作<br>5.第五章（项目）<br>5.1套餐管理系统实现<br>5.2窗体搭建</p>
-<p>5.3创建类<br>分析需求<br>创建检查项目类XiangMu:XmName,Description,Price<br>分析发现，一个套餐里面包含多个项目，所以需要在套餐类里面准备一个集合  专门用来存放该套餐的所有项目<br>创建套餐类TaoCan:string TcName,<br>int Price,List<xiangmu> xiangmus<br>项目类:</xiangmu></p>
-<p>套餐类:</p>
-<p>5.4初始化医院所有的项目和所有的套餐<br>将两个集合放在外面</p>
-<p>编写初始化方法:<br>5.5初始化项目(初始化4个)</p>
-<p>5.6初始化套餐(初始化1个)</p>
-<p>5.7绑定套餐列表下拉框</p>
-<p>5.8绑定DGV<br>下拉框事件:SelectedIndexChanged<br>注意:dgv的列的dataProperty名字要和项目属性的名字一模一样</p>
-<p>5.9完成当前套餐删除项目功能</p>
-<p>6.0完成当前套餐添加项目功能</p>
-<p>6.1添加套餐功能</p>
-<p>6.第六章（初识继承和多态）<br>6.1什么是继承<br>6.1.1移除类的冗余代码<br>两个类中描述这些相同属性的代码也是相同的加入学生、老师、家长这类的角色，他们必然也有年龄、姓名、性别 这些属性随着系统规模的扩大，冗余越来越多，如何去避免冗余，把冗余代码集中起来重复使用<br>1、创建一个新类Employee，将学生类 和老师类中的公共属性都提取出来放到这个类中，<br>2、删除 学生类 和 老师类中的公共属性，保留它们各自独有的成员<br>6.1.2继承的概念<br>其实生活中有很多可以继承的例子，列如，在马路上跑的卡车，我们每天都乘坐的公交汽车，它们都是汽车，卡车有自己的特征：有货舱，有额定载重，行为是可以拉货、卸货、而公共汽车的公共特征和行为、有车轮、可以行使、可以刹车。它们就是一种继承关系，卡车和公共汽车都继承汽车类.<br>继承:<br>继承:<br>6.1.3为什么要使用继承<br>    解决代码冗余 多个类有很多共性部分<br>    可以抽取到父类中 使用冒号实现继承<br>6.1.4父类哪些成员不能被继承<br>    private的属性和方法<br>    构造函数<br>    public Student():base(){<br>        //调用父类的无参构造函数<br>    }<br>6.1.5 base关键字使用<br>    base可以用来调用父类的属性和方法<br>    在子类中，继承过来的成员 用this或者base没有区别<br>6.1.6继承里面的构造函数执行顺序？<br>    在子类的构造函数执行之前，默认调用父类的无参构造函数<br>    如果父类没有无参构造函数，必须手动调用父类的有参构造函数<br>6.1.7继承里面的重写<br>    重写是因为子类不满足父类提供的方法<br>    在C#中，子类可以重写父类的虚方法或者抽象方法<br>    父类的方法要定义成虚方法  子类重写要加ovveride<br>    特点:方法名，参数列表，返回值全部一样<br>    只有大括号里面的实现不一样 （ 方法体不一样）<br>6.1.8重写和重载的区别<br>    重载是方法名相同 参数列表不一致<br>    跟返回值无关  重载是在一个类中<br>    重写是在子父类中<br>6.1.9虚方法的特点<br>    虚方法用virtual关键字修饰<br>    子类可以重写，也可以不重写<br>    重写后，执行子类的方法  不重写  执行父类的方法<br>6.2继承的缺点<br>    由于C#和java都只支持单继承  所以有局限性<br>    所以才有后面的接口<br>    但是支持多层继承  A–B–C<br>6.2.1is关键字<br>    用于判断父类的引用到底属于哪个具体子类对象<br>    例子:List<person> list<br>    foreach(Person p in list){<br>        if(p is Student){<br>            ((Student)p).study();<br>        }<br>    } 因为study方法是属于Student类里面的特有方法<br>    Person类里面没有study方法  也就没办法调用</person></p>
-<p>多态：一种事物的多种体现形态<br>    核心:父类 f = new 子类();<br>    父类引用指向了子类对象<br>    f.show();<br>    编译看左边  运行看右边<br>为什么要使用继承？<br>    解决代码冗余 多个类有很多共性部分<br>    可以抽取到父类中 使用冒号实现继承<br>6.2.1.1父类哪些成员不能被继承<br>    private的属性和方法<br>    构造函数<br>    public Student():base(){<br>        //调用父类的无参构造函数<br>    }<br>6.2.2base关键字使用<br>    base可以用来调用父类的属性和方法<br>    在子类中，继承过来的成员 用this或者base没有区别<br>6.2.3继承里面的构造函数执行顺序<br>    在子类的构造函数执行之前，默认调用父类的无参构造函数<br>    如果父类没有无参构造函数，必须手动调用父类的有参构造函数<br>6.2.4继承里面的重写<br>    重写是因为子类不满足父类提供的方法<br>    在C#中，子类可以重写父类的虚方法或者抽象方法<br>    父类的方法要定义成虚方法  子类重写要加ovveride<br>    特点:方法名，参数列表，返回值全部一样<br>    只有大括号里面的实现不一样 （ 方法体不一样）<br>6.2.5重写和重载的区别<br>    重载是方法名相同 参数列表不一致<br>    跟返回值无关  重载是在一个类中<br>    重写是在子父类中<br>6.2.6虚方法的特点<br>    虚方法用virtual关键字修饰<br>    子类可以重写，也可以不重写<br>    重写后，执行子类的方法  不重写  执行父类的方法<br>6.2.7继承的缺点<br>    由于C#和java都只支持单继承  所以有局限性<br>    所以才有后面的接口<br>    但是支持多层继承  A–B–C<br>6.2.8 is关键字<br>    用于判断父类的引用到底属于哪个具体子类对象<br>    例子:List<person> list<br>    foreach(Person p in list){<br>        if(p is Student){<br>            ((Student)p).study();<br>        }<br>    } 因为study方法是属于Student类里面的特有方法<br>    Person类里面没有study方法  也就没办法调用</person></p>
-<p>多态：一种事物的多种体现形态<br>    核心:父类 f = new 子类();<br>    父类引用指向了子类对象<br>    f.show();<br>    编译看左边  运行看右边 </p>
-<p>6.2Base 关键字和 protected修饰符<br>6.2.1Base关键字<br>Base 关键字，它表示父类，可以用于访问父类的成员。例如：调用父类的属性、方法、(base.Name 、 base.Age)<br>示例:<br>Public void Show(){<br>Console.WirteLine(“我的名字是:{0},我的年龄为:{1}”,base.Name,base.Age);<br>}<br>示例说明，在子类中可以用base调用父类的属性，实际上还可以用base关键字调用父类的方法及父类的构造函数。<br>6.2.2protected修饰符<br>被这个访问修饰符修饰的成员只能被其子类访问，不能被其他非子类访问<br>6.3子类构造函数<br>6.3.1隐式调用父类构造函数<br>父类：</p>
-<p>程序员类：</p>
-<p>测试类：</p>
-<p>Main方法调用子类SE的构造函数创建SE对象时自动调用了父类的无参构造，经过单步调试会发现，创建子类对象时会首先调用父类的构造函数，然后才会调用子类本身的构造函数，由于没指明调用父类的哪一个构造函数，所以系统隐式地调用了父类的无参构造函数<br>6.3.2显示调用父类构造函数<br>父类：</p>
-<p>程序员类：<br>可以用base关键字调用父类的构造函数，只要在子类的构造函数后添加:base（参数列表），就可以指定该子类的构造函数调用父类的哪一个构造函数了，这样便可以实现继承属性的初始化，然后在子类本身的构造函数中完成对子类特有属性的初始化即可<br>6.4继承的特性<br>6.4.1继承的传递性<br>前面我们说过卡车和公共汽车继承汽车，也就是卡车和公共汽车都具有汽车的特性，其实卡车还可以分为小型卡车和重型卡车，公共汽车还可以分为单层公共汽车和双层公共汽车。<br>6.4.2继承的单根性<br>假设某类人（CharmingPerson）既有程序员（SE）天赋，又有音乐家Musician（）天赋，我们是否可以用一下代码来描述他呢</p>
-<p>Public class CharmingPerson：SE,Musician{}</p>
-<p>在C#中这样写是不正确的，因为在C#中明确规定，一个子类不能同时继承多个父类</p>
-<p>C#中还有一个特殊的关键字 sealed，用它修饰的类时不能被继承的，我们称这种类为密封类<br>6.4.3继承中应该注意的点<br>1)在抽取父类的时候，父类里面的属性和方法一定要是<br>    所有子类共有的属性和方法<br>    重写<br>    2)在 C# 中，类可以继承自另一个类<br>    派生的类（子类）继承父类的方法和数据成员<br>    所有的类都管Object叫爸爸<br>类 Object 是类层次结构的根类。每个类都使用 Object 作为父类。<br>    所有对象（包括数组）都实现这个类的方法。<br>    Equals在Object类里面</p>
-<pre><code>3)在父类里面创建一个有参构造函数，</code></pre><p>发现所有子类的有参构造函数报错了。<br>    4)当执行子类的构造函数的时候，发现<br>    父类的无参构造函数先执行，然后才执行子类的有参构造<br>    也就是说 子类的构造函数里面第一句话默认调用<br>    父类的无参构造函数<br>    5)为什么子类的构造函数一定<br>    要去访问父类的构造方法？<br>    因为子类继承父类的成员，需要知道父类有没有<br>    对这些成员进行初始化的动作<br>        public Person(int age, string myName)<br>        {<br>            Console.WriteLine(“父类有参构造函数”);<br>            this.Age = age;<br>            this.MyName = myName;<br>        }</p>
-<pre><code>public Student(string name, int age, int renqi)
-:base(age,name){
-    this.renqi = RenQi;
-}</code></pre><p>6.5is a 的应用<br>由于SE继承Employee，即SE is a Employee ，所以可以定义一个List<employee>的集合，SE加入到这个集合中去，当要遍历集合进行问好时，只需要对每个对象的类型进行判断，如示例所示：</employee></p>
-<p>示例中遍历emp集合时使用了is关键字，这个关键字用来判断对象是否属于给定的类型，如果属于返回true，否则返回false，if(emp is SE) 表示判断emp对象是否有SE类型。<br>6.6继承的价值<br>回顾本章中学习的例子，体会一下继承的特点，它将会在开发中带来很多便利。<br>1、继承模拟了现实世界的关系，OOP中强调一切皆对象，这符合我们面向对象编程的思考方向。<br>2、继承实现了代码的重用，这在示例中我们已经有所体会，合理地使用继承，会是代码更加简洁。<br>3、继承使得程序结构清晰，子类和父类的层次结构清晰，最终的目的是使子类只关注子类的相关行为和状态，无须关注父类的行为和状态。例如，学员（Student）只需要管理学号，爱好这些属性，而公共的姓名、年龄、性别等…属性都交给父类（Person）管理。<br>6.7多态<br>6.7.1解决继承带来的问题<br>我们在遍历员工实现问好的时候，需要使用is关键字判断每个员工的类型，这时就会带来一个问题，如果Employee类的 子类非常多，Show()方法各不相同，那么程序就要对众多的对象编写非常多的id语句进行判断，使程序变得庞大，扩展困难。<br>如何解决这个问题，如示例所示：<br>父类：</p>
-<p>子类：</p>
-<p>测试类：</p>
-<p>示例中直接调用Fhow()方法，无须考虑集合中的对象是何种类型，就可以实现他的方法，程序运行结果如下：</p>
-<p>观察示例代码，我们在父类中定义了下面的方法：<br>Public virtual void Fhow()<br>{<br>//方法体<br>}<br>像使用virtual 关键字修饰的方法，称为虚方法，虚方法有方法体，语法如下：<br>访问修饰符 virtual 返回类型 方法名()<br>{<br>//方法体<br>}<br>还定义了这样的方法：<br>Public override void Fhow()<br>{<br>//方法体<br>}<br>像override关键字来修饰的方法、称为方法的重写、虚方法可以被重写，方法语法如下：<br>访问修饰符 override 返回类型 方法名()<br>{<br>//方法体<br>}</p>
-<p>注意：<br>父类中定义的虚方法并非必须被子类重写，在父类中可以给虚方法的默认实现，如果子类不重写父类的虚方法，依然执行父类的默认实现，如果子类重写了父类的虚方法，执行子类重写后的方法<br>6.7.2什么是多态<br>生活中有许多例子：例如要求三种人——理发师、外科医生、演员进行”cut” 动作，会发生什么<br>可以把三种不同职业的人看成三个不同的子类对象，都继承自人类，每个对象得到同一个”cut”，他们知道对于自己来说，命令意味着不同的含义。从面向对象的编程的角度思考，三种不同的对象对于同一个方法调用表现出了不同的行为<br>  多态按字面意思就是 多种形态 指同一操作作用于不同的对象时，可以有不同的解释，产生不同的执行结果<br>6.7.3实现多态<br>如何使用虚方法实现多态，总结：<br>1、实现方法重写<br>  父类中定义Fhow() 方法，用virtual关键字定义为虚方法<br>  在子类中定义子类自己Fhow() 方法，用override关键字修饰，就实现了对父类Fhow() 方法的重写<br>2、定义父类变量，用子类对象初始化父类变量<br>Employee ema=new SE(“S1208”,20,”小琪”,”女”,150);<br>直接用这个父类变量就可以调用子类的Fhow()方法，系统可以根据对象运行时的类型决定调用那个方法，从而实现类的多态性<br>6.7.4多态中注意的点<br>一个事物的多种体现形态<br>    一个苹果  可以以苹果的形态存在<br>    也可以以水果的形态存在<br>    Cat c=  new Cat();<br>    Animal c = new Cat();  父类引用指向了子类对象<br>在父类里面添加一个虚方法<br>然后子类可以重写父类的这个虚方法<br>那么这个时候就不需要强转<br>                item.say();<br>                //if (item is Teacher)<br>                //{<br>                //    ((Teacher)item).say();<br>                //}<br>                //else<br>                //{<br>                //    ((Student)item).say();<br>                //}<br>如果子类没有重写父类虚方法  那么执行父类的<br>如果重写了  执行子类的<br>public class Worker{<br>    int age;<br>    string name;<br>    public void work(){<br>        cw(“搬砖”);<br>    }<br>}<br>public class Student extends Worker{<br>    int age;<br>    string name;<br>    public void study(){<br>    }<br>}<br>            Math m = null;<br>            if (comboBox1.Text.Equals(“+”)) {<br>                m = new MathAdd();<br>            }<br>            else if (comboBox1.Text.Equals(“-“)) {<br>                m = new MathDelete();<br>            }<br>            label1.Text = m.getResult(a, b).ToString();<br>            Math类里面如果没有getResult方法,<br>            程序必然会编译报错  因为m是父类的引用<br>            父类没有的方法  m都调不出来<br>            所以父类才需要写虚方法 给子类去重写<br>实际上在父类里面定义虚方法就是为了让父类的引用能够调用<br>这个方法  而真正运行的时候，是执行的子类重写的这个虚方法<br>核心:父类引用指向了子类对象   Pet p = new Dog();<br>7.第七章（深入理解多态）<br>7.1里氏替换概念<br>泛型集合可以保存这两种不同类型的员工对象，原则上子类对象可以赋值给父类，也可以说子类可以替换父类并且出现在父类能够出现的任何地方，且程序的行为不会发生变化。但是反过来，父类对象是不能替换子类对象的，这中特征被称为“里氏替换原则”。<br>7.2里氏替换原则<br>  里氏替换原则是软件设计应该遵守的重要原则之一。有了里氏替换原则，才使继承复用成为可能，只有子类可以替换父类时，软件的功能不受影响，父类才真正被复用，而子类也能够在父类的基础上增加新的行为。<br>7.2.1里氏替换原则:<br>在一个软件系统中，<br>子类对象可以替换所有使用的父类对象，<br>且程序行为没有变化<br>7.3 as关键字:<br>    用于强转<br>    Pet p = new Dog();<br>    1)   ((Cat)p).eat();  运行挂了 转型失败<br>     System.InvalidCastException<br>    2)   Dog d = p as Dog;<br>         d.eat();<br>      System.NullReferenceException</p>
-<pre><code>第二种方式强转不会发生强转错误  只是引用变成null</code></pre><p>7.4 多态的两种应用场景(重点)<br>    父类引用指向了子类对象<br>    Pet p = new Dog();<br>  1.将父类引用当做方法的参数<br>  abstract class Pet{<br>    public abstract void eat();<br>    //抽象方法:<br>    没有方法体<br>    作用:强制要求子类重写eat方法  实际上抽象方法就确定了其子类必须具备的功能<br>    抽象方法只能存在于抽象类中<br>    抽象类中能不能有普通方法？  能   给子类使用<br>    抽象类能不能实例化？ 不能  因为实例化父类没有意义<br>  }<br>  class Dog:Pet{<br>    public override void eat(){<br>        cw(“吃骨头”)<br>    }<br>  }<br>  class Cat:Pet{<br>    public override void eat(){<br>        cw(“吃鱼”)<br>    }<br>  }<br>  public class Person{<br>    public void feedPet(Pet p){Pet p = new Cat()<br>        p.eat();<br>    }<br>  }<br>  public class Test{<br>    Person p = new Person();<br>    p.feedPet(new Cat());<br>  }<br>  2.将父类引用当做方法返回值<br>class Pet{<br>}<br>class Dog:Pet{<br>}<br>class Cat:Pet{<br>}<br>class Person{<br>    //领养宠物<br>    public Pet getPet(int num){</p>
-<pre><code>    if(num==1){
-        return new Dog();
-    }else{
-        return new Cat();
-    }
-}</code></pre><p>}<br>class Test{<br>    Person p = new Person();<br>    cw(“1.Dog2.Cat”)<br>    Pet pet = p.getPet(1);  new Dog()<br>}</p>
-<p>//抽象方法<br>7.5  面向对象的三特征<br>1.继承:建立类之间的关系，实现代码复用，方便系统的扩展;</p>
-<p>3.多态:相同的方法调用可实现不同的实现方法;</p>
-<p>3.封装:保证对象自身数据的完整性和安全性。<br>8.第八章 (可扩展标记语言XML)<br>8.1.xml文件的读取</p>
-<p>8.2.将xml文件放到项目的bin文件夹下的debug文件夹下。好处是，路径可以直接写文件名<br>8.3.读取Engineer.xml文件</p>
-<p>8.4.读取FullChannels.xml</p>
-<p>方法2:</p>
-<p>8.5.读取北京电视台的所有节目单</p>
-<p>方式一:</p>
-<p>方式二:</p>
-<p>8.6.读取凤凰卫视.xml</p>
-<p>8.6.1treeView控件的使用</p>
-<p>需求:</p>
-<p>8.7.将xml文件内容读取出来跟dgv绑定</p>
-<p>思路:<br>treeView控件两个根节点:我的  所有<br>跟dgv绑定   List   对象<br>创建类  类里面两个属性:播放时间   节目名称</p>
-<p>字符编码:<br>ASCII    美国信息交换标准码<br>gbk   中文编码<br>gb2312  中文编码<br> utf-8  国际编码<br>9.第九章 (文件操作)<br>9.1如何读取文件<br>1.创建文件流；<br>FileStream文件流对象=new FileStream(String filepath,FileMode fileMode);<br>2.创建阅读器或者写入器;<br>3.执行读写操作；44<br>4.关闭阅读器或者写入器；<br>5.关闭文件流。<br>Myfs.Close();<br>Using System.Io;<br>这个命名空间用于对文件和文件流的处理。<br>9.2文件读写器<br>9.2.1 StreamWriter写入器<br>StreamWriter mySw=new StreamWriter(myfs);<br>创建好写入器后，可以调用它的方法要写入的内容写入文件流，其中的主要方法如下:<br>StreanWriter.Write():用于写入流，这个流就是我们创建好的流。<br>StreamWriter.WriteLine():用于写入一行数据，写入某些数据后跟换行符。<br>StreamWriter.Close();用于关闭写入器。<br>9.2.2 StreamReader读取器<br>StreamReader:主要用于读取流中的数据，它包含以下几种方法。<br>StreamReader.ReadLine():读取文件流中的一行数据，并返回字符串。<br>StreamReader.ReadToEnd():从当前位置读到末端，返回字符串。<br>StreamReader.Close():用于关闭读取器。<br>9.2静态类和静态方法<br>1.静态类：<br>用static修饰<br>只包含静态成员<br>不可以包含实例成员<br>使用类名调用静态成员<br>不能被实例化<br>不能包含实例化构造函数<br>2.非静态类<br>不用static修饰<br>可以包含静态成员<br>可以包含实例成员<br>使用实例对象调用非静态成员<br>可以被实例化<br>包含实例构造函数<br>本章示例：</p>
-<p>10.第十章 (总复习)<br>10.1.深入.NET框架<br>    FCL CLR   CLR:CLS(公共语言规范) CTS(通用类型系统)<br>10.2.深入C#数据类型<br>    值类型和引用类型<br>        值类型:<br>        基本数据类型  枚举 结构<br>        引用类型:<br>        string 对象 数组 接口<br>        比较特殊的是string  虽然是引用类型<br>        但是值还是不会发生改变<br>    值传递和引用传递    ref<br>        值传递的方式传递值类型时，值不会发生改变<br>        其余都会发生改变<br>10.3.集合<br>    List<t><br>        foreach(T obj in list){<br>            obj<br>        }<br>    Dictionary&lt;TKey,TValue&gt;<br>        foreach(TKey key in dic.Keys){<br>            dic[key]<br>        }<br>        foreach(TValue value in dic.Values){<br>            value<br>        }<br>10.4.深入类的方法<br>    构造函数:<br>    1.每个类在创建的时候  系统会默认给一个无参构造函数<br>    2.如果编写了有参构造，默认的无参就不存在，如果想要使用，<br>    必须手动添加无参构造函数<br>    3.构造函数的作用是用来实例化对象,并且初始化属性<br>    4.this代表当前对象的引用  谁调用这个方法  this就代表谁<br>10.5.重载<br>    一个类中，多个方法功能一致，仅仅只是参数列表不一致，<br>    那么这些方法就构成重载<br>    特点：方法名相同，参数列表不一样，与返回值无关<br>    重点例子：<br>    public void show(int a)<br>    public int show(int a)<br>    这两个函数不能存在于同一个类中  所以不构成重载<br>10.6.继承和多态<br>    1.继承使用：实现<br>    2.子类可以继承父类的非私有成员<br>    3.调用父类的方法或者属性使用base<br>    4.子类的构造函数一定会去访问父类的构造函数<br>    默认访问父类无参，如果父类没有无参，那么子类构造函数<br>    必须手动去调用父类的有参构造函数<br>    5.抽象方法:<br>    父类里面定义的抽象方法，仅仅只是所有子类需要具备的功能<br>    但是每个子类都实现不一样，所以子类就需要去重写这个抽象方法<br>    父类的抽象方法 是  强制性要求子类去重写<br>    6.抽象方法的特点:<br>        1)使用abstract关键字修饰<br>        2)抽象方法没有方法体{}<br>        3)抽象方法必须在抽象类中<br>        4)抽象类不能实例化<br>        5)子类必须重写父类抽象方法<br>        6)抽象类中可以有普通方法,这个普通方法是给子类去调用<br>10.7.多态<br>    核心:父类引用指向了子类对象<br>    多态的两种应用:<br>    1)将父类引用当做方法的参数<br>    2)将父类引用当做方法的返回值</t></p>
-<pre><code>Pet p = new Dog();
-编译看左边，运行看右边  除了成员变量</code></pre><p>10.8.XML<br>    读xml文件:<br>    声明xml文档对象  用来加载xml文件<br>    这个文件放在项目的bin/debug文件夹下  这样<br>    路径就可以直接写成文件名<br>    XMLDocument doc = new XMLDocument();<br>    doc.Load(“xxx.xml”);<br>    获得根节点<br>    XMLNode ele =  doc.DocumentElement;<br>    分析xml结构  看需要遍历几次<br>    foreach(XMLNode node in ele.ChildNodes){<br>        node[“节点名称”].InnerText;<br>    }</p>
-<pre><code>TreeView控件
-    Clear:清空节点  Remove:移除节点
-    tv.nodes.add(&quot;根节点名称&quot;)
-    tv.selectedNode.nodes.add(&quot;添加子节点&quot;)</code></pre><p>10.9.IO<br>    静态类:<br>    File:<br>        Copy(oldPath,newPath)<br>        Move(oldPath,newPath)<br>        Delete(path)<br>    Directory：<br>        Delete(path,bool)// bool如果为true  则删除文件夹以及文件夹下面的所有文件</p>
-<pre><code>实例类:
-FileInfo属性:
-    Name:文件名
-    FullName:文件路径
-    Extension:文件扩展名
-    Length：文件大小
-
-DirectoryInfo
-    两种重要方法:
-    1.Directory[]  getDirectories() 获得该文件夹下面的所有文件夹        
-    2.FileInfo[] getFiles() 获得该文件夹下面的所有文件    
-静态类每次操作都需要进行安全检查
-实例类只是在实例化的时候检查一次
-所以如果是对同一个文件进行多次操作，这个时候用实例类
-如果对不同的文件进行操作，这个时候可以用静态类</code></pre>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/13/C#/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<!-- 来必力City版安装代码 -->
-
-  <!-- 这一句是适配样式 -->
-  <section class="duoshuo" id="comments">
-    <!-- 以下是 来必力City版安装代码 -->
-    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
-      <script type="text/javascript">
-       (function(d, s) {
-           var j, e = d.getElementsByTagName(s)[0];
-           if (typeof LivereTower === 'function') { return; }
-           j = d.createElement(s);
-           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-           j.async = true;
-           e.parentNode.insertBefore(j, e);
-       })(document, 'script');
-      </script>
-    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
-    </div>
-  </section>
-
-
-  
-    <article id="post-How much i love you" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/13/How much i love you/">How much i love you</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/13/How much i love you/" class="archive-article-date">
-  	<time datetime="2019-07-13T03:00:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <pre><code>遇见刘欣的时候，我正处在痛苦无法排遣的低潮。刘欣是中央美院的学生，高我两届。他写了个广告，要找个助手，会画漫画的。广告挂在学院区的一个音像自选中心。 </code></pre><p>　　　　　　　　　　　　　　　　　<br>　　而我那时正陷在对宋永生的迷恋中。宋永生已经有了女朋友，“才子佳人”的一对。我不是娇媚的女孩，只能用笔画出娇媚的美女。我只能让宋永生对我笔下的美女着迷，</p>
-<pre><code>而不是对我。 我游历在窒息的痛心边缘。朋友看见刘欣的广告，叫我去试试，好过整天游魂似的东游西荡。无可无不可地拨通了刘欣的电话。看了我的画，刘欣当即拍板。
-
-接了他的活，回去便开始埋头苦画。 </code></pre><p>　　　　　　　　　　　　　　　　　 　　　　　　　　　　　　　　　　<br>　　室友回来，问我：“见刘欣了？”“见了。”我点头，手仍在画。“怎么样？”又问。我总结：“高，略帅，美院四年级，北京人。”说完我又低头画起来。发现画的人都像宋永生——他在笑，在？眉、转身、驻足，整个整个的他。我再一次溃不成军。<br>　　　　　　　　　　　　　　　　　<br>　　第二天早晨6：30，我画好了刘欣要求的32格场景。我需要借这种穷凶极恶地忙碌来忘记宋永生。6：35，我跑到校门口的IC电话亭，拨了刘欣的电话。刘欣懒洋洋的声音穿过话筒，我告诉他，我画好了，8幅，32个场景。电话那边的声音简直是震惊后的拖腔。他要马上来看。我说好吧。他来的时候已经快8点了。他很意外我在校门口等他，我说我喜欢站在这里看着形形色色陌生人走过，有一种虚空的满足。他说：“你很特别。”<br>　　　　　　　　　　　　　　　　　<br>　　特别？我愕然。恋爱未遂，我想我的确是很特别——的惨。看了画，他很满意，说我有一种他意想不到的灵气。“谢谢。”我点头。<br>　　　　　　　　　　　　　　　　　<br>　　没有人知道我的灵感来自一个欲爱不能的对象。我无法解释自己对宋永生的情感。仅仅因为那次春游我伤了脚他自告奋勇地背我？或是自己寂寞的少女心任性地找个对象胡乱发挥？我不懂。<br>　　　　　　　　　　　　　　　　　<br>　　第二次见到刘欣，是在一个多月后。哪天北京下着雪，我躺在被子里看书，刘欣的电话打进来，由于天气吧，他的手机“嗡嗡”地响，只听见说：“你快下楼，我有个惊喜给你。”<br>　　　　　　　　　　　　　　　　　<br>　　我披上风衣戴上帽子冲下去；走到操场我便呆住。刘欣站在一个雪人旁边，对，是雪人。只知道雪人是可爱的，却从没想到雪人也是可以美丽——立在那里的雪人却分明似有着长发，秀眉秀眼的模样。<br>　　　　　　　　　　　　　　　　　<br>　　“喜欢吗？我可是想堆得和你一样美丽的。”他笑道。给我一样美？我忽然有一种不可思议的幸福感，我哭了起来，哭的一塌糊涂。刘欣一句话没说，纵容我这样毫无理由地哭。<br>　　　　　　　　　　　　　　　　　<br>　　过了好一阵，他说：“好了，现在哭完了，可以笑了吧。”<br>　　　　　　　　　　　　　　　　　<br>　　我说，为我而做的雪人，我要拍照留念。<br>　　　　　　　　　　　　　　　　　<br>　　照片出来后，效果意外的好。我迫不及待地打刘欣的手机。电话没人听。第一批画稿我已完成，近段他没派我任务。有点惘然。我上网，打开我的电子信箱，发现里面新邮件暴涨。我是在毫无心里准备的情况下打开刘欣发给我的信的。他的署名是HMILY。HMILY？我正纳闷，便看到一行字：“冰冰，Would you be my girl friend？ Give me a chance（冰冰，做我的女朋友好吗？给我一个机会）。”<br>　　　　　　　　　　　　　　　　　<br>　　要我做他的女朋友？这个问题我想了一夜，终于决定回复——我需要有人疼爱，希望有人呵护，希望有人问我快不快乐，希望过马路时有人细心地牵我的手。<br>　　　　　　　　　　　　　　　　　<br>　　第二天一大早刘欣便来了，送来三枝红玫瑰，美得让人迷醉，大大地满足了小女人自怜的虚荣。<br>　　　　　　　　　　　　　　　　　<br>　　日子如水般流走。由于刘欣不是本校的，而且不常来，很少人知道他的存在。仍然不断有人追我。宋永生仍然在我的生活之外。灼痛已经变成麻木，我已经能够平静地远观他和他的青梅竹马丝毫也不心潮澎湃。<br>　　　　　　　　　　　　　　　　　<br>　　1999年的最后一夜，刘欣带我到了天安门前。我说过我要在千禧年来临的时刻看广场鸽子飞起，看五星红旗升起。这只是我无聊时的念头，但他却真心想让我快乐。<br>　　　　　　　　　　　　　　　　　<br>　　新年钟声响起时，我打电话回家。听到妈妈的声音，忍不住哭了，不可抑止地，刘欣把我抱在胸前。如果说这么久以来我一直觉得冷，在那一刻，我感觉到了温暖。<br>　　　　　　　　　　　　　　　　　<br>　　那天晚上，他说了许多关于他的事。我这才知道他不？的外表掩盖了多少心酸。父母离异，谁都不肯要他。从小和奶奶一起生活，父亲只提供一些生活费用。初中的时候卖过大白菜，高中曾在歌舞厅打工，长久以来都是打工养活自己和年迈的奶奶。他用平淡的语气说着，我听不出他有一点的自怨自艾。他说，第一次见我时，很意外我的美，有一种游离于尘世之外的气息，只是我的眼神憔悴，由此他知我正逢失意。他说最打动他的是我自始至终不提钱——我那时只是想找一份事情做打发空虚，哪里想得到钱——他说现在很少看到不计较得失的女孩。<br>　　　　　　　　　　　　　　　　　<br>　　很喜欢他语气夸张地说那天我红衣红帽站在雪地上时，他是怎样剧烈地心跳。<br>　　　　　　　　　　　　　　　　　<br>　　被宋永生摧毁的骄傲，我正在慢慢拾起。可是我的心仍是迷茫。我被刘欣的爱温暖着，然而脑海里仍会有宋永生的影子。<br>　　　　　　　　　　　　　　　　　<br>　　从助手升级为女朋友，刘欣便不允许我熬夜画画，每个星期才让我完成以前三天任务的一半。我仍然有事可做，跟着他一起做设计，不然就赖在他的画室。从那时开始我跟着他学油画。有了刘欣，生活变的丰盈。<br>　　　　　　　　　　　　　　　　　<br>　　5月的一天，刘欣送我回学校，我们在门口告别，一切如常。我走到宿舍，却看见一个久违的身影。我的心猛地一抽。宋永生。他转头，也看到了我。<br>　　　　　　　　　　　　　　　　　<br>　　“我和她分手了，因为你。”他艰难地开口。<br>　　　　　　　　　　　　　　　　　<br>　　我的心疼痛起来。为什么？<br>　　　　　　　　　　　　　　　　　<br>　　宋永生不知道我已经有了刘欣。他说他一直知道我对他的情感，而他现在终于弄清楚了自己究竟爱谁。<br>　　　　　　　　　　　　　　　　　<br>　　他自由了。可是，为什么是现在？<br>　　　　　　　　　　　　　　　　　<br>　　刘欣的电话打来，嘱咐我晚上记得吃药。<br>　　　　　　　　　　　　　　　　　<br>　　我知道，我不能给两个人同一个梦。宋永生是我一个未完结的梦。如同怀旧的小女孩，无法舍弃自己童年时的梦想，我告诉我自己，想要而未能得到，那是注定，能要而没有要，那是错失。宋永生的出现即是注定。我不甘心自己曾经有过的那份感情是一场遗憾。<br>　　　　　　　　　　　　　　　　　<br>　　宋永生约我出去，我没有拒绝，尽管我并未打算马上答复他。我心乱如麻。<br>　　　　　　　　　　　　　　　　　<br>　　然而意外却未和我商量就降临了。那天地铁里人很多，我和宋永生站在车门附近，我时不时被上车的人挤得摇晃。宋永生从背后抱住了我，靠着他，我站得稳多了。也就在这时，车门开了，有人上来。四目相接，是刘欣。<br>　　　　　　　　　　　　　　　　　<br>　　他转身下车。宋永生问我：“你怎么了，脸色突然那么惨白。”我说没事，我要回去。一路上，刘欣刚才的眼神在我面前晃动。北京这么大，竟会遇见，刘欣是很少搭地铁的，这，难道也是天意，注定我要回到宋永生的身边？<br>　　　　　　　　　　　　　　　　　<br>　　那晚，刘欣没有给我电话。我欠他一个解释。<br>　　　　　　　　　　　　　　　　　<br>　　一个星期，两个星期，刘欣没有出现，也没有电话。尽管宋永生在身边，但仍觉得生活里少了些什么。刘欣的沉默，让我有很重的失落。<br>　　　　　　　　　　　　　　　　　<br>　　宋永生的女朋友要出国，一遍一遍地来求宋永生跟她一块走。宋永生要我明确地答复他。<br>　　　　　　　　　　　　　　　　　<br>　　刘欣仍是沉默，他甚至不想听我解释。<br>　　　　　　　　　　　　　　　　　<br>　　直到那天，无意中看了一本组织，才明白刘欣当初发邮件为什么用HMILY这个英文名。他肯定也是看过那个小故事的了——HMILY的意思是：How much I love you（我多么爱你）！我的心突然被强烈地撞击，平日的细节在我心里过滤，我恨自己。活该他不理我。<br>　　　　　　　　　　　　　　　　　<br>　　我去了画室。打开那扇熟悉的门，我忽然之间心跳加速。我以为会见到刘欣，但是我没有。我看见的是我自己。一幅油画，很大，画的是哪天雪地上的我。我完全可以相信只有爱一个人很深，才可以画得如此真切。我看到自己的灵魂在他的笔端流溢。我的相片洒满桌子，我发现每一张的背面都写着那个英文单词：HMILY。这时我才明白，他对我的爱远比我想象的要深，而我对他的情感，也比我自以为的深了不知多少。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/13/How much i love you/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<!-- 来必力City版安装代码 -->
-
-  <!-- 这一句是适配样式 -->
-  <section class="duoshuo" id="comments">
-    <!-- 以下是 来必力City版安装代码 -->
-    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
-      <script type="text/javascript">
-       (function(d, s) {
-           var j, e = d.getElementsByTagName(s)[0];
-           if (typeof LivereTower === 'function') { return; }
-           j = d.createElement(s);
-           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-           j.async = true;
-           e.parentNode.insertBefore(j, e);
-       })(document, 'script');
-      </script>
-    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
-    </div>
-  </section>
-
-
-  
     <article id="post-人的一生有三件事情不能等" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -4550,10 +4424,462 @@ DirectoryInfo
 
 
   
+    <article id="post-Java面试笔记" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
-    </nav>
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/07/11/Java面试笔记/">Java面试笔记</a>
+    </h1>
+  
+
+        
+        <a href="/2019/07/11/Java面试笔记/" class="archive-article-date">
+  	<time datetime="2019-07-11T13:13:53.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-11</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>一、 面试整体流程<br> 1.1 简单的自我介绍<br>      我是xxxx,工作xxx年.我先后在xxxx公司、yyyy公司工作。先后做个xxxx项目、yyyy项目。<br> 1.2 你简单介绍一下xxxx项目<br>    为了解决xxxx问题，开发了一套xxxx系统，该系统主要有那些部分组成。简单介绍项目的整体架构。参与某个模块的开发。就要求你说一下这个模块的业务及设计。<br> 1.3 会问一下JAVA的专业技能<br>     后面详细讲解<br> 1.4你还有什么需要询问我的吗<br>     公司要做的项目？项目中会使用一下什么技术？</p>
+<p>注意：经历了多轮面试后，对于你的自我介绍和项目项目经验面试官就不太关心了。<br>   你说一下你最擅长的什么？你简单说一下？<br>最终技术面试完成后，都会让你回家等消息，或者等hr来和你谈薪资和福利。<br>二、 java的专业技能<br>2.1 java的基础部分<br>2.1.1 简单讲一下java的跨平台原理<br>      由于各操作系统（windows,liunx等）支持的指令集，不是完全一致的。就会让我们的程序在不同的操作系统上要执行不同程序代码。Java开发了适用于不同操作系统及位数的java虚拟机来屏蔽个系统之间的差异，提供统一的接口。对于我们java开发者而言，你只需要在不同的系统上安装对应的不同java虚拟机、这时你的java程序只要遵循java规范，就可以在所有的操作系统上面运行java程序了。</p>
+<p>Java通过不同的系统、不同版本、不同位数的java虚拟机(jvm),来屏蔽不同的系统指令集差异而对外体统统一的接口(java API),对于我们普通的java开发者而言，只需要按照接口开发即可。如果我系统需要部署到不同的环境时，只需在系统上面按照对应版本的虚拟机即可。</p>
+<p>2.2.2 搭建一个java开发环境的步骤<br>Java开发环境需要些什么？</p>
+<p>1、 适用于我们开发环境的jdk<br>2、 对应开发环境eclipse<br>3、 还需要web服务器(tomcat)</p>
+<p>一、 下载对应组件<br>二、 安装<br>     Jdk,安装正常流程安装即可，配置我们的JAVA_HOME,因为后面的eclispe和tomcat会依赖于这个变量.<br>     Eclispe正常解压就ok,设置workspace的默认编码<br>     Tomcat 正常解压就ok,把tomcat集成到eclispe中，安装插件就OK。<br>     …….<br>     Svn/git</p>
+<p>2.1.3讲一下java中int数据占几个字节<br>Java中有几种基本数据类型？8种</p>
+<p>Int占 4个字节，32位<br>Boolean 1位</p>
+<p>2.1.4 面向对象的特征有哪些方面<br>有四大基本特征:封装、抽象、继承、多态<br>      面向对象的封装性，即将对象封装成一个高度自治和相对封闭的个体，对象状态（属性）由这个对象自己的行为（方法）来读取和改变。<br>张三这个人，他的姓名等属性，要有自己提供的获取或改变的方法来操作。private name setName getName</p>
+<pre><code> 封装就是将对象封装成一个个体，不允许外部访问和修改，只能通过该类提供的方法来实现调用和修改。
+
+ 抽象就是找出一些事物的相似和共性之处，然后将这些事物归为一个类，这个类只考虑这些事物的相似和共性之处，并且会忽略与当前主题和目标无关的那些方面，将注意力集中在与当前目标有关的方面。 就是把现实生活中的对象，抽象为类。
+
+   抽象就是找出一些事物的相似和共似之处，将这些事物归为一个类，这个类只考虑事物的相似和共性之处。
+
+在定义和实现一个类的时候，可以在一个已经存在的类的基础之上来进行，把这个已经存在的类所定义的内容作为自己的内容，并可以加入若干新的内容，或修改原来的方法使之更适合特殊的需要，这就是继承。遗产继承
+
+把这个已经存在的类所定义的内容作为自己的内容，并可以加入若干新的内容，或修改原来的方法使之更适合特殊的需要，这就是继承。
+
+多态是指程序中定义的引用变量所指向的具体类型和通过该引用变量发出的方法调用在编程时并不确定，而是在程序运行期间才确定，即一个引用变量倒底会指向哪个类的实例对象，该引用变量发出的方法调用到底是哪个类中实现的方法，必须在由程序运行期间才能决定。。
+
+多态是指程序定义的引用变量在指向具体类型调用的时候在编程时不确定，在运行期间才能确定，一个引用变量倒底会指向哪个类的实例对象。
+
+Object obj = new xxx();
+UserDao userDao = new UserDaoJdbcImpl();。
+UserDao userDao = new UserDaoHibernateImpl();</code></pre><p>　　靠的是父类或接口定义的引用变量可以指向子类或具体实现类的实例对象，而程序调用的方法在运行期才动态绑定，就是引用变量所指向的具体实例对象的方法，也就是内存里正在运行的那个对象的方法，而不是引用变量的类型中定义的方法。 </p>
+<pre><code>原则：回答比较抽象问题的时候，要举例说明</code></pre><p>2.1.5有了基本数据类型，为什么还需要包装类型？<br>基本数据类型，java中提供了8中基本的数据类型。boolean int float等</p>
+<p>包装类型：每一个基本的数据类型都会一一对应一个包装类型。<br>boolean —–&gt;Boolean<br>Int ——–&gt;Integer</p>
+<p>装箱和拆箱<br>装箱：把基本的数据类型转换成对应的包装类型.<br>Integer .valueOf(1)<br>Integer i = 1;自动装箱，实际上在编译时会调用Integer .valueOf方法来装箱<br>拆箱：就是把包装类型转换为基本数据类型.基本数据类型 名称 = 对应的包装类型。<br>Integer i = 1;<br>int j = i;//自动拆箱//int j = i=intValue();手动拆箱<br>自动拆箱：实际上会在编译调用intValue</p>
+<p>Java是一个面向对象的语言，而基本的数据类型，不具备面向对象的特性。<br>null Integer—&gt;null int—-&gt;0 用Integer和int分别表示Person这个类的ID<br>Max 最大值<br>min 最小值<br>缓存值:对象缓存,Integer i=1; integer j= 1;i ==j</p>
+<p>2.1.6、说一下”==”和equals方法究竟有什么区别？<br>非常经典的一个面试题？先说清楚一个，再来说另一个？<br>==用来判断两个变量之间的的值是否相等。变量就可以分为基本数据类型变量，引用类型。<br>如果是基本数据类型的变量直接比较值而引用类型要比较对应的引用的内存的首地址。</p>
+<p>equals 用来比较两个对象长得是否一样。判断两个对象的某些特征是否一样。实际上就是调用对象的equals方法进行比较。</p>
+<p>2.1.7讲一下String和StringBuilder的区别(final)？StringBuffer和StringBuilder的区别?</p>
+<p>1.在java中提供三个类String  StringBuillder StringBuffer来表示和操作字符串。字符串就是多个字符的集合。<br>String是内容不可变的字符串。String底层使用了一个不可变的字符数组(final char[])</p>
+<p>String str =new String(“bbbb”);<br>而StringBuillder StringBuffer,是内容可以改变的字符串。StringBuillder StringBuffer底层使用的可变的字符数组（没有使用final来修饰） </p>
+<p>2.最经典就是拼接字符串。<br>1、 String进行拼接.String c = “a”+”b”;<br>2、 StringBuilder或者StringBuffer<br>StringBuilder sb = new StringBuilder(); sb.apend(“a”).apend(“b”)</p>
+<p>拼接字符串不能使用String进行拼接，要使用StringBuilder或者StringBuffer</p>
+<p>3.StringBuilder是线程不安全的，效率较高.而StringBuffer是线程安全的，效率较低。</p>
+<p>2.1.8、讲一下java中的集合?<br>Java中的集合分为value，key–vale(Conllection Map)两种。<br>存储值有分为List 和Set.<br>     List是有序的，可以重复的。<br>     Set是无序的，不可以重复的。根据equals和hashcode判断，也就是如果<br>     一个对象要存储在Set中，必须重写equals和hashCode方法。<br>存储key-value的为map.</p>
+<p>8、 ArrayList和LinkedList的区别?<br>  List常用的ArrayList和LinkedList。区别和使用场景?<br>  ArrayList底层使用时数组。LinkedList使用的是链表。<br>  数组查询具有所有查询特定元素比较快。而插入和删除和修改比较慢(数组在内存中是一块连续的内存，如果插入或删除是需要移动内存)。<br>  链表不要求内存是连续的，在当前元素中存放下一个或上一个元素的地址。查询时需要从头部开始，一个一个的找。所以查询效率低。插入时不需要移动内存，只需改变引用指向即可。所以插入或者删除的效率高。</p>
+<p>ArrayList使用在查询比较多，但是插入和删除比较少的情况，而LinkedList使用在查询比较少而插入和删除比较多的情况。</p>
+<p>2.1.9讲一下HashMap和HashTable的区别?HashTable和ConcurrentHashMap的区别?<br>相同点：HashMap和HasheTalbe都可以使用来存储key–value的数据。<br>区别：<br>1、 HashMap是可以把null作为key或者value的，而HashTable是不可以的。<br>2、 HashMap是线程不安全的，效率较高。而HashTalbe是线程安全的，效率较低。</p>
+<p>？我想线程安全但是我又想效率高？<br>通过把整个Map分为N个Segment（类似HashTable），可以提供相同的线程安全，但是效率提升N倍，默认提升16倍。</p>
+<p>2.1.10、实现一个拷贝文件的工具类使用字节流还是字符流?<br>我们拷贝的文件不确定是只包含字符流，有可以能有字节流(图片、声音、图像等)，为考虑到通用性，要使用字节流。</p>
+<p>2.1.11、讲一下线程的几种实现方式?启动方式？区分方式？<br>①实现方式<br>1、 通过继承Thread类实现一个线程<br>2、 通过实现Runnable接口实现一个线程<br>   继承扩展性不强，java总只支持单继承，如果一个类继承Thread就不能继承其他的类了。<br>②怎么启动？<br>   Thread thread = new Thread(继承了Thread的对象/实现了Runnable的对象)<br>   thread.setName(“设置一个线程名称”);<br>   thread.start();<br>   启动线程使用start方法，而启动了以后执行的是run方法。<br>③怎么区分线程？在一个系统中有很多线程，每个线程都会打印日志，我想区分是哪个线程打印的怎么办？<br>   thread.setName(“设置一个线程名称”); 这是一种规范，在创建线程完成后，都需要设置名称。</p>
+<p>2.1.12有没有使用过线程并发库?<br>简单了解过？<br>JDK5中增加了Doug Lea的并发库，这一引进给Java线程的管理和使用提供了强大的便利性。 java.util.current包中提供了对线程优化、管理的各项操作，使得线程的使用变得的心应手。该包提供了线程的运行，线程池的创建，线程生命周期的控制.</p>
+<p>Java通过Executors提供四个静态方法创建四种线程池，分别为：<br>     newCachedThreadPool创建一个可缓存线程池，如果线程池长度超过处理需要，可灵活回收空闲线程，若无可回收，则新建线程。<br>     newFixedThreadPool 创建一个定长线程池，可控制线程最大并发数，超出的线程会在队列中等待。<br>     newScheduledThreadPool 创建一个定长线程池，支持定时及周期性任务执行。<br>     newSingleThreadExecutor 创建一个单线程化的线程池，它只会用唯一的工作线程来执行任务，保证所有任务按照指定顺序(FIFO, LIFO, 优先级)执行</p>
+<p>2.1.13线程池的作用？<br>1、 限定线程的个数，不会导致由于线程过多导致系统运行缓慢或崩溃<br>2、 线程池不需要每次都去创建或销毁，节约了资源、<br>3、 线程池不需要每次都去创建，响应时间更快。<br>连接池也是一样？</p>
+<p>2.1.14讲一下什么是设计模式？常用的设计模式有哪些？<br>设计模式就是经过前人无数次的实践总结出的，设计过程中可以反复使用的、可以解决特定问题的设计方法。</p>
+<p>单例(饱汉模式、饥汉模式)<br>1、 构造方法私有化，让出了自己类中能创建外其他地方都不能创建<br>2、在自己的类中创建一个单实例（饱汉模式是一出来就创建创建单实例，而饥汉模式需要的时候才创建）<br>3、提供一个方法获取该实例对象(创建时需要进行方法同步)<br>工厂模式:Spring IOC就是使用了工厂模式.<br>       对象的创建交给一个工厂去创建。<br>代理模式:Spring AOP就是使用的动态代理。</p>
+<p>2.2 java web部分<br>2.2.1讲一下http get和post请求的区别?</p>
+<p>GET和POST请求都是http的请求方式，用户通过不同的http的请求方式完成对资源（url）的不同操作。GET，POST，PUT，DELETE就对应着对这个资源的查 ，改 ，增 ，删 4个操作,具体点来讲GET一般用于获取/查询资源信息，而POST一般用于更新资源信息</p>
+<p>1、Get请求提交的数据会在地址栏显示出来，而post请求不会再地址栏显示出来.<br>GET提交，请求的数据会附在URL之后（就是把数据放置在HTTP协议头中），以?分割URL和传输数据，多个参数用&amp;连接；POST提交：把提交的数据放置在是HTTP包的包体中。 因此，GET提交的数据会在地址栏中显示出来，而POST提交，地址栏不会改变<br>2、传输数据的大小<br>http Get请求由于浏览器对地址长度的限制而导致传输的数据有限制。而POST请求不会因为地址长度限制而导致传输数据限制。<br>3、安全性,POST的安全性要比GET的安全性高。由于数据是会在地址中呈现，所以可以通过历史记录找到密码等关键信息。<br>2.2.2 说一下你对servlet的理解？或者servlet是什么？<br>Servlet（Server Applet），全称Java Servlet， 是用Java编写的服务器端程序。而这些Sevlet都要实现Servlet这个借口。其主要功能在于交互式地浏览和修改数据，生成动态Web内容。Servlet运行于支持Java的应用服务器中。</p>
+<p>HttpServlet 重写doGet和doPost方法或者你也可以重写service方法完成对get和post请求的响应<br>2.2.3简单说一下servlet的生命周期?<br>servlet有良好的生存期的定义，包括加载和实例化、初始化、处理请求以及服务结束。这个生存期由javax.servlet.Servlet接口的init,service和destroy方法表达。</p>
+<p>加载Servlet的class—-&gt;实例化Servlet—–&gt;调用Servlet的init完成初始化—-&gt;响应请求（Servlet的service方法）—–&gt;Servlet容器关闭时(Servlet的destory方法)</p>
+<p>Servlet启动时，开始加载servlet生命周期开始。Servlet被服务器实例化后，容器运行其init方法，请求到达时运行其service方法，service方法自动派遣运行与请求对应的doXXX方法（doGet，doPost）等，当服务器决定将实例销毁的时候(服务器关闭)调用其destroy方法。</p>
+<p>2.2.4 Servlet API中forward() 与redirect()的区别？<br>1、 forward是服务器端的转向而redirect是客户端的跳转。<br>2、 使用forward浏览器的地址不会发生改变。而redirect会发生改变。<br>3、 Forward是一次请求中完成。而redirect是重新发起请求。<br>4、 Forward是在服务器端完成，而不用客户端重新发起请求，效率较高。</p>
+<p>2.2.5 JSP和Servlet有哪些相同点和不同点?<br>JSP是Servlet技术的扩展，所有的jsp文件都会被翻译为一个继承HttpServlet的类。也就是jsp最终也是一个Servlet.这个Servlet对外提供服务。</p>
+<p>Servlet和JSP最主要的不同点在于JSP侧重于视图，Servlet主要用于控制逻辑。</p>
+<p>Servlet如果要实现html的功能，必须使用Writer输出对应的html,比较麻烦。而JSP的情况是Java和HTML可以组合成一个扩展名为.jsp的文件,做界面展示比较方便而嵌入逻辑比较复杂。</p>
+<p>2.2.6 jsp有哪些内置对象?作用分别是什么?<br>9个内置的对象：<br>     request 用户端请求，此请求会包含来自GET/POST请求的参数<br>     response 网页传回用户端的回应<br>     pageContext 网页的属性是在这里管理<br>     session 与请求有关的会话期<br>     application servlet正在执行的内容<br>     out 用来传送回应的输出<br>     config servlet的构架部件<br>     page JSP网页本身<br>     exception 针对错误网页，未捕捉的例外<br>     四大作用域：pageContext request session application 可以通过jstl从四大作用域中取值.<br>     Jsp传递值request session application cookie也能传值</p>
+<p>2.2.7说一下session和cookie的区别？你在项目中都有哪些地方使用了？<br>Session和cookie都是会话(Seesion)跟踪技术。Cookie通过在客户端记录信息确定用户身份，Session通过在服务器端记录信息确定用户身份。但是Session的实现依赖于Cookie,sessionId(session的唯一标识需要存放在客户端).<br>cookie 和session 的区别：<br>1、cookie数据存放在客户的浏览器上，session数据放在服务器上。<br>2、cookie不是很安全，别人可以分析存放在本地的COOKIE并进行COOKIE欺骗<br>   考虑到安全应当使用session。<br>3、session会在一定时间内保存在服务器上。当访问增多，会比较占用你服务器的性能,考虑到减轻服务器性能方面，应当使用COOKIE。<br>4、单个cookie保存的数据不能超过4K，很多浏览器都限制一个站点最多保存20个cookie。<br>5、所以个人建议：<br>   将登陆信息等重要信息存放为SESSION<br>   其他信息如果需要保留，可以放在COOKIE中，比如购物车</p>
+<p>购物车最好使用cookie，但是cookie是可以在客户端禁用的，这时候我们要使用cookie+数据库的方式实现，当从cookie中不能取出数据时，就从数据库获取。</p>
+<p>2.2.8、MVC的各个部分都有那些技术来实现?<br>M(Model) 模型 javabean<br>V(View) 视图  html jsp volicity freemaker<br>C(Control) 控制器 Servlet,Action</p>
+<p>Jsp+Servlet+javabean 最经典mvc模式,实际上就是model2的实现方式，就是把视图和逻辑隔离开来<br>Model1的方式 jsp+service+dao<br>MOdel2的方式 jsp+servlet+service+dao</p>
+<p>使用struts2和springmvc这样的mvc框架后，jsp+核心控制器+action+javabean</p>
+<p>2.3数据库部分<br>2.3.1数据库的分类及常用的数据库<br>      数据库分为：关系型数据库和非关系型数据库<br>          关系型：mysql oracle sqlserver等<br>          非关系型：redis,memcache,mogodb,hadoop等<br>2.3.2简单介绍一下关系数据库三范式？<br>    范式就是规范,就是关系型数据库在设计表时，要遵循的三个规范。<br>     要想满足第二范式必须先满足第一范式，要满足第三范式必须先满足第二范式。</p>
+<pre><code>第一范式（1NF）是指数据库表的每一列都是不可分割的基本数据项，同一列中不能有多个值，即实体中的某个属性不能有多个值或者不能有重复的属性。列数据的不可分割
+
+二范式（2NF）要求数据库表中的每个行必须可以被唯一地区分。为实现区分通常需要为表加上一个列，以存储各个实例的唯一标识。(主键)
+
+ 满足第三范式（3NF）必须先满足第二范式（2NF）。简而言之，第三范式（3NF）要求一个数据库表中不包含已在其它表中已包含的非主关键字信息。(外键)
+
+反三范式,有的时候为了效率，可以设置重复或者可以推导出的字段.
+        订单（总价）和订单项（单价）</code></pre><p>2.3.3事务四个基本特征或 ACID 特性。<br>     事务是并发控制的单位，是用户定义的一个操作序列。这些操作要么都做，要么都不做，是一个不可分割的工作单位。<br>     一个转账必须 A账号扣钱成功，B账号加钱成功，才算正真的转账成功。<br>       事务必须满足四大特征:原子性,一致性,隔离性持久性/持续性<br>      原子性：表示事务内操作不可分割。要么都成功、要么都是失败.<br>      一致性：要么都成功、要么都是失败.后面的失败了要对前面的操作进行回滚。<br>      隔离性：一个事务开始后，不能后其他事务干扰。<br>      持久性/持续性：表示事务开始了，就不能终止。<br>2.3.4 mysql数据库的默认的最大连接数？<br>100<br> 为什么需要最大连接数？特定服务器上面的数据库只能支持一定数目同时连接，这时候我们一般都会设置最大连接数（最多同时服务多少连接）。在数据库安装时都会有一个默认的最大连接数为100</p>
+<p>2.3.5说一下msyql的分页？Oracle的分页？<br>为什么需要分页？在很多数据是，不可能完全显示数据。进行分段显示.</p>
+<p>Mysql是使用关键字limit来进行分页的 limit offset,size 表示从多少索引去多少位.<br>Oracle的分页，大部分情况下，我们是记不住了。说思路，要使用三层嵌套查询。<br>   Oracle的分页有点儿记不住了，只记得一些大概。是使用了三层嵌套查询。如果在工作中使用了，可以到原来的项目中拷贝或上网查询。</p>
+<p>mysql:</p>
+<pre><code>String sql = 
+&quot;select * from students order by id limit &quot; + pageSize*(pageNumber-1) + &quot;,&quot; + pageSize;</code></pre><p>oracle:</p>
+<pre><code>String sql = 
+ &quot;select * from &quot; +  
+ (select *,rownum rid from (select * from students order by postime desc) where rid&lt;=&quot; + pagesize*pagenumber + &quot;) as t&quot; + 
+ &quot;where t&gt;&quot; + pageSize*(pageNumber-1);</code></pre><p>2.3.6简单讲一下数据库的触发器的使用场景？<br>触发器，需要有触发条件，当条件满足以后做什么操作。</p>
+<p>触发器用处还是很多的，比如校内网、开心网、Facebook，你发一个日志，自动通知好友，其实就是在增加日志时做一个后触发，再向通知表中写入条目。因为触发器效率高。而UCH没有用触发器，效率和数据处理能力都很低。</p>
+<p>每插入一个帖子，都希望将版面表中的最后发帖时间，帖子总数字段进行同步更新，用触发器做效率就很高。</p>
+<pre><code>create table board1(id int primary key auto_increment,name varchar(50),ar
+ticleCount int);
+
+create table article1(id int primary key auto_increment,title varchar(50)
+,bid int references board1(id));
+
+delimiter |#把分割符;改成|
+
+create trigger insertArticle_Trigger after insert on article1 for each ro
+w begin
+    -&gt; update board1 set articleCount=articleCount+1 where id= NEW.bid;
+    -&gt; end;
+    -&gt; |
+
+delimiter ;
+
+insert into board1 value (null,&apos;test&apos;,0);
+
+insert into article1 value(null,&apos;test&apos;,1);</code></pre><p>2.3.7 简单讲一下数据库的存储过程的使用场景？<br>数据库存储过程具有如下优点：<br>1、存储过程只在创建时进行编译，以后每次执行存储过程都不需再重新编译，而一般 SQL 语句每执行一次就编译一次，因此使用存储过程可以大大提高数据库执行速度。<br>2、通常，复杂的业务逻辑需要多条 SQL 语句。这些语句要分别地从客户机发送到服务器，当客户机和服务器之间的操作很多时，将产生大量的网络传输。如果将这些操作放在一个存储过程中，那么客户机和服务器之间的网络传输就会大大减少，降低了网络负载。<br>3、存储过程创建一次便可以重复使用，从而可以减少数据库开发人员的工作量。<br>4、安全性高，存储过程可以屏蔽对底层数据库对象的直接访问，使用 EXECUTE 权限调用存储过程，无需拥有访问底层数据库对象的显式权限。</p>
+<p>正是由于存储过程的上述优点，目前常用的数据库都支持存储过程，例如 IBM DB2，Microsoft SQL Server，Oracle，Access 等，开源数据库系统 MySQL 也在 5.0 的时候实现了对存储过程的支持。</p>
+<p>定义存储过程:<br>create procedure insert_Student (_name varchar(50),_age int ,out _id int)<br>begin<br>    insert into student value(null,_name,_age);<br>    select max(stuId) into _id from student;<br>end;</p>
+<p>call insert_Student(‘wfz’,23,@id);<br>select @id;</p>
+<p>2.3.8 用jdbc怎么调用存储过程？<br>贾琏欲执事<br>     加载驱动<br>     获取连接<br>     设置参数<br>     执行<br>     释放连接</p>
+<p>package com.huawei.interview.lym;</p>
+<p>import java.sql.CallableStatement;<br>import java.sql.Connection;<br>import java.sql.DriverManager;<br>import java.sql.SQLException;<br>import java.sql.Types;</p>
+<p>public class JdbcTest {</p>
+<pre><code>/**
+ * @param args
+ */
+public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    Connection cn = null;
+    CallableStatement cstmt = null;        
+    try {
+        //这里最好不要这么干，因为驱动名写死在程序中了
+        Class.forName(&quot;com.mysql.jdbc.Driver&quot;);
+        //实际项目中，这里应用DataSource数据，如果用框架，
+        //这个数据源不需要我们编码创建，我们只需Datasource ds = context.lookup()
+        //cn = ds.getConnection();            
+        cn = DriverManager.getConnection(&quot;jdbc:mysql:///test&quot;,&quot;root&quot;,&quot;root&quot;);
+        cstmt = cn.prepareCall(&quot;{call insert_Student(?,?,?)}&quot;);
+        cstmt.registerOutParameter(3,Types.INTEGER);
+        cstmt.setString(1, &quot;wangwu&quot;);
+        cstmt.setInt(2, 25);
+        cstmt.execute();
+        //get第几个，不同的数据库不一样，建议不写
+        System.out.println(cstmt.getString(3));
+    } catch (Exception e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+    finally
+    {
+
+        /*try{cstmt.close();}catch(Exception e){}
+        try{cn.close();}catch(Exception e){}*/
+        try {
+            if(cstmt != null)
+                cstmt.close();
+            if(cn != null)                
+                cn.close();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+}</code></pre><p>2.3.9常用SQL<br>略<br>2.3.10简单说一下你对jdbc的理解？<br>Java database connection java数据库连接.数据库管理系统(mysql oracle等)是很多，每个数据库管理系统支持的命令是不一样的。</p>
+<p>Java只定义接口，让数据库厂商自己实现接口，对于我们者而言。只需要导入对应厂商开发的实现即可。然后以接口方式进行调用.(mysql + mysql驱动（实现）+jdbc)</p>
+<p>2.3.11 写一个简单的jdbc的程序。写一个访问oracle数据的jdbc程序?<br>贾琏欲执事<br>     加载驱动(com.mysql.jdbc.Driver,oracle.jdbc.driver.OracleDriver)<br>     获取连接(DriverManager.getConnection(url,usernam,passord))<br>     设置参数  Statement PreparedStatement<br>                cstmt.setXXX(index, value);<br>     执行   executeQuery executeUpdate<br>     释放连接(是否连接要从小到大，必须放到finnaly)</p>
+<p>2.3.12 JDBC中的PreparedStatement相比Statement的好处<br>大多数我们都使用PreparedStatement代替Statement<br>1：PreparedStatement是预编译的，比Statement速度快<br>2：代码的可读性和可维护性<br>虽然用PreparedStatement来代替Statement会使代码多出几行,但这样的代码无论从可读性还是可维护性上来说.都比直接用Statement的代码高很多档次：<br>stmt.executeUpdate(“insert into tb_name (col1,col2,col2,col4) values (‘“+var1+”‘,’”+var2+”‘,”+var3+”,’”+var4+”‘)”);<br>perstmt = con.prepareStatement(“insert into tb_name (col1,col2,col2,col4) values (?,?,?,?)”);<br>perstmt.setString(1,var1);<br>perstmt.setString(2,var2);<br>perstmt.setString(3,var3);<br>perstmt.setString(4,var4);<br>perstmt.executeUpdate();<br>不用我多说,对于第一种方法，别说其他人去读你的代码，就是你自己过一段时间再去读,都会觉得伤心。</p>
+<p>3：安全性<br>PreparedStatement可以防止SQL注入攻击，而Statement却不能。比如说：<br>String sql = “select * from tb_name where name= ‘“+varname+”‘ and passwd=’”+varpasswd+”‘“;<br>如果我们把[‘ or ‘1’ = ‘1]作为varpasswd传入进来.用户名随意,看看会成为什么?<br>select * from tb_name = ‘随意’ and passwd = ‘’ or ‘1’ = ‘1’;<br>因为’1’=’1’肯定成立，所以可以任何通过验证，更有甚者：<br>把[‘;drop table tb_name;]作为varpasswd传入进来,则：<br>select * from tb_name = ‘随意’ and passwd = ‘’;drop table tb_name;有些数据库是不会让你成功的，但也有很多数据库就可以使这些语句得到执行。<br>而如果你使用预编译语句你传入的任何内容就不会和原来的语句发生任何匹配的关系，只要全使用预编译语句你就用不着对传入的数据做任何过虑。而如果使用普通的statement,有可能要对drop等做费尽心机的判断和过虑。<br>2.3.13 数据库连接池作用<br>1、限定数据库的个数，不会导致由于数据库连接过多导致系统运行缓慢或崩溃<br>2、数据库连接不需要每次都去创建或销毁，节约了资源<br>3、数据库连接不需要每次都去创建，响应时间更快。<br>2.4 前端部分<br>2.4.1简单说一下html,css,javascript在网页开发中的定位?<br>HTML 超文本标记语言 定义网页的结构<br>CSS 层叠样式表，用来美化页面<br>JavaScript主要用来验证表单，做动态交互(其中ajax)</p>
+<p>2.4.2简单介绍一下Ajax?<br>  什么是Ajax? 异步的javascript和xml<br>  作用是什么？通过AJAX与服务器进行数据交换，AJAX可以使网页实现布局更新。<br>          这意味着可以在不重新加载整个网页的情况下，对网页的某部分进行更新。<br>  怎么来实现Ajax XmlHttpRequest对象，使用这个对象可以异步向服务器发送请求，获取获取响应，完成局部更新。Open send responseText/responseXML 局部响应.<br>  使用场景 登陆失败时不跳转页面，注册时提示用户名是否存在,二级联动等等使用场景<br>2.4.3 js和jQuery的关系?<br>  jQuery是一个js框架，封装了js的属性和方法。让用户使用起来更加便利。<br>,并且增强了js的功能.</p>
+<p>使用原生js是要处理很多兼容性的问题(注册事件等)，由jQuery封装了底层，就不用处理兼容性问题。<br>原生的js的dom和事件绑定和Ajax等操作非常麻烦，jQuery封装以后操作非常方便。<br>2.4.4 jQuery的常用选择器？<br>     ID选择器   通过ID获取一个元素<br>     Class选择器 通过类(css)获取元素<br>     标签选择器 通过标签获取元素<br>     通用选择器(*) 获取所以的元素<br>     div.myCls  获取有myCls这个类的div<br>     层次选择器<br>          儿子选择器 &gt; 获取下面的子元素<br>          后代选择器 空格 获取下面后代，包括儿子、孙子等后代<br>     属性选择器<br>         Tag[attrName=’test’] 获取有属性名为xxxx并且属性的值为test的所有xxx标签<br>         <input type="”checkbox”" name="”hobby”/"> 吃饭<br><br>         <input type="”checkbox”" name="”hobby”/"> 睡觉<br><br>        Input[name=’hobby’],表示获取属性名为name并且name属性值为hobby的的所有input标签元素 </p>
+<p>2.4.5 jQuery的页面加载完毕事件？<br>    很多时候我们需要获取元素，但是必须等到该元素被加载完成后才能获取。我们可以把js代码放到该元素的后面，但是这样就会造成js在我们的body中存在不好管理。所有页面加载完毕后所有的元素当然已经加载完毕。一般获取元素做操作都要在页面加载完毕后操作。<br>第一种:<br>$(document).ready(function(){<br>});</p>
+<p>$(document)把原生的document这个dom对象转换为jQuery对象，转换完成后才能调用ready方法</p>
+<p>ready(fn),表示的是页面结构被加载完毕后执行传入函数fn<br>第二种:<br>$(function(){<br>});</p>
+<p>当页面加载完毕后执行里面的函数,这一种相对简单，用得最多。<br>window.onload的区别<br>1、 jQuery中的页面加载完毕事件，表示的是页面结构被加载完毕。<br>2、 window.onload 表示的是页面被加载完毕。<br>  <img src="”htttp://baidu.com/1.jpg”/"> onload必须等等页面中的图片、声音、图像等远程资源被加载完毕后才调用而jQuery中只需要页面结构被加载完毕。</p>
+<p>2.4.6 Jquery的Ajax和原生Js实现Ajax有什么关系？<br>jQuery中的Ajax也是通过原生的js封装的。封装完成后让我们使用起来更加便利，不用考虑底层实现或兼容性等处理。</p>
+<p>如果采用原生js实现Ajax是非常麻烦的，并且每次都是一样的。如果我们不使用jQuery我们也要封装Ajax对象的方法和属性。有像jQuery这些已经封装完成，并经过很多企业实际的框架，比较可靠并且开源。我们就不需要封装，直接使用成熟的框架(jQuery)即可.</p>
+<p>2.4.7简单说一下html5?你对现在的那些新技术有了解?<br>Html5是最新版本的html,是在原来html4的基础上增强了一些标签。</p>
+<p>Html增加一些像画板、声音、视频、web存储等高级功能。但是html5有一个不好的地方，那就是html5太强调语义了，导致开发中都不知道要选择那个标签。<br>  在做页面布局是，无论头部、主题、导航等模块都使用div来表示，但是html5的规范，需要使用不同的标签来表示。(header footer等)</p>
+<p>你对现在的那些新技术有了解<br>Html5 css3等</p>
+<p>2.4.8 简单说一下css3?<br>   Css3是最新版本的css,是对原理css2的功能增强。</p>
+<p>   Css3中提供一些原来css2中实现起来比较困难或者不能实现的功能。<br>     1、盒子圆角边框<br>     2、盒子和文字的阴影<br>     3、渐变<br>     4、转换 移动、缩放、旋转等<br>     5、过渡、动画都可以使用动画。<br>     6、可以使用媒体查询实现响应式网站。<br>   Css3最大缺点就是要根据不同的浏览器处理兼容性。对应有一些处理兼容性的工具。不用担心.<br>2.4.9 bootstrap是什么？<br>BootStrap是一个移动设备优先的UI框架。我们可以不用谢任何css,js代码就能实现比较漂亮的有交互性的页面。我们程序员对页面的编写是有硬伤的，所有要自己写页面的话就要使用类似于bootstrap这样的UI框架。</p>
+<p>平时用得很多的：<br>1、 模态框<br>2、 表单，表单项<br>3、 布局<br>4、 删格系统<br>2.5 框架部分<br>2.5.1什么是框架?<br>  框架（Framework）是一个框子——指其约束性，也是一个架子——指其支撑性。</p>
+<p>  IT语境中的框架，特指为解决一个开放性问题而设计的具有一定约束性的支撑结构。在此结构上可以根据具体问题扩展、安插更多的组成部分，从而更迅速和方便地构建完整的解决问题的方案。</p>
+<p>1）框架本身一般不完整到可以解决特定问题,但是可以帮助您快速解决特定问题；<br>   没有框架所有的工作都从零开始做,有了框架,为我们提供了一定的功能,我们就可以在框 架的基础上开发,极大的解放了生产力。<br>不同的框架，是为了解决不同领域的问题。一定要为了解决问题才去学习框架。<br>2）框架天生就是为扩展而设计的；<br>3）框架里面可以为后续扩展的组件提供很多辅助性、支撑性的方便易用的实用工具（utilities），也就是说框架时常配套了一些帮助解决某类问题的库（libraries）或工具（tools）。<br>  java中就是一系列的jar包，其本质就是对jdk功能的扩展.</p>
+<p>2.5.2 MVC模式<br>   MVC全名是Model View Controller，是模型(model)－视图(view)－控制器(controller)的缩写，一种软件设计典范，用一种业务逻辑、数据、界面显示分离的方法组织代码，将业务逻辑聚集到一个部件里面，在改进和个性化定制界面及用户交互的同时，不需要重新编写业务逻辑。</p>
+<p>最简单的、最经典就是Jsp(view) +Servlet(controller) + JavaBean(model)</p>
+<p>1、 当控制器收到来自用户的请求<br>2、 控制器调用JavaBean完成业务<br>3、 完成业务后通过控制器跳转JSP页面的方式给用户反馈信息<br>4、 Jsp个 用户做出响应。<br>    控制器都是核心</p>
+<p>2.5.3 MVC框架<br>什么是MVC框架？<br>  是为了解决传统MVC模式(Jsp + Servlet + JavaBean)的一些问题而出现的框架。</p>
+<p>传统MVC模式问题<br>1、 所有的Servlet和Servlet映射都要配置在web.xml中，如果项目太大，web.xml就太庞大，并且不能实现模块化管理。<br>2、 Servlet的主要功能就是接受参数、调用逻辑、跳转页面，比如像其他字符编码、文件上传等功能也要写在Servlet中，不能让Servlet主要功能而需要做处理一下特例。<br>3、接受参数比较麻烦(String name = request.getParameter(“name”),User user=new User user.setName(name))，不能通过model接收，只能单个接收，接收完成后转换封装model.<br>4、跳转页面方式比较单一(forword,redirect),并且当我的页面名称发生改变时需要修改Servlet源代码.</p>
+<p>现在比较常用的MVC框架有：<br>   struts<br>   webwork<br>   Struts2<br>   Spring MVC</p>
+<p>2.5.4 简单讲一下struts2的执行流程？<br>Struts2的原理?</p>
+<p>一个请求在Struts2框架中的处理大概分为以下几个步骤：<br>1、客户端浏览器发送请求<br>2、这个请求经过一系列的过滤器（Filter）（这些过滤器中有一个叫做ActionContextCleanUp的可选过滤器，这个过滤器对于Struts2和其他框架的集成很有帮助，例如：SiteMesh Plugin）；<br>3、接着FilterDispatcher(StrutsPrepareAndExecuteFilter)被调用，FilterDispatcher<br>(StrutsPrepareAndExecuteFilter)询问ActionMapper来决定这个请求是否需要调用某个Action；<br>4、 如果ActionMapper决定需要调用某个Action，FilterDispatcher<br>    (StrutsPrepareAndExecuteFilter)把请求的处理交给ActionProxy；<br>5、ActionProxy通过Configuration Manager询问框架的配置文件，找到需要调用的Action类；<br>6、ActionProxy创建一个ActionInvocation的实例。<br>7、ActionInvocation实例使用命名模式来调用，在调用Action的过程前后，涉及到相关拦截器（Intercepter）的调用。<br>8、一旦Action执行完毕，ActionInvocation负责根据struts.xml中的配置找到对应的返回结果。返回结果通常是（但不总是，也可能是另外的一个Action链）一个需要被表示的JSP或者FreeMarker的模版。在表示的过程中可以使用Struts2框架中继承的标签。在这个过程中需要涉及到ActionMapper。</p>
+<p>面试：<br>1、 浏览器发送请求，经过一系列的过滤器后，到达核心过滤器(StrutsPrepareAndExecuteFilter).<br>2、 StrutsPrepareAndExecuteFilter通过ActionMapper判断当前的请求是否需要某个Action处理,如果不需要，则走原来的流程。如果需要则把请求交给ActionProxy来处理<br>3、 ActionProxy通过Configuration Manager询问框架的配置文件(Struts.xml)，找到需要调用的Action类；<br>4、 创建一个ActionInvocation实例，来调用Action的对应方法来获取结果集的name,在调用前后会执行相关拦截器。<br>5、 通过结果集的Name知道对应的结果集来对浏览器进行响应。</p>
+<p>拦截、判断、寻找、执行、响应</p>
+<p>2.5.5 Struts2中的拦截器，你都用它干什么？<br>    java里的拦截器是动态拦截Action调用的对象。它提供了一种机制可以使开发者可以定义在一个action执行的前后执行的代码，也可以在一个action执行前阻止其执行，同时也提供了一种可以提取action中可重用部分的方式。<br>    在AOP（Aspect-Oriented Programming）中拦截器用于在某个方法或字段被访问之前，进行拦截然后在之前或之后加入某些操作。</p>
+<p>面试：<br>    struts2中的的功能（参数处理、文件上传、字符编码等）都是通过系统拦截器实现的。<br>     如果业务需要，当然我们也可以自定义拦截器,进行可插拔配置，在执行Action的方法前后、加入相关逻辑完成业务。<br>     使用场景：<br>     1、 用户登录判断，在执行Action的前面判断是否已经登录，如果没有登录的跳转到登录页面。<br>     2、 用户权限判断，在执行Action的前面判断是否具有，如果没有权限就给出提示信息。<br>     3、 操作日志……<br>    4、……<br> 2.5.6 简单讲一下SpringMVC的执行流程？</p>
+<ol>
+<li>用户向服务器发送请求，请求被Spring 前端控制Servelt DispatcherServlet捕获；</li>
+<li>DispatcherServlet对请求URL进行解析，得到请求资源标识符（URI）。然后根据该URI，调用HandlerMapping获得该Handler配置的所有相关的对象（包括Handler对象以及Handler对象对应的拦截器），最后以HandlerExecutionChain对象的形式返回；<ol start="3">
+<li>DispatcherServlet 根据获得的Handler，选择一个合适的HandlerAdapter。（附注：如果成功获得HandlerAdapter后，此时将开始执行拦截器的preHandler(…)方法）</li>
+<li>提取Request中的模型数据，填充Handler入参，开始执行Handler（Controller)。 在填充Handler的入参过程中，根据你的配置，Spring将帮你做一些额外的工作：<br>HttpMessageConveter： 将请求消息（如Json、xml等数据）转换成一个对象，将对象转换为指定的响应信息<br>数据转换：对请求消息进行数据转换。如String转换成Integer、Double等<br>数据根式化：对请求消息进行数据格式化。 如将字符串转换成格式化数字或格式化日期等<br>数据验证： 验证数据的有效性（长度、格式等），验证结果存储到BindingResult或Error中<ol start="5">
+<li>Handler执行完成后，向DispatcherServlet 返回一个ModelAndView对象；</li>
+<li>根据返回的ModelAndView，选择一个适合的ViewResolver（必须是已经注册到Spring容器中的ViewResolver)返回给DispatcherServlet ；</li>
+<li>ViewResolver 结合Model和View，来渲染视图</li>
+<li>将渲染结果返回给客户端。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+<p>面试：<br>1、 用户向服务器发送请求，请求被Spring 前端控制Servelt DispatcherServlet捕获(捕获)<br>2、 DispatcherServlet对请求URL进行解析，得到请求资源标识符（URI）。然后根据该URI，调用HandlerMapping获得该Handler配置的所有相关的对象（包括Handler对象以及Handler对象对应的拦截器），最后以HandlerExecutionChain对象的形式返回；(查找handler)<br>3、 DispatcherServlet 根据获得的Handler，选择一个合适的HandlerAdapter。 提取Request中的模型数据，填充Handler入参，开始执行Handler（Controller), Handler执行完成后，向DispatcherServlet 返回一个ModelAndView对象(执行handler)<br>4、DispatcherServlet 根据返回的ModelAndView，选择一个适合的ViewResolver（必须是已经注册到Spring容器中的ViewResolver) (选择ViewResolver)<br>5、通过ViewResolver 结合Model和View，来渲染视图,DispatcherServlet 将渲染结果返回给客户端。（渲染返回）</p>
+<p>快速记忆技巧：<br>核心控制器捕获请求、查找Handler、执行Handler、选择ViewResolver,通过ViewResolver渲染视图并返回</p>
+<p>2.5.7 说一下struts2和springMVC有什么不同？</p>
+<p>目前企业中使用SpringMvc的比例已经远远超过Struts2,那么两者到底有什么区别，是很多初学者比较关注的问题，下面我们就来对SpringMvc和Struts2进行各方面的比较:</p>
+<ol>
+<li>核 心控制器（前端控制器、预处理控制器）：对于使用过mvc框架的人来说这个词应该不会陌生，核心控制器的主要用途是处理所有的请求，然后对那些特殊的请求 （控制器）统一的进行处理(字符编码、文件上传、参数接受、异常处理等等),spring mvc核心控制器是Servlet，而Struts2是Filter。</li>
+</ol>
+<p>2.控制器实例：Spring Mvc会比Struts快一些（理论上）。Spring Mvc是基于方法设计，而Sturts是基于对象，每次发一次请求都会实例一个action，每个action都会被注入 属性，而Spring更像Servlet一样，只有一个实例，每次请求执行对应的方法即可(注意：由于是单例实例，所以应当避免全局变量的修改，这样会产生线程安全问题)。</p>
+<ol start="3">
+<li>管理方式：大部分的公司的核心架构中，就会使用到spring,而spring mvc又是spring中的一个模块，所以spring对于spring mvc的控制器管理更加简单方便，而且提供了全 注解方式进行管理，各种功能的注解都比较全面，使用简单，而struts2需要采用XML很多的配置参数来管理（虽然也可以采用注解，但是几乎没有公司那 样使用）。</li>
+</ol>
+<p>4.参数传递：Struts2中自身提供多种参数接受，其实都是通过（ValueStack）进行传递和赋值，而SpringMvc是通过方法的参数进行接收。</p>
+<p>5.学习难度：Struts更加很多新的技术点，比如拦截器、值栈及OGNL表达式，学习成本较高，springmvc 比较简单，很较少的时间都能上手。</p>
+<p>6.intercepter 的实现机制：struts有以自己的interceptor机制，spring mvc用的是独立的AOP方式。这样导致struts的配置文件量还是比spring mvc大，虽然struts的配置能继承，所以我觉得论使用上来讲，spring mvc使用更加简洁，开发效率Spring MVC确实比struts2高。spring mvc是方法级别的拦截，一个方法对应一个request上下文，而方法同时又跟一个url对应，所以说从架构本身上spring3 mvc就容易实现restful url。struts2是类级别的拦截，一个类对应一个request上下文；实现restful url要费劲，因为struts2 action的一个方法可以对应一个url；而其类属性却被所有方法共享，这也就无法用注解或其他方式标识其所属方法了。spring3 mvc的方法之间基本上独立的，独享request response数据，请求数据通过参数获取，处理结果通过ModelMap交回给框架方法之间不共享变量，而struts2搞的就比较乱，虽然方法之间 也是独立的，但其所有Action变量是共享的，这不会影响程序运行，却给我们编码，读程序时带来麻烦。</p>
+<ol start="7">
+<li>spring mvc处理ajax请求,直接通过返回数据，方法中使用注解@ResponseBody，spring mvc自动帮我们对象转换为JSON数据。而struts2是通过插件的方式进行处理</li>
+</ol>
+<p>在SpringMVC流行起来之前，Struts2在MVC框架中占核心地位，随着SpringMVC的出现，SpringMVC慢慢的取代struts2,但是很多企业都是原来搭建的框架，使用Struts2较多。<br>2.5.8 说一下Spring中的两大核心？<br>Spring是什么？<br>     spring是J2EE应用程序框架，是轻量级的IoC和AOP的容器框架(相对于重量级的EJB)，主要是针对javaBean的生命周期进行管理的轻量级容器，可以单独使用，也可以和Struts框架，ibatis框架等组合使用。</p>
+<pre><code>1、 IOC(Inversion of Control )或DI(Dependency Injection)
+  IOC控制权反转
+     原来：我的Service需要调用DAO，Service就需要创建DAO
+     Spring:Spring发现你Service依赖于dao,就给你注入.
+  核心原理：就是配置文件+反射(工厂也可以)+容器(map)  
+2、 AOP:面向切面编程
+  核心原理：使用动态代理的设计模式在执行方法前后或出现异常做加入相关逻辑。
+ 我们主要使用AOP来做：
+ 1、事务处理
+ 2、权限判断
+ 3、日志
+ 4、....</code></pre><p>2.5.9 AOP是什么？你都拿它做什么？<br>     3、 AOP:面向切面编程<br>       核心原理：使用动态代理的设计模式在执行方法前后或出现异常做加入相关逻辑。<br>      我们主要使用AOP来做：<br>      1、事务处理 执行方法前，开启事务、执行完成后关闭事务、出现异常后回滚事务<br>      2、权限判断 在执行方法前，判断是否具有权限<br>      3、日志     在执行前进行日志处理<br>      4、….</p>
+<p>2.5.10讲一下Spring的事务传播特性<br>多个事务存在是怎么处理的策略</p>
+<ol>
+<li>PROPAGATION_REQUIRED: 如果存在一个事务，则支持当前事务。如果没有事务则开启</li>
+<li>PROPAGATION_SUPPORTS: 如果存在一个事务，支持当前事务。如果没有事务，则非事务的执行</li>
+<li>PROPAGATION_MANDATORY: 如果已经存在一个事务，支持当前事务。如果没有一个活动的事务，则抛出异常。</li>
+<li>PROPAGATION_REQUIRES_NEW: 总是开启一个新的事务。如果一个事务已经存在，则将这个存在的事务挂起。</li>
+<li>PROPAGATION_NOT_SUPPORTED: 总是非事务地执行，并挂起任何存在的事务。</li>
+<li>PROPAGATION_NEVER: 总是非事务地执行，如果存在一个活动事务，则抛出异常</li>
+<li>PROPAGATION_NESTED：如果一个活动的事务存在，则运行在一个嵌套的事务中. 如果没有活动事务, 则按TransactionDefinition.PROPAGATION_REQUIRED 属性执行</li>
+</ol>
+<p>Propagation<br>Required 需要 如果存在一个事务，则支持当前事务。如果没有事务则开启<br>Supports 支持 如果存在一个事务，支持当前事务。如果没有事务，则非事务的执行<br>Mandatory 必要的 如果已经存在一个事务，支持当前事务。如果没有一个活动的事务，则抛出异常。<br>required_new 总是开启一个新的事务。如果一个事务已经存在，则将这个存在的事务挂起。<br>Not_support 总是非事务地执行，并挂起任何存在的事务。<br>Never 绝不 总是非事务地执行，如果存在一个活动事务，则抛出异常<br>Nested 嵌套的 如果有就嵌套、没有就开启事务</p>
+<p>2.5.11 Spring事务的隔离级别</p>
+<ol>
+<li>ISOLATION_DEFAULT： 这是一个PlatfromTransactionManager默认的隔离级别，使用数据库默认的事务隔离级别.<br>另外四个与JDBC的隔离级别相对应</li>
+<li>ISOLATION_READ_UNCOMMITTED： 这是事务最低的隔离级别，它充许令外一个事务可以看到这个事务未提交的数据。<br>   这种隔离级别会产生脏读，不可重复读和幻像读。</li>
+<li>ISOLATION_READ_COMMITTED： 保证一个事务修改的数据提交后才能被另外一个事务读取。另外一个事务不能读取该事务未提交的数据</li>
+<li>ISOLATION_REPEATABLE_READ： 这种事务隔离级别可以防止脏读，不可重复读。但是可能出现幻像读。<br>   它除了保证一个事务不能读取另一个事务未提交的数据外，还保证了避免下面的情况产生(不可重复读)。</li>
+<li>ISOLATION_SERIALIZABLE 这是花费最高代价但是最可靠的事务隔离级别。事务被处理为顺序执行。<br>除了防止脏读，不可重复读外，还避免了幻像读。</li>
+</ol>
+<p>其中的一些概念的说明：<br>       脏读: 指当一个事务正在访问数据，并且对数据进行了修改，而这种修改还没有提交到数据库中，这时，另外一个事务也访问这个数据，然后使用了这个数据。因为这个数据是还没有提交的数据， 那么另外一 个事务读到的这个数据是脏数据，依据脏数据所做的操作可能是不正确的。<br>     不可重复读: 指在一个事务内，多次读同一数据。在这个事务还没有结束时，另外一个事务也访问该同一数据。 那么，在第一个事务中的两次读数据之间，由于第二个事务的修改，那么第一个事务两次读到的数据可能是不一样的。这样就发生了在一个事务内两次读到的数据是不一样的，因此称为是不可重复读。<br>      幻觉读: 指当事务不是独立执行时发生的一种现象，例如第一个事务对一个表中的数据进行了修改，这种修改涉及 到表中的全部数据行。同时，第二个事务也修改这个表中的数据，这种修改是向表中插入一行新数据。那么，以后就会发生操作第一个事务的用户发现表中还有没有修改的数据行，就好象发生了幻觉一样。</p>
+<p>2.5.12 什么是ORM?<br> 对象关系映射（Object Relational Mapping，简称ORM）模式是一种为了解决面向对象与关系数据库存在的互不匹配的现象的技术。简单的说，ORM是通过使用描述对象和数据库之间映射的元数据，将程序中的对象自动持久化到关系数据库中。那么，到底如何实现持久化呢？一种简单的方案是采用硬编码方式(jdbc操作sql方式)，为每一种可能的数据库访问操作提供单独的方法。<br>这种方案存在以下不足：<br>    1.持久化层缺乏弹性。一旦出现业务需求的变更，就必须修改持久化层的接口<br>    2.持久化层同时与域模型与关系数据库模型绑定，不管域模型还是关系数据库模型发生变化，都要修改持久化曾的相关程序代码，增加了软件的维护难度。 </p>
+<p>   ORM提供了实现持久化层的另一种模式，它采用映射元数据来描述对象关系的映射，使得ORM中间件能在任何一个应用的业务逻辑层和数据库层之间充当桥梁。Java典型的ORM框架有:Hibernate,ibatis(mybatis),speedframework。<br>   ORM的方法论基于三个核心原则：<br>     简单：以最基本的形式建模数据。<br>     传达性：数据库结构被任何人都能理解的语言文档化。<br>     精确性：基于数据模型创建正确标准化了的结构。</p>
+<p>   对象关系映射（Object Relational Mapping，简称ORM）模式是一种为了解决面向对象与关系数据库存在的互不匹配的现象的技术。可以简单的方案是采用硬编码方式(jdbc操作sql方式)，为每一种可能的数据库访问操作提供单独的方法。这种方法存在很多缺陷，使用<br>使用ORM框架(为了解决解决面向对象与关系数据库存在的互不匹配的现象的框架)来解决. </p>
+<p>   Hibernate,ibatis(mybatis),<br>2.5.13 iBatis(mybatis)与Hibernate有什么不同?<br>相同点：<br>        都是java中orm框架、屏蔽jdbc api的底层访问细节，使用我们不用与jdbc api打交道，就可以完成对数据库的持久化操作。jdbc api编程流程固定，还将sql语句与java代码混杂在了一起，经常需要拼凑sql语句，细节很繁琐。<br>   ibatis的好处：屏蔽jdbc api的底层访问细节；将sql语句与java代码进行分离;提供了将结果集自动封装称为实体对象和对象的集合的功能.queryForList返回对象集合，用queryForObject返回单个对象；提供了自动将实体对象的属性传递给sql语句的参数。</p>
+<p>   Hibername的好处：Hibernate是一个全自动的orm映射工具，它可以自动生成sql语句，并执行并返回java结果。</p>
+<p>不同点：<br>   1、hibernate要比ibatis功能强大很多。因为hibernate自动生成sql语句。<br>   2、ibatis需要我们自己在xml配置文件中写sql语句，hibernate我们无法直接控制该语句，我们就无法去写特定的高效率的sql。对于一些不太复杂的sql查询，hibernate可以很好帮我们完成，但是，对于特别复杂的查询，hibernate就很难适应了，这时候用ibatis就是不错的选择，因为ibatis还是由我们自己写sql语句。<br>  ibatis可以出来复杂语句，而hibernate不能。<br>   3、ibatis要比hibernate简单的多。ibatis是面向sql的，不同考虑对象间一些复杂的映射关系。</p>
+<p>2.5.14 Hibernate映射对象的状态<br>临时状态/瞬时状态(transient)：刚刚用new语句创建，没有被持久化<br>    不处于session中(没有使用session的方法去操作临时对象)。该对象成为临时对象</p>
+<p>持久化状态/托管状态(persistent)：已经被持久化，加入到session的缓存中。session是没有关闭该状态的对象为持久化对象。</p>
+<p>游离状态/脱管状态(detached)：已经被持久化，但不处于session中。<br>    该状态的对象为游离对象。</p>
+<p>删除状态(removed)：对象有关联的ID，并且在Session管理下，但是已经被计划(事务提交的时候,commit())删除。如果没有事务就不能删除</p>
+<p>相互转换</p>
+<p>2.5.15 介绍一下Hibernate的缓存?</p>
+<p>一、why（为什么要用Hibernate缓存？）</p>
+<p>Hibernate是一个持久层框架，经常访问物理数据库。</p>
+<p>为了降低应用程序对物理数据源访问的频次，从而提高应用程序的运行性能。</p>
+<p>缓存内的数据是对物理数据源中的数据的复制，应用程序在运行时从缓存读写数据，在特定的时刻或事件会同步缓存和物理数据源的数据。</p>
+<p>为了提供访问速度，把磁盘或数据库访问变成内存访问。</p>
+<p>二、what（Hibernate缓存原理是怎样的？）Hibernate缓存包括两大类：Hibernate一级缓存和Hibernate二级缓存。</p>
+<p>1.Hibernate一级缓存又称为“Session的缓存”。</p>
+<p>Session缓存内置不能被卸载，Session的缓存是事务范围的缓存（Session对象的生命周期通常对应一个数据库事务或者一个应用事务）。</p>
+<p>一级缓存中，持久化类的每个实例都具有唯一的OID。</p>
+<p>2.Hibernate二级缓存又称为“SessionFactory的缓存”。</p>
+<p>由于SessionFactory对象的生命周期和应用程序的整个过程对应，因此Hibernate二级缓存是进程范围或者集群范围的缓存，有可能出现并发问题，因此需要采用适当的并发访问策略，该策略为被缓存的数据提供了事务隔离级别。</p>
+<p>第二级缓存是可选的，是一个可配置的插件，默认下SessionFactory不会启用这个插件。</p>
+<p>Hibernate提供了org.hibernate.cache.CacheProvider接口,它充当缓存插件与Hibernate之间的适配器。</p>
+<p>面试：<br>   Hibernate中的缓存分一级缓存和二级缓存。<br>   一级缓存就是Session级别的缓存，在事务范围内有效是,内置的不能被卸载。二级缓存是SesionFactory级别的缓存，从应用启动到应用结束有效。是可选的，默认没有二级缓存，需要手动开启。<br>    保存数据库后，在内存中保存一份，如果更新了数据库就要同步更新。<br> 什么样的数据适合存放到第二级缓存中？<br>     1) 很少被修改的数据  帖子的最后回复时间<br>     2) 经常被查询的数据   电商的地点<br>     2) 不是很重要的数据，允许出现偶尔并发的数据<br>     3) 不会被并发访问的数据<br>     4) 常量数据<br>     扩展：hibernate的二级缓存默认是不支持分布式缓存的。使用memcahe,redis等中央缓存来代替二级缓存。  </p>
+<p>2.5.16 简单讲一下webservice使用的场景？<br>     webservice是一个SOA（面向服务的编程）的架构，它是不依赖于语言，不依赖于平台，可以实现不同的语言间的相互调用，通过Internet进行基于Http协议的网络应用间的交互。</p>
+<pre><code>1、 异构系统(不同语言)的整合
+2、 不同客户端的整合 浏览器、手机端(android,ios.塞班)、微信单、PC端等终端来访问
+
+3、 实实在在的列子：
+  天气预报：可以通过实现webservice客户端调用远程天气服务实现的。
+  单点登录：一个服务是所有系统的登录</code></pre><p>2.5.17 简单介绍一下activiti?<br>    Activiti是一个业务流程管理(BPM)和工作流系统，适用于开发人员和系统管理员。其核心是超快速，稳定的BPMN2流程引擎。它易于与 Spring集成使用。</p>
+<p>主要要在OA中，把线下流程放到线上。 把现实生活中一些流程固话定义到系统中，然后通过输入表单数据完成业务。</p>
+<p>他可用在OA系统的流程管理中：<br>     请假流程 小于三天，一级主管审批，大于三天二级才能审批。<br>     报销流程 1000 2000 3000&gt;….</p>
+<pre><code>如果你想找专门这方面的工作，要下去复习。</code></pre><p>2.6 高级部分<br>2.6.1 有没有用过linux?你都用它来做什么？<br>Linux是一个长时间运行比较稳定的操作系统，所有我们一般会拿它作为服务器(web,db,app等)。<br>Linux本身具有C的编译环境、我们的一些软件是没有软件包(redis、nginx等)的，需要在Linux的C编译环境编译得到软件包.</p>
+<p>2.6.2 说一下linux下面的一下常用命令？<br>常用：<br>     Pwd 获取当前路径<br>     Cd 跳转到目录<br>     Su -u 切换到管理员<br>     Ls ls 列举目录<br>文件操作命令：<br>     文件<br>        tail 查看<br>        rm -rf<br>        vi<br>     文件夹<br>        mkdir<br>        rm -r</p>
+<p>2.6.3 你是使用什么来连接远程的Linux服务器的？<br>需要依赖于Linux服务器安装ssh服务端，一般这个ssh服务的端口22.<br>需要依赖于Linux服务器安装sftp服务端，一般这个sftp服务的端口25.</p>
+<p>使用ssh客户端连接linux服务器，就有点儿像windows下面的远程连接。但是linux通过ssh连接上以后是没有图形界面，全是命令行。<br>     Putty<br>     Xshell<br>使用sftp客户端来连接sftp服务端，来上传和下载文件.(上传安装包，修改了配置文件上传。)</p>
+<pre><code>Winscp
+xftp
+
+企业中常用的两种组合:
+     putty+winscp 
+     Xshell+xftp=xmanager</code></pre><p>　　 </p>
+<pre><code>面试：使用xshell、putty等ssh客户端来连接服务器，使用xftp、winscp等sftp客户端来上传和现在文件。连接和上传、下载必须依赖于服务器的ssh、sftp服务，也就是linux服务器需要启动这两个服务。</code></pre><p>2.6.4 有没有使用过云主机？<br>使用过，在原来的公司，我们没有使用自己的服务器，而是租用阿里的云主机。<br>没有使用过，但是有所了解。</p>
+<p>云主机就是一些云服务运营商(阿里、华为、西部数码、新浪等)，提供的远程的服务器功能，我们开发者或者企业只需按需付费就可以租用对应的服务器。</p>
+<p>使用ssh和sftp来进行操作。</p>
+<p>2.6.5 有没有做过数据库优化方面的事情?<br> 做过mysql数据库的优化、其他数据库类似<br>定位：查找、定位慢查询<br>优化手段：<br>a) 创建索引:创建合适的索引，我们就可以现在索引中查询，查询到以后直接找对应的记录。<br>b) 分表   ：当一张表的数据比较多或者一张表的某些字段的值比较多并且很少使用时，采用水平分表和垂直分表来优化<br>c) 读写分离：当一台服务器不能满足需求时，采用读写分离的方式进行集群。<br>d) 缓存:使用redis来进行缓存<br>e) 一些常用优化技巧</p>
+<p>   2.6.6 查找慢查询并定位慢查询？<br>   在项目自验项目转测试之前，在启动mysql数据库时开启慢查询，并且把执行慢的语句写到日志中，在运行一定时间后。通过查看日志找到慢查询语句。</p>
+<p>要找出项目中的慢Sql时<br>     1、关闭数据库服务器(关闭服务)<br>     2、把慢查询记录到日志中<br>　　<br>3、 设置慢查询时间<br>　　<br>     4、找出日志中的慢查询SQL</p>
+<p>   使用explain 慢查询语句，来详细分析语句的问题.</p>
+<p>2.6.6 数据库优化之遵循范式？<br> 数据库表设计时需要遵循方式<br> 表的范式，是首先符合1NF, 才能满足2NF , 进一步满足3NF<br>     1NF: 即表的列的具有原子性,不可再分解，即列的信息，不能分解.只要数据库是关系型数据库(mysql/oracle/db2/sysbase/sql server)，就自动的满足1NF.关系型数据库中是不允许分割列的。<br>     2NF:表中的记录是唯一的.通常我们设计一个主键来实现<br>     3NF:即表中不要有冗余数据, 就是说，表的信息，如果能够被推导出来，就不应该单独的设计一个字段来存放.(外键)<br>     反3NF :没有冗余的数据库未必是最好的数据库，有时为了提高运行效率，就必须降低范式标准，适当保留冗余数据。具体做法是： 在概念数据模型设计时遵守第三范式，降低范式标准的工作放到物理数据模型设计时考虑。降低范式就是增加字段，允许冗余。 订单和订单项、相册浏览次数和照片的浏览次数<br>2.6.7 选择合适的存储引擎<br>　　在开发中，我们经常使用的存储引擎 myisam / innodb/ memory<br>     MyISAM存储引擎<br>     如果表对事务要求不高，同时是以查询和添加为主的，我们考虑使用myisam存储引擎. 比如 bbs 中的 发帖表，回复表.</p>
+<p>INNODB存储引擎:<br>     对事务要求高，保存的数据都是重要数据，我们建议使用INNODB,比如订单表，账号表.</p>
+<p>Memory 存储<br>    我们数据变化频繁，不需要入库，同时又频繁的查询和修改，我们考虑使用memory, 速度极快.</p>
+<p>问 MyISAM 和 INNODB的区别(主要)</p>
+<ol>
+<li>事务安全 myisam不支持事务而innodb支持</li>
+<li>查询和添加速度 myisam不用支持事务就不用考虑同步锁，查找和添加和添加的速度快</li>
+<li>支持全文索引 myisam支持innodb不支持</li>
+<li>锁机制 myisam支持表锁而innodb支持行锁(事务)</li>
+<li>外键 MyISAM 不支持外键， INNODB支持外键. (通常不设置外键，通常是在程序中保证数据的一致)</li>
+</ol>
+<p>2.6.8 数据库优化之创建合适的索引?<br>索引（Index）是帮助DBMS高效获取数据的数据结构。<br>分类：普通索引/唯一索引/主键索引/全文索引<br>     普通索引:允许重复的值出现<br>     唯一索引:除了不能有重复的记录外，其它和普通索引一样(用户名、用户身份证、email,tel)<br>     主键索引：是随着设定主键而创建的，也就是把某个列设为主键的时候，数据库就会給改列创建索引。这就是主键索引.唯一且没有null值<br>     全文索引:用来对表中的文本域(char，varchar，text)进行索引， 全文索引针对MyIsam<br>     explain select * from articles where match(title,body) against(‘database’);【会使用全文索引】<br>2.6.9 索引使用小技巧？*****<br>索引弊端<br>     1.占用磁盘空间。<br>     2.对dml(插入、修改、删除)操作有影响，变慢。<br>使用场景：<br>     a: 肯定在where条件经常使用,如果不做查询就没有意义<br>     b: 该字段的内容不是唯一的几个值(sex)<br>     c: 字段内容不是频繁变化.</p>
+<p>具体技巧：</p>
+<ol>
+<li><p>对于创建的多列索引（复合索引），不是使用的第一部分就不会使用索引。<br>　　alter table dept add index my_ind (dname,loc); // dname 左边的列,loc就是右边的列<br>　　explain select * from dept where dname=’aaa’\G 会使用到索引<br>　　explain select * from dept where loc=’aaa’\G 就不会使用到索引
+　　 </p>
+</li>
+<li><p>对于使用like的查询，查询如果是’%aaa’不会使用到索引而‘aaa%’会使用到索引。<br>explain select * from dept where dname like ‘%aaa’\G不能使用索引<br>explain select * from dept where dname like ‘aaa%’\G使用索引.<br>所以在like查询时，‘关键字’的最前面不能使用 % 或者 _这样的字符.，如果一定要前面有变化的值，则考虑使用 全文索引-&gt;sphinx.</p>
+</li>
+<li><p>如果条件中有or，有条件没有使用索引,即使其中有条件带索引也不会使用。换言之，就是要求使用的所有字段,都必须单独使用时能使用索引.</p>
+</li>
+</ol>
+<ol start="4">
+<li>如果列类型是字符串，那一定要在条件中将数据使用引号引用起来。否则不使用索引。<br>　　expain select * from dept where dname=’111’;<br>　　expain select * from dept where dname=111;（数值自动转字符串）<br>　　expain select * from dept where dname=qqq;报错<br>　　也就是，如果列是字符串类型，无论是不是字符串数字就一定要用 ‘’ 把它包括起来.</li>
+<li>如果mysql估计使用全表扫描要比使用索引快，则不使用索引。<br>表里面只有一条记录</li>
+</ol>
+<p>2.6.10 数据库优化之分表？<br>分表分为水平(按行)分表和垂直(按列)分表</p>
+<p>根据经验，Mysql表数据一般达到百万级别，查询效率会很低，容易造成表锁，甚至堆积很多连接，直接挂掉；水平分表能够很大程度较少这些压力。<br>按行数据进行分表。</p>
+<p>如果一张表中某个字段值非常多(长文本、二进制等)，而且只有在很少的情况下会查询。这时候就可以把字段多个单独放到一个表，通过外键关联起来。<br>     考试详情，一般我们只关注分数，不关注详情。<br>水平分表策略：<br>     1.按时间分表<br>     这种分表方式有一定的局限性，当数据有较强的实效性，如微博发送记录、微信消息记录等，这种数据很少有用户会查询几个月前的数据，如就可以按月分表。<br>     2.按区间范围分表<br>     一般在有严格的自增id需求上，如按照user_id水平分表：<br>     table_1  user_id从1<del>100w<br>     table_2  user_id从101</del>200w<br>     table_3  user_id从201~300w<br>     3.hash分表*****<br>     通过一个原始目标的ID或者名称通过一定的hash算法计算出数据存储表的表名，然后访问相应的表。<br>2.6.11 数据库优化之读写分离<br>一台数据库支持的最大并发连接数是有限的，如果用户并发访问太多。一台服务器满足不要要求是就可以集群处理。Mysql的集群处理技术最常用的就是读写分离。    </p>
+<pre><code>主从同步
+数据库最终会把数据持久化到磁盘，如果集群必须确保每个数据库服务器的数据是一直的。能改变数据库数据的操作都往主数据库去写，而其他的数据库从主数据库上同步数据。
+读写分离
+   使用负载均衡来实现写的操作都往主数据去，而读的操作往从服务器去。</code></pre><p>2.6.12 数据库优化之缓存<br>     在持久层(dao)和数据库(db)之间添加一个缓存层，如果用户访问的数据已经缓存起来时，在用户访问时直接从缓存中获取，不用访问数据库。而缓存是在操作内存级，访问速度快。</p>
+<p>作用：减少数据库服务器压力，减少访问时间。</p>
+<p>Java中常用的缓存有，<br>   1、hibernate的二级缓存。该缓存不能完成分布式缓存。</p>
+<pre><code>2、 可以使用redis(memcahe等)来作为中央缓存。
+   对缓存的数据进行集中处理</code></pre><p>2.6.13 语句优化小技巧<br>DDL优化:<br>     1 、通过禁用索引来提供导入数据性能 。 这个操作主要针对有数据库的表，追加数据<br>     //去除键<br>     alter table test3 DISABLE keys;<br>     //批量插入数据<br>     insert into test3 select * from test;<br>     //恢复键<br>     alter table test3 ENABLE keys;</p>
+<pre><code>2、 关闭唯一校验
+set unique_checks=0  关闭
+set unique_checks=1  开启
+
+3、修改事务提交方式(导入)（变多次提交为一次）
+set autocommit=0   关闭
+//批量插入
+set autocommit=1   开启</code></pre><p>DML优化（变多次提交为一次）<br>     insert into test values(1,2);<br>     insert into test values(1,3);<br>     insert into test values(1,4);<br>     //合并多条为一条<br>     insert into test values(1,2),(1,3),(1,4)<br>DQL优化<br>     Order by优化<br>         1、多用索引排序<br>     2、 普通结果排序（非索引排序）Filesort<br>   group by优化<br>      是使用order by null,取消默认排序<br>   子查询优化<br>     在客户列表找到不在支付列表的客户<br>     #在客户列表找到不在“支付列表”的客户 , 查询没买过东西的客户<br>     explain<br>     select * from customer where customer_id not in (select DISTINCT customer_id from payment); #子查询      – 这种是基于func外链<br><br>     explain<br>     select * from customer c left join payment p on(c.customer_id=p.customer_id) where p.customer_id is null   – 这种是基于“索引”外链</p>
+<p>   Or优化<br>     在两个独立索引上使用or的性能优于<br>     1、 or两边都是用索引字段做判断，性能好！！<br>     2、 or两边，有一边不用，性能差<br>     3、 如果employee表的name和email这两列是一个复合索引，但是如果是 :name=’A’ OR email=’B’ 这种方式，不会用到索引！<br>  limit优化<br>     select film_id,description from film order by title limit 50,5;</p>
+<pre><code>select a.film_id,a.description from film a inner join (select film_id from film order by title limit 50,5)b on a.film_id=b.film_id</code></pre><p>2.6.14 jdbc批量插入几百万数据怎么实现？*****<br>1、变多次提交为一次<br>3、使用批量操作</p>
+<p>省出的时间可观。</p>
+<p>像这样的批量插入操作能不使用代码操作就不使用，可以使用存储过程来实现。<br>2.6.15 有没有使用过redis? Redis是什么  </p>
+<p>Redis是一个key-value的nosql数据库.先存到内存中，会根据一定的策略持久化到磁盘,即使断电也不会丢失数据。支持的数据类型比较多。</p>
+<p>主要用来做缓存数据库的数据和web集群时当做中央缓存存放seesion</p>
+<p>2.4.15 Redis和memche的比较? </p>
+<p>1、 Redis和Memcache都是将数据存放在内存中，都是内存数据库。不过memcache还可用于缓存其他东西，例如图片、视频等等。<br>2、Redis不仅仅支持简单的k/v类型的数据，同时还提供list，set，hash等数据结构的存储。<br>3、虚拟内存–Redis当物理内存用完时，可以将一些很久没用到的value 交换到磁盘</p>
+<p>2.6.16 简单说一下redis的使用场景？<br>缓存：<br>     把经常需要查询的、很少修改数据，放到读速度很快的空间(内存)，以便下次访问减少时间。减轻压力，减少访问时间.<br>计数器：<br>     redis中的计数器是原子性的内存操作。<br>       可以解决库存溢出问题.进销存系统库存溢出。<br>session缓存服务器：<br>     web集群时作为session缓存服务器<br>　　<br>缓存队列等<br>2.6.17 redis对象保存方式？<br>Json字符串:<br>     需要把对象转换为json字符串，当做字符串处理。直接使用set get来设置或者或。<br>     优点：设置和获取比较简单<br>     缺点：没有提供专门的方法，需要把把对象转换为json。(jsonlib)<br>字节:<br>   需要做序列号，就是把对象序列化为字节保存。</p>
+<p>如果是担心JSON转对象会消耗资源的情况，这个问题需要考量几个地方，<br>第一点：就是使用的JSON转换lib是否就会存在性能问题。<br>第二点：就是数据的数据量级别，如果是存储百万级的大数据对象，建议采用存储序列化对象方式。如果是少量的数据级对象，或者是数据对象字段不多，还是建议采用JSON转换成String方式。<br>毕竟redis对存储字符类型这部分优化的非常好。具体采用的方式与方法，还要看你所使用的场景。</p>
+<p>2.6.18 Redis数据淘汰机制<br>在 redis 中，允许用户设置最大使用内存大小 server.maxmemory，在内存限定的情况下是很有用的。譬如，在一台 8G 机子上部署了 4 个 redis 服务点，每一个服务点分配 1.5G 的内存大小，减少内存紧张的情况，由此获取更为稳健的服务。</p>
+<p>内存大小有限，需要保存有效的数据?<br>redis 内存数据集大小上升到一定大小的时候，就会施行数据淘汰策略。<br>redis 提供 6种数据淘汰策略：</p>
+<pre><code>volatile-lru：从已设置过期时间的数据集（server.db[i].expires）中挑选最近最少使用的数据淘汰
+volatile-ttl：从已设置过期时间的数据集（server.db[i].expires）中挑选将要过期的数据淘汰
+volatile-random：从已设置过期时间的数据集（server.db[i].expires）中任意选择数据淘汰
+allkeys-lru：从数据集（server.db[i].dict）中挑选最近最少使用的数据淘汰
+allkeys-random：从数据集（server.db[i].dict）中任意选择数据淘汰
+no-enviction（驱逐）：禁止驱逐数据</code></pre><p>2.6.19 Java访问Redis<br>1、使用jedis java客户端来访问redis服务器，有点类似通过jdbc访问mysql一样。<br>2、当然如果是spring进行集成时，可以使用spring data来访问redis,spring data只是对jedis的二次封装。jdbcTemplate jdbc关系一样<br>2.6.20 Redis集群<br>当一台数据无法满足要求，可以使用reids集群来处理，类似于mysql的读写分离。<br>2.6.21简单介绍一下微信公共号的分类？<br>   公众号:个人和企业都能申请<br>   服务号：企业才能申请<br>   企业号:企业才能申请<br>2.6.22 微信开发原理</p>
+<p>微信公众平台开发者，通过接入认证的方式，让我们的服务器能处理来自微信服务器转发的微信用户的请求,处理完成后返回给微信服务器，有微信服务器对用户响应。<br>2.6.23怎么把微信和业务平台绑定？</p>
+<p>微信用户和注册用户绑定？<br>     让微信用户也能完成注册用户的功能。<br>用户注册实体中包含一个微信号的字段，当我进行绑定时就是修改用户的微信号字段。<br>当然我们在进行菜单跳转到页面后，我们是无法直接获取微信号的。要通过微信网页授权来获取微信号。</p>
+<p>第一步：用户同意授权，获取code<br><a href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&amp;redirect_uri=REDIRECT_URI&amp;response_type=code&amp;scope=SCOPE&amp;state=STATE#wechat_redirect" target="_blank" rel="noopener">https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&amp;redirect_uri=REDIRECT_URI&amp;response_type=code&amp;scope=SCOPE&amp;state=STATE#wechat_redirect</a> 若提示“该链接无法访问”，请检查参数是否填写错误，是否拥有scope参数对应的授权作用域权限。<br>第二步：通过code换取网页授权openId也就是我们微信号<br>获取code后，请求以下链接获取access_token：  <a href="https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&amp;secret=SECRET&amp;code=CODE&amp;grant_type=authorization_code" target="_blank" rel="noopener">https://api.weixin.qq.com/sns/oauth2/access_token?appid=APPID&amp;secret=SECRET&amp;code=CODE&amp;grant_type=authorization_code</a><br>{ “access_token”:”ACCESS_TOKEN”,<br> “expires_in”:7200,<br> “refresh_token”:”REFRESH_TOKEN”,<br> “openid”:”OPENID”,<br> “scope”:”SCOPE” } </p>
+<p>2.7 项目和业务部分<br>2.7.1项目分类<br>     在公司中做的项目可以分为两种产品、项目.<br>项目：就是给一些公司接的项目，项目开发完成后。就交互，后面这个项目代码就不在维护了<br>产品：充分考虑扩展性和基本业务，来做一个产品。在这个产品上可以进行定制开发。</p>
+<p>2.7.2 项目参与者<br>   产品经理？PM？架构师（SE）？(开发PL? MDE？可能会有多个) (测试PL ？ TSE可能会有多个)   UI 资料</p>
+<p>开发团队:开始代码能完成需求<br>测试团队：测试功能<br>UI:负责界面设计、静态代码的编写<br>资料：负责界面的文字描述。<br>QA    :通过项目质量监控,和PM,SE同级</p>
+<p>开发和UI和资料，协同设计和开发，开发完成后转测试(测试策略)交给测试团队进行测试，测试完成后会出一个测试报告。<br>2.7.3 项目流程<br>   可行性分析和立项和开工会<br>   需求分析<br>   需求设计<br>   项目开发(多个迭代)<br>        迭代开工会<br>        迭代设计<br>           迭代开发<br>           迭代测试<br>           集成测试<br>           迭代发布<br>        迭代总结<br>        ….不断迭代<br>   项目验收<br>   项目总结</p>
+<p>2.7.4 业务注意事项<br>1、 不要多个项目都说你同一个模块。如果要说，就说后面是进行改进。<br>   在pss,crm,shopping都写权限模块<br>2、多写点业务</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/07/11/Java面试笔记/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<!-- 来必力City版安装代码 -->
+
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
+
+
+  
   
 
 
