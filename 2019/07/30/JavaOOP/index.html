@@ -16,10 +16,12 @@
 <meta property="og:site_name" content="阿浩的博客~">
 <meta property="og:description" content="JavaOOP      1.第一章(对象和封装)      1.1.构造函数      1.构造函数是用来创建对象的   实例化对象      2.构造函数的作用是用来初始化对象的属性      3.一个类，系统默认提供无参的构造函数      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值      5.当编写了一个有参的构造函数以后，无参的构造函数就没了      6.如果">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-08-27T12:11:56.847Z">
+<meta property="og:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920247573&di=a8791ba5bace6b1e10cac7d5f5b9ee27&imgtype=0&src=http%3A%2F%2Fimg3.doubanio.com%2Fpview%2Fevent_poster%2Fraw%2Fpublic%2F33e2b80588bf743.jpg">
+<meta property="og:updated_time" content="2019-08-27T12:49:58.301Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JavaOOP相关">
 <meta name="twitter:description" content="JavaOOP      1.第一章(对象和封装)      1.1.构造函数      1.构造函数是用来创建对象的   实例化对象      2.构造函数的作用是用来初始化对象的属性      3.一个类，系统默认提供无参的构造函数      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值      5.当编写了一个有参的构造函数以后，无参的构造函数就没了      6.如果">
+<meta name="twitter:image" content="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920247573&di=a8791ba5bace6b1e10cac7d5f5b9ee27&imgtype=0&src=http%3A%2F%2Fimg3.doubanio.com%2Fpview%2Fevent_poster%2Fraw%2Fpublic%2F33e2b80588bf743.jpg">
   
     <link rel="alternative" href="/atom.xml" title="阿浩的博客~" type="application/atom+xml">
   
@@ -179,7 +181,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>  JavaOOP<br>      1.第一章(对象和封装)<br>      1.1.构造函数<br>      1.构造函数是用来创建对象的   实例化对象<br>      2.构造函数的作用是用来初始化对象的属性<br>      3.一个类，系统默认提供无参的构造函数<br>      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值<br>      5.当编写了一个有参的构造函数以后，无参的构造函数就没了<br>      6.如果想要用无参构造函数new对象   就必须手动添加<br>      7.当一个类中存在多种构造函数的时候，这些构造函数就构成了重载<br>      1.2.this,super关键字<br>      1.this代表当前对象的引用，谁调用这个方法  this就代表谁<br>      2.this()调用调用本类的无参构造函数<br>      3.super代表父类对象的引用，super用来调用父类的属性和方法<br>      4.super()调用父类的无参构造函数</p>
+        <p><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920247573&di=a8791ba5bace6b1e10cac7d5f5b9ee27&imgtype=0&src=http%3A%2F%2Fimg3.doubanio.com%2Fpview%2Fevent_poster%2Fraw%2Fpublic%2F33e2b80588bf743.jpg" alt="JavaOOP"><br>  JavaOOP<br>      1.第一章(对象和封装)<br>      1.1.构造函数<br>      1.构造函数是用来创建对象的   实例化对象<br>      2.构造函数的作用是用来初始化对象的属性<br>      3.一个类，系统默认提供无参的构造函数<br>      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值<br>      5.当编写了一个有参的构造函数以后，无参的构造函数就没了<br>      6.如果想要用无参构造函数new对象   就必须手动添加<br>      7.当一个类中存在多种构造函数的时候，这些构造函数就构成了重载<br>      1.2.this,super关键字<br>      1.this代表当前对象的引用，谁调用这个方法  this就代表谁<br>      2.this()调用调用本类的无参构造函数<br>      3.super代表父类对象的引用，super用来调用父类的属性和方法<br>      4.super()调用父类的无参构造函数</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1.3.重载</span><br><span class="line">一个类中，多个方法功能相同，方法名相同，参数列表不一样。与返回值无关</span><br><span class="line">public void show();</span><br><span class="line">public int show();</span><br><span class="line">这两个方法不构成重载   因为两个方法不能同时存在于同一个类中</span><br><span class="line">示例：</span><br><span class="line">public class Math&#123;</span><br><span class="line">public void add(int a,int b)</span><br><span class="line">public void add(int a,int b,int c)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <pre><code>1.4.static关键字
@@ -1097,11 +1099,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
+                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
+                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1113,7 +1115,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
+                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -1121,7 +1123,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
+                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
               </li>
              
               <li class="article-tag-list-item">

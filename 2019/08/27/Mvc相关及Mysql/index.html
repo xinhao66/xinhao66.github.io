@@ -16,10 +16,12 @@
 <meta property="og:site_name" content="阿浩的博客~">
 <meta property="og:description" content="Spring的xml配置方式1.首先:造一个配置文件 (applicationContext.xml) 123456781.造数据源   &amp;lt;!-- 数据源 --&amp;gt;   &amp;lt;bean id = &amp;quot;datasource&amp;quot; class=&amp;quot;com.alibaba.druid.pool.DruidDataSource&amp;quot;&amp;gt;   		&amp;lt;prop">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-08-27T12:12:34.919Z">
+<meta property="og:image" content="http://www.dxzy163.com/pic/uploadimg/2018-8/20188218411768475.jpg">
+<meta property="og:updated_time" content="2019-08-27T12:55:07.062Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Mvc相关及Mysql">
 <meta name="twitter:description" content="Spring的xml配置方式1.首先:造一个配置文件 (applicationContext.xml) 123456781.造数据源   &amp;lt;!-- 数据源 --&amp;gt;   &amp;lt;bean id = &amp;quot;datasource&amp;quot; class=&amp;quot;com.alibaba.druid.pool.DruidDataSource&amp;quot;&amp;gt;   		&amp;lt;prop">
+<meta name="twitter:image" content="http://www.dxzy163.com/pic/uploadimg/2018-8/20188218411768475.jpg">
   
     <link rel="alternative" href="/atom.xml" title="阿浩的博客~" type="application/atom+xml">
   
@@ -179,7 +181,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Spring的xml配置方式<br>1.首先:造一个配置文件 (applicationContext.xml)</p>
+        <p><img src="http://www.dxzy163.com/pic/uploadimg/2018-8/20188218411768475.jpg" alt="SpringMvc"><br>Spring的xml配置方式<br>1.首先:造一个配置文件 (applicationContext.xml)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1.造数据源   </span><br><span class="line">&lt;!-- 数据源 --&gt;</span><br><span class="line">   &lt;bean id = &quot;datasource&quot; class=&quot;com.alibaba.druid.pool.DruidDataSource&quot;&gt;</span><br><span class="line">   		&lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;password&quot; value=&quot;1234&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/smbms?zeroDateTimeBehavior=convertToNull&quot;&gt;&lt;/property&gt;</span><br><span class="line">   &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">2.造会话工厂</span><br><span class="line">&lt;!-- 会话工厂--&gt;</span><br><span class="line">   &lt;bean id = &quot;sqlsessionfactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">   		&lt;property name=&quot;dataSource&quot; ref=&quot;datasource&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;!-- 加载mybatis的全局配置文件 --&gt;</span><br><span class="line">   		&lt;property name=&quot;configLocation&quot; value=&quot;classpath:mybatis-config.xml&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;!-- 加载mybatis的映射文件 --&gt;</span><br><span class="line">   		&lt;property name=&quot;mapperLocations&quot; value=&quot;classpath:com/bdqn/dao/*.xml&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;typeAliasesPackage&quot; value=&quot;com.bdqn.entity&quot;&gt;&lt;/property&gt;</span><br><span class="line">   &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
@@ -493,11 +495,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
+                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
+                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -509,7 +511,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
+                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -517,7 +519,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
+                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
               </li>
              
               <li class="article-tag-list-item">

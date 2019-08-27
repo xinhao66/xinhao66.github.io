@@ -176,7 +176,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Spring的xml配置方式<br>1.首先:造一个配置文件 (applicationContext.xml)</p>
+        <p><img src="http://www.dxzy163.com/pic/uploadimg/2018-8/20188218411768475.jpg" alt="SpringMvc"><br>Spring的xml配置方式<br>1.首先:造一个配置文件 (applicationContext.xml)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1.造数据源   </span><br><span class="line">&lt;!-- 数据源 --&gt;</span><br><span class="line">   &lt;bean id = &quot;datasource&quot; class=&quot;com.alibaba.druid.pool.DruidDataSource&quot;&gt;</span><br><span class="line">   		&lt;property name=&quot;username&quot; value=&quot;root&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;password&quot; value=&quot;1234&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;driverClassName&quot; value=&quot;com.mysql.jdbc.Driver&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;url&quot; value=&quot;jdbc:mysql://127.0.0.1:3306/smbms?zeroDateTimeBehavior=convertToNull&quot;&gt;&lt;/property&gt;</span><br><span class="line">   &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">2.造会话工厂</span><br><span class="line">&lt;!-- 会话工厂--&gt;</span><br><span class="line">   &lt;bean id = &quot;sqlsessionfactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">   		&lt;property name=&quot;dataSource&quot; ref=&quot;datasource&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;!-- 加载mybatis的全局配置文件 --&gt;</span><br><span class="line">   		&lt;property name=&quot;configLocation&quot; value=&quot;classpath:mybatis-config.xml&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;!-- 加载mybatis的映射文件 --&gt;</span><br><span class="line">   		&lt;property name=&quot;mapperLocations&quot; value=&quot;classpath:com/bdqn/dao/*.xml&quot;&gt;&lt;/property&gt;</span><br><span class="line">   		&lt;property name=&quot;typeAliasesPackage&quot; value=&quot;com.bdqn.entity&quot;&gt;&lt;/property&gt;</span><br><span class="line">   &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
@@ -308,7 +308,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>一、 面试整体流程<br> 1.1 简单的自我介绍<br>      我是xxxx,工作xxx年.我先后在xxxx公司、yyyy公司工作。先后做个xxxx项目、yyyy项目。<br> 1.2 你简单介绍一下xxxx项目<br>    为了解决xxxx问题，开发了一套xxxx系统，该系统主要有那些部分组成。简单介绍项目的整体架构。参与某个模块的开发。就要求你说一下这个模块的业务及设计。<br> 1.3 会问一下JAVA的专业技能<br>     后面详细讲解<br> 1.4你还有什么需要询问我的吗<br>     公司要做的项目？项目中会使用一下什么技术？</p>
+        <p><img src="http://img4.imgtn.bdimg.com/it/u=3750555954,1222160618&fm=26&gp=0.jpg" alt="Java面试"><br>一、 面试整体流程<br> 1.1 简单的自我介绍<br>      我是xxxx,工作xxx年.我先后在xxxx公司、yyyy公司工作。先后做个xxxx项目、yyyy项目。<br> 1.2 你简单介绍一下xxxx项目<br>    为了解决xxxx问题，开发了一套xxxx系统，该系统主要有那些部分组成。简单介绍项目的整体架构。参与某个模块的开发。就要求你说一下这个模块的业务及设计。<br> 1.3 会问一下JAVA的专业技能<br>     后面详细讲解<br> 1.4你还有什么需要询问我的吗<br>     公司要做的项目？项目中会使用一下什么技术？</p>
 <p>注意：经历了多轮面试后，对于你的自我介绍和项目项目经验面试官就不太关心了。<br>   你说一下你最擅长的什么？你简单说一下？<br>最终技术面试完成后，都会让你回家等消息，或者等hr来和你谈薪资和福利。<br>二、 java的专业技能<br>2.1 java的基础部分<br>2.1.1 简单讲一下java的跨平台原理<br>      由于各操作系统（windows,liunx等）支持的指令集，不是完全一致的。就会让我们的程序在不同的操作系统上要执行不同程序代码。Java开发了适用于不同操作系统及位数的java虚拟机来屏蔽个系统之间的差异，提供统一的接口。对于我们java开发者而言，你只需要在不同的系统上安装对应的不同java虚拟机、这时你的java程序只要遵循java规范，就可以在所有的操作系统上面运行java程序了。</p>
 <p>Java通过不同的系统、不同版本、不同位数的java虚拟机(jvm),来屏蔽不同的系统指令集差异而对外体统统一的接口(java API),对于我们普通的java开发者而言，只需要按照接口开发即可。如果我系统需要部署到不同的环境时，只需在系统上面按照对应版本的虚拟机即可。</p>
 <p>2.2.2 搭建一个java开发环境的步骤<br>Java开发环境需要些什么？</p>
@@ -690,7 +690,7 @@ xftp
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>1.数据库优化经验<br>可以从 硬件 系统配置 数据表结构 sql语句几个方面优化<br>具体实现优化方向<br>1.1SQL语句及索引的优化<br>首先要根据需求写出结构良好的SQL，然后根据SQL在表中建立有效的索引。但是如果索引太多，不但会影响写入的效率，对查询也有一定的影响。</p>
+        <p><img src="http://img5.imgtn.bdimg.com/it/u=1978669613,850076544&fm=26&gp=0.jpg" alt="面试"><br>1.数据库优化经验<br>可以从 硬件 系统配置 数据表结构 sql语句几个方面优化<br>具体实现优化方向<br>1.1SQL语句及索引的优化<br>首先要根据需求写出结构良好的SQL，然后根据SQL在表中建立有效的索引。但是如果索引太多，不但会影响写入的效率，对查询也有一定的影响。</p>
 <p>1.2合理的数据库是设计<br>根据数据库三范式来进行表结构的设计。设计表结构时，就需要考虑如何设计才能更有效的查询。<br>数据库三范式：<br>第一范式：数据表中每个字段都必须是不可拆分的最小单元，也就是确保每一列的原子性；<br>第二范式：满足一范式后，表中每一列必须有唯一性，都必须依赖于主键；<br>第三范式：满足二范式后，表中的每一列只与主键直接相关而不是间接相关(外键也是直接相关)，字段没有冗余。<br>注意：没有最好的设计，只有最合适的设计，所以不要过分注重理论。三范式可以作为一个基本依据，不要生搬硬套。</p>
 <p>有时候可以根据场景合理地反规范化：<br>A：分割表。<br>B：保留冗余字段。当两个或多个表在查询中经常需要连接时，可以在其中一个表上增加若干冗余的字段，以 避免表之间的连接过于频繁，一般在冗余列的数据不经常变动的情况下使用。<br>C：增加派生列。派生列是由表中的其它多个列的计算所得，增加派生列可以减少统计运算，在数据汇总时可以大大缩短运算时间。</p>
 <p>数据库五大约束：<br>A：PRIMARY key:设置主键约束；<br>B：UNIQUE：设置唯一性约束，不能有重复值；<br>C：DEFAULT 默认值约束<br>D：NOT NULL：设置非空约束，该字段不能为空；<br>E：FOREIGN key :设置外键约束。</p>
@@ -848,7 +848,7 @@ xftp
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p> Java EE面试题<br>第一部分：Servlet/JSP快速入门<br>1.请列举至少6种javaEE技术，并简述其作用。<br>解析：<br>javaEE是一系列的技术，主要包扩13种。对于开发人员来说，了解几种主要的技术是非常必要的，例如JDBC、JSP、Servlet、XML、JNDI、JMS、JTA等。<br>参考答案：<br>(1)JDBC(Java Database Connectivity):用来访问数据库的API。<br>(2)JavaServlet :是一种小型的Java程序，扩展了web服务器的功能。<br>(3)JSP(Java Server Pages):JSP页面由HTM代码和嵌入其中的Java代码组成，用来实现动态视图。<br>(4)JNDI(Java Name and Directory Interface): JNDI API被用于访问名字和目录服务。<br>(5)EJB(Enterprise JavaBean):实现业务逻辑的组件，可以构成分布式系统。<br>(6)RMI(Remote Method Invoke):调用远程对象方法。<br>(7)Java IDL/CORBA:将Java和CORBA集成在一起。<br>(8)XML(Extensible Markup Language):可以用它来定义其他标记语言的语言。<br>(9)JMS(Java Message Service):用于和消息中间件相互通信的API。<br>(10)JTA(Java Transaction Achitecture):一种标准的API，可以访问各种事务管理器。<br>(11)JTS(Java Transaction Service):是CORBA OTS事务监控的基本实现。<br>(12)JavaMail:用于存取邮件服务的API。<br>(13)JAF(JavaBeans Activation Framework):JavaMail利用JAF来处理MIME编码的邮件附件。<br>2.在web.xml文件中配置Servlet时，主要配置哪些信息？<br>解析：  使用IDE开发Servlet时，配置信息可以通过可视化方式定义。然而对于web应用开发员来说，了解Servlet的配置非常必要，能够在必要的时候手动进行修改。</p>
+        <p><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920038303&di=7685ecdb4c925b9b6451e6f735f30049&imgtype=0&src=http%3A%2F%2Fimg0.pconline.com.cn%2Fpconline%2F1709%2F14%2F9962264_b0ebff3eeffac41_thumb.jpg" alt="JavaEE"><br> Java EE面试题<br>第一部分：Servlet/JSP快速入门<br>1.请列举至少6种javaEE技术，并简述其作用。<br>解析：<br>javaEE是一系列的技术，主要包扩13种。对于开发人员来说，了解几种主要的技术是非常必要的，例如JDBC、JSP、Servlet、XML、JNDI、JMS、JTA等。<br>参考答案：<br>(1)JDBC(Java Database Connectivity):用来访问数据库的API。<br>(2)JavaServlet :是一种小型的Java程序，扩展了web服务器的功能。<br>(3)JSP(Java Server Pages):JSP页面由HTM代码和嵌入其中的Java代码组成，用来实现动态视图。<br>(4)JNDI(Java Name and Directory Interface): JNDI API被用于访问名字和目录服务。<br>(5)EJB(Enterprise JavaBean):实现业务逻辑的组件，可以构成分布式系统。<br>(6)RMI(Remote Method Invoke):调用远程对象方法。<br>(7)Java IDL/CORBA:将Java和CORBA集成在一起。<br>(8)XML(Extensible Markup Language):可以用它来定义其他标记语言的语言。<br>(9)JMS(Java Message Service):用于和消息中间件相互通信的API。<br>(10)JTA(Java Transaction Achitecture):一种标准的API，可以访问各种事务管理器。<br>(11)JTS(Java Transaction Service):是CORBA OTS事务监控的基本实现。<br>(12)JavaMail:用于存取邮件服务的API。<br>(13)JAF(JavaBeans Activation Framework):JavaMail利用JAF来处理MIME编码的邮件附件。<br>2.在web.xml文件中配置Servlet时，主要配置哪些信息？<br>解析：  使用IDE开发Servlet时，配置信息可以通过可视化方式定义。然而对于web应用开发员来说，了解Servlet的配置非常必要，能够在必要的时候手动进行修改。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">参考答案：  配置Servlet时，主要配置&lt;servlet&gt;以及&lt; servlet -mapping&gt;，如下所示：</span><br><span class="line">		&lt;servlet&gt;</span><br><span class="line">    		&lt;servlet-name&gt;IndexServlet&lt;/servlet-name&gt;</span><br><span class="line">    		&lt;servlet-class&gt;com.oracle.servlet.IndexServlet&lt;/servlet-class&gt;</span><br><span class="line">  	&lt;/servlet&gt;</span><br><span class="line">		&lt;servlet-mapping&gt;</span><br><span class="line">    		&lt;servlet-name&gt;IndexServlet&lt;/servlet-name&gt;</span><br><span class="line">    		&lt;url-pattern&gt;/IndexServlet&lt;/url-pattern&gt;</span><br><span class="line"> 	 &lt;/servlet-mapping&gt;</span><br><span class="line">其中&lt;servlet-class&gt;是Servlet源文件的名字，&lt;servlet-name&gt;是自定义的名字，往往使用类名。&lt;url-pattern&gt;是其中非常重要的信息，用来配置访问Servlet的逻辑路径。必须以/开头。</span><br><span class="line">&lt;servlet-class&gt;com.oracle.FirstServlet&lt;/servlet-class&gt;</span><br><span class="line">&lt;/servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">&lt;servlet-name&gt;FristServlet&lt;/servlet-name&gt;</span><br><span class="line">&lt;url-pattern&gt;/frist&lt;url-pattern&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
 
 <p>其中，<servlet-class>是Servlet源文件的名字，<servlet-name>是自定义的名字，往往使用类名。<url-pattern>是非常重要的信息，用来配置访问Servlet的逻辑路径，必须以/开头。</url-pattern></servlet-name></servlet-class></p>
@@ -2456,7 +2456,7 @@ public void addInterceptors(InterceptorRegistry registry) {
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>  JavaOOP<br>      1.第一章(对象和封装)<br>      1.1.构造函数<br>      1.构造函数是用来创建对象的   实例化对象<br>      2.构造函数的作用是用来初始化对象的属性<br>      3.一个类，系统默认提供无参的构造函数<br>      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值<br>      5.当编写了一个有参的构造函数以后，无参的构造函数就没了<br>      6.如果想要用无参构造函数new对象   就必须手动添加<br>      7.当一个类中存在多种构造函数的时候，这些构造函数就构成了重载<br>      1.2.this,super关键字<br>      1.this代表当前对象的引用，谁调用这个方法  this就代表谁<br>      2.this()调用调用本类的无参构造函数<br>      3.super代表父类对象的引用，super用来调用父类的属性和方法<br>      4.super()调用父类的无参构造函数</p>
+        <p><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920247573&di=a8791ba5bace6b1e10cac7d5f5b9ee27&imgtype=0&src=http%3A%2F%2Fimg3.doubanio.com%2Fpview%2Fevent_poster%2Fraw%2Fpublic%2F33e2b80588bf743.jpg" alt="JavaOOP"><br>  JavaOOP<br>      1.第一章(对象和封装)<br>      1.1.构造函数<br>      1.构造函数是用来创建对象的   实例化对象<br>      2.构造函数的作用是用来初始化对象的属性<br>      3.一个类，系统默认提供无参的构造函数<br>      4.有参的构造函数：是为了在new对象的同时就给这个对象赋值<br>      5.当编写了一个有参的构造函数以后，无参的构造函数就没了<br>      6.如果想要用无参构造函数new对象   就必须手动添加<br>      7.当一个类中存在多种构造函数的时候，这些构造函数就构成了重载<br>      1.2.this,super关键字<br>      1.this代表当前对象的引用，谁调用这个方法  this就代表谁<br>      2.this()调用调用本类的无参构造函数<br>      3.super代表父类对象的引用，super用来调用父类的属性和方法<br>      4.super()调用父类的无参构造函数</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1.3.重载</span><br><span class="line">一个类中，多个方法功能相同，方法名相同，参数列表不一样。与返回值无关</span><br><span class="line">public void show();</span><br><span class="line">public int show();</span><br><span class="line">这两个方法不构成重载   因为两个方法不能同时存在于同一个类中</span><br><span class="line">示例：</span><br><span class="line">public class Math&#123;</span><br><span class="line">public void add(int a,int b)</span><br><span class="line">public void add(int a,int b,int c)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <pre><code>1.4.static关键字
@@ -3183,7 +3183,7 @@ dos.close();
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>  1.JavaScript基础<br>     1.1.为什么学习JavaScript<br>     1.客户端表单验证<br>     注册页面，或者登陆页面<br>     2.页面动态效果<br>     创建动态页面特效，从而高效的控制页面内容<br>     3.jQuery的基础<br>     1.2.什么是JavaScript<br>     JavaScript是一种描述性语言，也是一种基于对象和事件驱动的，并具有安全性能的脚本语言，其特点如下：<br>     1.JavaScript 主要用来在HTML页面中添加交互行为<br>     2.JavaScript是一种脚本语言，语法和Java类似<br>     3.JavaScript一般用来编写客户端的脚本<br>     4.JavaScript是一种解释性语言，边执行边解释<br>     1.2.1.JavaScript的组成<br>     一个完整的JavaScript是由以下三个不同的部分组成的：</p>
+        <p><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920165051&di=c4360e9eb391c4a54f7ff66fdd5ae3c5&imgtype=0&src=http%3A%2F%2Fpic2.16pic.com%2F00%2F07%2F83%2F16pic_783628_b.jpg" alt="JavaJQuery"><br>  1.JavaScript基础<br>     1.1.为什么学习JavaScript<br>     1.客户端表单验证<br>     注册页面，或者登陆页面<br>     2.页面动态效果<br>     创建动态页面特效，从而高效的控制页面内容<br>     3.jQuery的基础<br>     1.2.什么是JavaScript<br>     JavaScript是一种描述性语言，也是一种基于对象和事件驱动的，并具有安全性能的脚本语言，其特点如下：<br>     1.JavaScript 主要用来在HTML页面中添加交互行为<br>     2.JavaScript是一种脚本语言，语法和Java类似<br>     3.JavaScript一般用来编写客户端的脚本<br>     4.JavaScript是一种解释性语言，边执行边解释<br>     1.2.1.JavaScript的组成<br>     一个完整的JavaScript是由以下三个不同的部分组成的：</p>
 <pre><code>1.ECMAScript 标准
 ECMAScript是一种开放的，被国际上广为接受的、标准的脚本语言规范，它不与任何具体的浏览器绑定，ECMAScript标准主要描述了以下内容
 (1)  语法
@@ -4039,7 +4039,7 @@ pattern        规定验证input域的模式（正则表达式）
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>  1.安装Nginx<br>  下载nginx：</p>
+        <p><img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2651731524,3339854291&fm=11&gp=0.jpg" alt="Linux"><br>  1.安装Nginx<br>  下载nginx：</p>
 <p>官方网站：<br><a href="http://nginx.org/" target="_blank" rel="noopener">http://nginx.org/</a><br>使用的版本是1.8.0版本。</p>
 <p>Nginx提供的源码。<br>4.1.要求的安装环境<br>1、需要安装gcc的环境。yum install gcc-c++<br>2、第三方的开发包。<br>PCRE<br>    PCRE(Perl Compatible Regular Expressions)是一个Perl库，包括 perl 兼容的正则表达式库。nginx的http模块使用pcre来解析正则表达式，所以需要在linux上安装pcre库。<br>yum install -y pcre pcre-devel<br>注：pcre-devel是使用pcre开发的一个二次开发库。nginx也需要此库。<br>zlib<br>    zlib库提供了很多种压缩和解压缩的方式，nginx使用zlib对http包的内容进行gzip，所以需要在linux上安装zlib库。<br>yum install -y zlib zlib-devel</p>
 <p>openssl<br>    OpenSSL 是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。<br>    nginx不仅支持http协议，还支持https（即在ssl协议上传输http），所以需要在linux安装openssl库。<br>yum install -y openssl openssl-devel</p>
@@ -4506,11 +4506,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
+                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
+                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -4522,7 +4522,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
+                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -4530,7 +4530,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
+                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
               </li>
              
               <li class="article-tag-list-item">

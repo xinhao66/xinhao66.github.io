@@ -16,10 +16,12 @@
 <meta property="og:site_name" content="阿浩的博客~">
 <meta property="og:description" content="1.数据库优化经验可以从 硬件 系统配置 数据表结构 sql语句几个方面优化具体实现优化方向1.1SQL语句及索引的优化首先要根据需求写出结构良好的SQL，然后根据SQL在表中建立有效的索引。但是如果索引太多，不但会影响写入的效率，对查询也有一定的影响。 1.2合理的数据库是设计根据数据库三范式来进行表结构的设计。设计表结构时，就需要考虑如何设计才能更有效的查询。数据库三范式：第一范式：数据表中每">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-08-27T12:13:03.751Z">
+<meta property="og:image" content="http://img5.imgtn.bdimg.com/it/u=1978669613,850076544&fm=26&gp=0.jpg">
+<meta property="og:updated_time" content="2019-08-27T12:56:30.815Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="面试题补充">
 <meta name="twitter:description" content="1.数据库优化经验可以从 硬件 系统配置 数据表结构 sql语句几个方面优化具体实现优化方向1.1SQL语句及索引的优化首先要根据需求写出结构良好的SQL，然后根据SQL在表中建立有效的索引。但是如果索引太多，不但会影响写入的效率，对查询也有一定的影响。 1.2合理的数据库是设计根据数据库三范式来进行表结构的设计。设计表结构时，就需要考虑如何设计才能更有效的查询。数据库三范式：第一范式：数据表中每">
+<meta name="twitter:image" content="http://img5.imgtn.bdimg.com/it/u=1978669613,850076544&fm=26&gp=0.jpg">
   
     <link rel="alternative" href="/atom.xml" title="阿浩的博客~" type="application/atom+xml">
   
@@ -179,7 +181,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>1.数据库优化经验<br>可以从 硬件 系统配置 数据表结构 sql语句几个方面优化<br>具体实现优化方向<br>1.1SQL语句及索引的优化<br>首先要根据需求写出结构良好的SQL，然后根据SQL在表中建立有效的索引。但是如果索引太多，不但会影响写入的效率，对查询也有一定的影响。</p>
+        <p><img src="http://img5.imgtn.bdimg.com/it/u=1978669613,850076544&fm=26&gp=0.jpg" alt="面试"><br>1.数据库优化经验<br>可以从 硬件 系统配置 数据表结构 sql语句几个方面优化<br>具体实现优化方向<br>1.1SQL语句及索引的优化<br>首先要根据需求写出结构良好的SQL，然后根据SQL在表中建立有效的索引。但是如果索引太多，不但会影响写入的效率，对查询也有一定的影响。</p>
 <p>1.2合理的数据库是设计<br>根据数据库三范式来进行表结构的设计。设计表结构时，就需要考虑如何设计才能更有效的查询。<br>数据库三范式：<br>第一范式：数据表中每个字段都必须是不可拆分的最小单元，也就是确保每一列的原子性；<br>第二范式：满足一范式后，表中每一列必须有唯一性，都必须依赖于主键；<br>第三范式：满足二范式后，表中的每一列只与主键直接相关而不是间接相关(外键也是直接相关)，字段没有冗余。<br>注意：没有最好的设计，只有最合适的设计，所以不要过分注重理论。三范式可以作为一个基本依据，不要生搬硬套。</p>
 <p>有时候可以根据场景合理地反规范化：<br>A：分割表。<br>B：保留冗余字段。当两个或多个表在查询中经常需要连接时，可以在其中一个表上增加若干冗余的字段，以 避免表之间的连接过于频繁，一般在冗余列的数据不经常变动的情况下使用。<br>C：增加派生列。派生列是由表中的其它多个列的计算所得，增加派生列可以减少统计运算，在数据汇总时可以大大缩短运算时间。</p>
 <p>数据库五大约束：<br>A：PRIMARY key:设置主键约束；<br>B：UNIQUE：设置唯一性约束，不能有重复值；<br>C：DEFAULT 默认值约束<br>D：NOT NULL：设置非空约束，该字段不能为空；<br>E：FOREIGN key :设置外键约束。</p>
@@ -528,11 +530,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
+                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
+                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -544,7 +546,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
+                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -552,7 +554,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
+                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
               </li>
              
               <li class="article-tag-list-item">
