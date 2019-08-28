@@ -156,6 +156,117 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="post-真面试题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/28/真面试题/">真面试题</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/28/真面试题/" class="archive-article-date">
+  	<time datetime="2019-08-28T07:30:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-28</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1、如何判断一个二叉树是不是平衡二叉树？"><a href="#1、如何判断一个二叉树是不是平衡二叉树？" class="headerlink" title="1、如何判断一个二叉树是不是平衡二叉树？"></a>1、如何判断一个二叉树是不是平衡二叉树？</h1><p>答：概念：平衡二叉树必须满足两个条件：1、左右子树的高度差不能大于1   2、每个根节点下面的左右子树也必须满足平衡二叉树的性质。遍历每个结点，借助一个获取树深度的递归函数，根据该结点的左右子树高度差判断是否平衡，然后递归地对左右子树进行判断。</p>
+<h1 id="2、Switch语句能否作用在byte上，能否作用在long上，能否作用在String上？"><a href="#2、Switch语句能否作用在byte上，能否作用在long上，能否作用在String上？" class="headerlink" title="2、Switch语句能否作用在byte上，能否作用在long上，能否作用在String上？"></a>2、Switch语句能否作用在byte上，能否作用在long上，能否作用在String上？</h1><p>答：在switch（expression）中只能是一个表达式或者枚举常量，整数表达式可以是int或者integer包装类型，bate可以隐式转换为int类型，所以可以；long和String类型不符合swicth语法规定，并且不能隐式转换为int类型，所以不能作用在switch上。</p>
+<h1 id="3、如何判断一个链表是否有环。"><a href="#3、如何判断一个链表是否有环。" class="headerlink" title="3、如何判断一个链表是否有环。"></a>3、如何判断一个链表是否有环。</h1><p>答：设置两个指针，一个指针每次前进一步，一个指针每次前进两步，如果它们中有一个先到达链表末尾，那么无环，否则它们一定会相遇。<br>相遇后，每次前进一步的指针继续前进，同时另设一个指针从链表头部开始每次前进一步，它们必然会相遇于环的入口。</p>
+<h1 id="4、请简述Spring-MVC框架工作机制"><a href="#4、请简述Spring-MVC框架工作机制" class="headerlink" title="4、请简述Spring MVC框架工作机制"></a>4、请简述Spring MVC框架工作机制</h1><p>答：1.客户端将请求提交到DispatcherServlet<br>2.由DispatcherServlet控制器查询一个或者多个HandlerMapping找到请求的Controller<br>3.DispatcherServlet将请求提交到Controller<br>4.Controller调用业务逻辑处理后，返回ModelAndView<br>5.DispatcherServlet查询一个或者多个ViewResoler视图解析器，找到ModelAndView指定视图<br>6.视图将结果显示到客户端。</p>
+<h1 id="5、判断输出结果"><a href="#5、判断输出结果" class="headerlink" title="5、判断输出结果"></a>5、判断输出结果</h1><p>String a = “abc”;String b = “abc”;<br>String c = new String(“abc”);String d = “ab”+”c”;<br>System.out.print(a == b);        true<br>System.out.print(a == c);        false<br>System.out.print(a == d);        true<br>System.out.print(a.equals(b));    true<br>System.out.print(a.equals(c));    true<br>System.out.print(a.equals(d));    true</p>
+<h1 id="6、编写SQL，如下DDL描述了机构表-ORGAN-INFO-与用户表-ORGAN-USER-之间一对多的关系，请按下列要求写出相应的sql语句。"><a href="#6、编写SQL，如下DDL描述了机构表-ORGAN-INFO-与用户表-ORGAN-USER-之间一对多的关系，请按下列要求写出相应的sql语句。" class="headerlink" title="6、编写SQL，如下DDL描述了机构表(ORGAN_INFO)与用户表(ORGAN_USER)之间一对多的关系，请按下列要求写出相应的sql语句。"></a>6、编写SQL，如下DDL描述了机构表(ORGAN_INFO)与用户表(ORGAN_USER)之间一对多的关系，请按下列要求写出相应的sql语句。</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">OREATE TABLE ORGAN_INFO(</span><br><span class="line">ORGAN_ID	NUMBER(11)	PRIMARY KEY  NOT NULL  COMMENT’机构ID’,</span><br><span class="line">ORGAN_NAME	VARCHAR2(80)	COMMENT’机构名称’</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line">CREATE TABLE ORGAN_USER(</span><br><span class="line">USER_ID	NUMBER(11)	PRIMARY KEY	NOT NULL	COMMENT’用户ID’，</span><br><span class="line">ORGAN_ID	NUMBER(11)	COMMENT’机构ID’,</span><br><span class="line">USER_NAME	VARCHAR2(80)	COMMENT’用户名称’，</span><br><span class="line">CREATE_TIME	DATE	COMMENT‘创建时间’);</span><br></pre></td></tr></table></figure>
+
+<h2 id="1-查询机构ID，机构名称、用户ID、用户名称、且用户创建时间大于2013年1月7日的数据。"><a href="#1-查询机构ID，机构名称、用户ID、用户名称、且用户创建时间大于2013年1月7日的数据。" class="headerlink" title="(1)查询机构ID，机构名称、用户ID、用户名称、且用户创建时间大于2013年1月7日的数据。"></a>(1)查询机构ID，机构名称、用户ID、用户名称、且用户创建时间大于2013年1月7日的数据。</h2><p>SELECT E.ORGAN_ID,E.ORGAN_NAME,D.USER_ID,D.USER_NAME,D.CREATE_TIME DATE FROM ORGAN_INFO E, ORGAN_USER D WHERE E.ORGAN_ID = D.ORGAN_ID AND CREATE_TIME DATE&gt;2013.1.7;</p>
+<h2 id="2-查询每个机构的用户数量-要求显示机构名称-，且按照用户数量降序排序。"><a href="#2-查询每个机构的用户数量-要求显示机构名称-，且按照用户数量降序排序。" class="headerlink" title="(2)查询每个机构的用户数量(要求显示机构名称)，且按照用户数量降序排序。"></a>(2)查询每个机构的用户数量(要求显示机构名称)，且按照用户数量降序排序。</h2><p>SELECT E.ORGAN_NAME,D.USER_ID,D.USER_NAME FROM ORGAN_INFO E, ORGAN_USER D WHERE E.ORGAN_ID = D.ORGAN_ID<br>SELECT COUNT AS USER_ID FROM ORGAN_USER<br>SELECT ORGAN_INFO ORDER BY ORGAN_NAME DESC</p>
+<h1 id="1、CSS框模型中，-统一调整组件四周外边距的属性是margin统一调整组件四周内边距的属性是padding"><a href="#1、CSS框模型中，-统一调整组件四周外边距的属性是margin统一调整组件四周内边距的属性是padding" class="headerlink" title="1、CSS框模型中， 统一调整组件四周外边距的属性是margin统一调整组件四周内边距的属性是padding"></a>1、CSS框模型中， 统一调整组件四周外边距的属性是<strong><em>margin</em></strong>统一调整组件四周内边距的属性是<strong><em>padding</em></strong></h1><h1 id="2、默认情况下，Connection对象会在执行一条语句后自动提交，不利于事务的控制，如果要改变这种情况，需要调用Connection的setAutoCommit-false-方法设置为手动提交"><a href="#2、默认情况下，Connection对象会在执行一条语句后自动提交，不利于事务的控制，如果要改变这种情况，需要调用Connection的setAutoCommit-false-方法设置为手动提交" class="headerlink" title="2、默认情况下，Connection对象会在执行一条语句后自动提交，不利于事务的控制，如果要改变这种情况，需要调用Connection的setAutoCommit(false)方法设置为手动提交"></a>2、默认情况下，Connection对象会在执行一条语句后自动提交，不利于事务的控制，如果要改变这种情况，需要调用Connection的<strong><em>setAutoCommit(false)</em></strong>方法设置为手动提交</h1><h1 id="3、Java中最有效计算-28的表达式是-2-lt-lt-3"><a href="#3、Java中最有效计算-28的表达式是-2-lt-lt-3" class="headerlink" title="3、Java中最有效计算 28的表达式是**2&lt;&lt;3***"></a>3、Java中最有效计算 2<em>8的表达式是**</em>2&lt;&lt;3***</h1><p><strong><em>(2 &lt;&lt; 3 表示2的二进制表达数最后一位非0数字起前面的全部左移3位或者说小数点右移3位)</em></strong></p>
+<h1 id="4、局部变量的名字与成员变量的名字相同，若想在该方法内使用成员变量，必须使用关键字this"><a href="#4、局部变量的名字与成员变量的名字相同，若想在该方法内使用成员变量，必须使用关键字this" class="headerlink" title="4、局部变量的名字与成员变量的名字相同，若想在该方法内使用成员变量，必须使用关键字this"></a>4、局部变量的名字与成员变量的名字相同，若想在该方法内使用成员变量，必须使用关键字<strong><em>this</em></strong></h1><h1 id="5、Java-集合框架中抽象有序列表的接口是List无序列表的接口是Set他们的共同父接口是collection用于对集合进行特殊操作如排序的工具类是Collections"><a href="#5、Java-集合框架中抽象有序列表的接口是List无序列表的接口是Set他们的共同父接口是collection用于对集合进行特殊操作如排序的工具类是Collections" class="headerlink" title="5、Java 集合框架中抽象有序列表的接口是List无序列表的接口是Set他们的共同父接口是collection用于对集合进行特殊操作如排序的工具类是Collections"></a>5、Java 集合框架中抽象有序列表的接口是<strong><em>List</em></strong>无序列表的接口是<strong><em>Set</em></strong>他们的共同父接口是<strong><em>collection</em></strong>用于对集合进行特殊操作如排序的工具类是<strong><em>Collections</em></strong></h1><h1 id="1、描述JSP-MVC模式下重复提交问题产生的原因和解决办法"><a href="#1、描述JSP-MVC模式下重复提交问题产生的原因和解决办法" class="headerlink" title="1、描述JSP MVC模式下重复提交问题产生的原因和解决办法"></a>1、描述JSP MVC模式下重复提交问题产生的原因和解决办法</h1><p>原因：<br>a&gt;点击提交按钮两次。<br>b&gt;点击刷新按钮。<br>c&gt;使用浏览器后退按钮重复之前的操作，导致重复提交表单。<br>d&gt;使用浏览器历史记录重复提交表单。<br>e&gt;浏览器重复的HTTP请求。<br>但出现了这样的问题并不见得就必须处理，要看你所开发的系统的类别而定。比如你接手的是某个资源管理系统，系统本身从需求的角度根本就不允许出现” 重复”的记录，在这样需求的约束条件下，去执行重复的提交动作只会引发“业务级异常”的产生（比如说抽奖，回退之后重新抽一次）  </p>
+<p>解决方法：<br>在服务器端生成一个令牌保存在用户session中，在form中加一个hidden域，显示该令牌的值，form提交后重新生成一个新的令牌，将用户提交的令牌和session中的令牌比较，如相同则是重复提交</p>
+<h1 id="2-简述SERVLET中forward-与redirect-的区洲以及JSP中动态引入的区别"><a href="#2-简述SERVLET中forward-与redirect-的区洲以及JSP中动态引入的区别" class="headerlink" title="2. 简述SERVLET中forward()与redirect()的区洲以及JSP中动态引入的区别"></a>2. 简述SERVLET中forward()与redirect()的区洲以及JSP中动态引入的区别</h1><p>forward()：仅是容器中控制权的转向，在客户端浏览器地址栏中不会显示出转向后的地址<br>redirect()：则是完全的跳转，浏览器将会得到跳转的地址，并重新发送请求链接。这样，从浏览器的地址栏中可以看到跳转后的链接地址。<br>所以，前者<strong>更加高效</strong>，在前者可以满足需要时，尽量使用forward()方法，并且，这样也有助于<strong>隐藏实际的链接</strong>。在有些情况下，比如，需要<strong>跳转到一个其它服务器上</strong>的资源，则必须使用sendRedirect()方法。<br>静态引入：就是把页面A嵌入到页面B中，如果页面B中有JAVA代码，比如说变量名是X，A中也有变量X这样的话静态引入会报错，但是动态引入不会报错，静态引入的JSP编译的时候会生成一个.java文件<br>动态引入：会生成两个.java文件，因为动态引入（生成静态页面）是一个页面引用另一个页面而静态的是嵌入。<br>不过 静态引入和动态引入最后都只会生成一个html页面</p>
+<h1 id="3-描述Java中String、StringBuffer、StringBuilder的区别"><a href="#3-描述Java中String、StringBuffer、StringBuilder的区别" class="headerlink" title="3. 描述Java中String、StringBuffer、StringBuilder的区别"></a>3. 描述Java中String、StringBuffer、StringBuilder的区别</h1><p>1.String是内容不可变的字符串。String底层使用了一个不可变的字符数组(final char[])<br>2.StringBuillder StringBuffer,是内容可以改变的字符串。StringBuillder StringBuffer底层使用的可变的字符数组（没有使用final来修饰）<br>最经典就是拼接字符串<br>2、StringBuilder或者StringBuffer<br>StringBuilder sb = new StringBuilder(); sb.apend(“a”).apend(“b”)<br>拼接字符串不能使用String进行拼接，要使用StringBuilder或者StringBuffer<br>3.StringBuilder是线程不安全的，效率较高.而StringBuffer是线程安全的，效率较低</p>
+<h1 id="4-描述Hibernate中的ID生成器"><a href="#4-描述Hibernate中的ID生成器" class="headerlink" title="4. 描述Hibernate中的ID生成器"></a>4. 描述Hibernate中的ID生成器</h1><p>1) assigned<br>主键由外部程序负责生成，无需Hibernate参与。<br>2) hilo<br>通过hi/lo 算法实现的主键生成机制，需要额外的数据库表保存主键生成历史状态。<br>3) seqhilo<br>与hilo 类似，通过hi/lo 算法实现的主键生成机制，只是主键历史状态保存在Sequence中，适用于支持Sequence的数据库，如Oracle。<br>4) increment<br>主键按数值顺序递增。此方式的实现机制为在当前应用实例中维持一个变量，以保存着当前的最大值，之后每次需要生成主键的时候将此值加1作为主键。<br>这种方式可能产生的问题是：如果当前有多个实例访问同一个数据库，那么由于各个实例各自维护主键状态，不同实例可能生成同样的主键，从而造成主键重复异常。因此，如果同一数据库有多个实例访问，此方式必须避免使用。<br>5) identity<br>采用数据库提供的主键生成机制。如DB2、SQL Server、MySQL中的主键生成机制。<br>6) sequence<br>采用数据库提供的sequence 机制生成主键。如Oralce 中的Sequence。<br>7) native<br>由Hibernate根据底层数据库自行判断采用identity、hilo、sequence其中一种作为主键生成方式。<br>8) uuid.hex<br>由Hibernate基于128 位唯一值产生算法生成16 进制数值（编码后以长度32 的字符串表示）作为主键。<br>9) uuid.string<br>与uuid.hex 类似，只是生成的主键未进行编码（长度16）。在某些数据库中可能出现问题（如PostgreSQL）。<br>10) foreign<br>使用外部表的字段作为主键。</p>
+<h1 id="5-描述Spring中的编程式事务处理及声明式事务处理"><a href="#5-描述Spring中的编程式事务处理及声明式事务处理" class="headerlink" title="5. 描述Spring中的编程式事务处理及声明式事务处理"></a>5. 描述Spring中的编程式事务处理及声明式事务处理</h1><p>Spring对编程式事务的支持<br>Spring中的事务分为物理事务和逻辑事务<br>物理事务：就是底层数据库提供的事务支持，如JDBC或JTA提供的事务；<br>逻辑事务：是Spring管理的事务，不同于物理事务，逻辑事务提供更丰富的控制，而且如果想得到Spring事务管理的好处，必须使用逻辑事务，因此在Spring中如果没特别强调一般就是逻辑事务；<br>逻辑事务解决方案：<br>低级别解决方案:<br>使用工具类获取连接（会话）和释放连接（会话），如使用org.springframework.jdbc.datasource包中的DataSourceUtils 类来获取和释放具有逻辑事务功能的连接。当然对集成第三方ORM框架也提供了类似的工具类，如对Hibernate提供了SessionFactoryUtils工具类，JPA的EntityManagerFactoryUtils等，<br>高级别解决方案:<br>使用Spring提供的模板类，如JdbcTemplate、HibernateTemplate和JpaTemplate模板类等，而这些模板类内部其实是使用了低级别解决方案中的工具类来管理连接或会话<br>Spring提供两种编程式事务支持：直接使用PlatformTransactionManager实现和使用TransactionTemplate模板类，用于支持逻辑事务管理。如果采用编程式事务推荐使用TransactionTemplate模板类和高级别解决方案。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">面试题</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/28/真面试题/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<!-- 来必力City版安装代码 -->
+
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
+
+
+  
     <article id="post-Java面试" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -3906,119 +4017,6 @@ pattern        规定验证input域的模式（正则表达式）
 
 
   
-    <article id="post-鱼的记忆不止七秒" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/13/鱼的记忆不止七秒/">鱼的记忆不止七秒</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/13/鱼的记忆不止七秒/" class="archive-article-date">
-  	<time datetime="2019-07-13T07:00:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p> 1.记忆像是倒在掌心的水，不论你摊开还是紧握，终究还是会从指缝中一滴一滴流淌干净。</p>
-<p> 2.生命中有一些人与我们擦肩了，却来不及遇见；遇见了，却来不及相识；相识了，却来不及熟悉；熟悉了，却还是要说再见。<br> 3.那些已经犯过的错误，有一些是因为来不及，有一些是因为刻意躲避，更多的时候是茫然地站到了一边。我们就这样错了一次又一次，却从不晓得从中汲取教训，做一些反省。</p>
-<p> 4.很多人，因为寂寞而错爱了一人，但更多的人，因为错爱一人，而寂寞一生。我们可以彼此相爱，却注定了无法相守。不是我不够爱你，只是我不敢肯定，这爱，是不是最正确的。<br> 5.人最想得到什么，就会成为什么的囚徒。有些人一辈子执着于感情，一次又一次地受伤，但痴迷不悟，最后就变成了感情的囚徒。往往是你最看重的，一定会把你裹挟进去，让你变成它的囚徒，这时候，“我”就丢了。</p>
-<p> 6.人生最遗憾的，莫过于，轻易地放弃了不该放弃的，固执地，坚持了不该坚持的。</p>
-<p> 7.人生无奈，青春是打开了就合不上的书，人生是踏上了就回不了头的路，爱情是扔出了就收不回的赌注。</p>
-<p> 8.世界上真的没有什么是永远。一段友情，离开了就淡了。一段爱情，分离了就散了。现在所拥有的，也许下一秒，就不再属于你。</p>
-<p> 9.以为蒙上了眼睛，就可以看不见这个世界；以为捂住了耳朵，就可以听不到所有的烦恼；以为脚步停了下来，心就可以不再远行；以为我需要的爱情，只是一个拥抱。</p>
-<p> 10.分手后不可以做朋友，因为彼此伤害过。不可以做敌人。因为彼此深爱过，所以我们变成了最熟悉的陌生人。</p>
-<p> 11.回首昨天，我们问心无愧，尽管太多的苦涩融进了昨日的犁铧，尽管太多的忧伤充斥着我们的心灵，尽管太多的无奈写在我们的脸上，尽管太多的精力挥洒在昨日的流程上。</p>
-<p> 12.人生无奈，挥之不去的悲伤，却带着一种无奈。人生恍惚，时光匆忙，留给我们的只是一些零零碎碎的记忆，给我们的一生，烙上深深的印记。</p>
-<p> 13.拿起一张苍白的纸，用白色的蜡笔拼命地涂抹；绘到最后才发现，这也不过是一场自己与自己徒劳的角逐。</p>
-<p> 14.有时候我们不是不懂，只是不想懂；有时候不是不知道，只是不想说出来；有时候不是不明白，而是明白了也不知道该怎么做，于是就保持了沉默。</p>
-<p> 15.世上真的有太多的无奈，我们总是逼不得已做一些我们不愿意甚至是很讨厌做的事。</p>
-<p> 16.人的一生总会面对一些无之奈何、难以抉择的人和事，有时不得不说一些违心的话、做一些违心的事、见一些自己不愿意见的人。</p>
-<p> 17.安慰别人的话，终究安慰不了自己。</p>
-<p> 18.如果人生是一段旅途，快乐与悲伤就是那两条长长的铁轨，在我身后紧紧跟随。</p>
-<p> 19.“人有悲欢离合，月有阴晴圆缺”。好多事情都不会像我们想象的一样美好，因此人生常常充满了太多的无奈。</p>
-<p> 20.有些事，我们明知道是错的，也要去坚持，因为不甘心；有些人，我们明知道是爱的，也要去放弃，因为没结局；有时候，我们明知道没路了，却还在前行，因为习惯了。</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">鱼的记忆不止七秒</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/13/鱼的记忆不止七秒/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<!-- 来必力City版安装代码 -->
-
-  <!-- 这一句是适配样式 -->
-  <section class="duoshuo" id="comments">
-    <!-- 以下是 来必力City版安装代码 -->
-    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
-      <script type="text/javascript">
-       (function(d, s) {
-           var j, e = d.getElementsByTagName(s)[0];
-           if (typeof LivereTower === 'function') { return; }
-           j = d.createElement(s);
-           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-           j.async = true;
-           e.parentNode.insertBefore(j, e);
-       })(document, 'script');
-      </script>
-    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
-    </div>
-  </section>
-
-
-  
     <article id="post-Linux安装插件" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -4506,15 +4504,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">鱼的记忆不止七秒</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Mvc相关及Mysql</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color4">面试题</a>
               </li>
              
               <li class="article-tag-list-item">
