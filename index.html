@@ -156,19 +156,327 @@
           <div id="js-content" class="content-ll">
             
   
-    <article id="post-真面试题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Spring、Spring MVC、MyBatis 整合文件配置详解" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/28/真面试题/">真面试题</a>
+      <a class="article-title" href="/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/">Spring、Spring MVC、MyBatis 整合文件配置详解</a>
     </h1>
   
 
         
-        <a href="/2019/08/28/真面试题/" class="archive-article-date">
+        <a href="/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/" class="archive-article-date">
+  	<time datetime="2019-08-30T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-web-xml的配置"><a href="#1-web-xml的配置" class="headerlink" title="1 web.xml的配置"></a>1 web.xml的配置</h1><p>web.xml应该是整个项目最重要的配置文件了，不过servlet3.0中已经支持注解配置方式了。在servlet3.0以前每个servlet必须要在web.xml中配置servlet及其映射关系。但是在spring框架中就不用了，因为Spring中是依赖注入（Dependency Injection）的也叫控制反转（Inversion of Control）。但是也要配置一个重要的servlet，就是前端控制器（DispatcherServlet）。配置方式与普通的servlet基本相似。<br>配置内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置前端控制器 --&gt;</span><br><span class="line">  &lt;servlet&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</span><br><span class="line">      &lt;init-param&gt;</span><br><span class="line">          &lt;!-- ContextconfigLocation配置springmvc加载的配置文件</span><br><span class="line">          适配器、处理映射器等</span><br><span class="line">           --&gt;</span><br><span class="line">          &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">          &lt;param-value&gt;WEB-INF/classes/spring/springmvc.xml&lt;/param-value&gt;</span><br><span class="line">  &lt;/init-param&gt;</span><br><span class="line">  &lt;/servlet&gt;</span><br><span class="line">  &lt;servlet-mapping&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;!-- 1、.action访问以.action结尾的  由DispatcherServlet进行解析</span><br><span class="line">           2、/,所有访问都由DispatcherServlet进行解析</span><br><span class="line">       --&gt;</span><br><span class="line">      &lt;url-pattern&gt;/&lt;/url-pattern&gt;</span><br><span class="line">  &lt;/servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意，springmvc.xml是spring配置文件，将在后面讨论。在<servlet-mapping>中url如果是.action，前端控制器就只会拦截以.action结尾的请求，并不会理会静态的文件。对静态页面的控制就要通过其他的手段。以/作为url的话就会拦截所有的请求，包括静态页面的请求。这样的话就可以拦截任何想要处理的请求，但是有一个问题。如果拦截了所有的请求，如果不在拦截器中做出相应的处理那么所有静态的js、css以及页面中用到的图片就会访问不到造成页面无法正常显示。但这可以通过静态资源的配置来解决这个问题。后面会提到。</servlet-mapping></p>
+<p>配置spring容器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;context-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">        &lt;param-value&gt;WEB-INF/classes/spring/applicationContext-*.xml&lt;/param-value&gt;</span><br><span class="line">&lt;/context-param&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其中applicationContext-*.xml包含3个配置文件，是springIoC容器的具体配置。后面会提到。</p>
+<p>配置一个监听器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;listener&gt;</span><br><span class="line">        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;</span><br><span class="line">&lt;/listener&gt;</span><br></pre></td></tr></table></figure>
+
+<p>web.xml的完整配置是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;web-app version=&quot;3.0&quot;</span><br><span class="line">    xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</span><br><span class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee </span><br><span class="line"> </span><br><span class="line">http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;display-name&gt;&lt;/display-name&gt;    </span><br><span class="line"> </span><br><span class="line">  &lt;!-- 404错误拦截 --&gt;</span><br><span class="line">  &lt;error-page&gt;</span><br><span class="line">    &lt;error-code&gt;404&lt;/error-code&gt;</span><br><span class="line">    &lt;location&gt;/error404.jsp&lt;/location&gt;</span><br><span class="line">  &lt;/error-page&gt;</span><br><span class="line">  &lt;!-- 500错误拦截 --&gt;</span><br><span class="line">  &lt;error-page&gt;</span><br><span class="line">    &lt;error-code&gt;500&lt;/error-code&gt;</span><br><span class="line">    &lt;location&gt;/error500.jsp&lt;/location&gt;</span><br><span class="line">  &lt;/error-page&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;!-- 加载spring容器 --&gt;</span><br><span class="line">    &lt;context-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">        &lt;param-value&gt;WEB-INF/classes/spring/applicationContext-*.xml&lt;/param-value&gt;</span><br><span class="line">    &lt;/context-param&gt;</span><br><span class="line">    &lt;listener&gt;</span><br><span class="line">        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;</span><br><span class="line">    &lt;/listener&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;!-- 配置前端控制器 --&gt;</span><br><span class="line">  &lt;servlet&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</span><br><span class="line">      &lt;init-param&gt;</span><br><span class="line">          &lt;!-- ContextconfigLocation配置springmvc加载的配置文件</span><br><span class="line">          适配器、处理映射器等</span><br><span class="line">           --&gt;</span><br><span class="line">          &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">          &lt;param-value&gt;WEB-INF/classes/spring/springmvc.xml&lt;/param-value&gt;</span><br><span class="line">  &lt;/init-param&gt;</span><br><span class="line">  &lt;/servlet&gt;</span><br><span class="line">  &lt;servlet-mapping&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;!-- 1、.action访问以.action结尾的  由DispatcherServlet进行解析</span><br><span class="line">           2、/,所有访问都由DispatcherServlet进行解析</span><br><span class="line">       --&gt;</span><br><span class="line">      &lt;url-pattern&gt;/&lt;/url-pattern&gt;</span><br><span class="line">  &lt;/servlet-mapping&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;!-- 解决post乱码问题的过滤器 --&gt;</span><br><span class="line">  &lt;filter&gt;</span><br><span class="line">      &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;</span><br><span class="line">      &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;</span><br><span class="line">      &lt;init-param&gt;</span><br><span class="line">          &lt;param-name&gt;encoding&lt;/param-name&gt;</span><br><span class="line">          &lt;param-value&gt;utf-8&lt;/param-value&gt;</span><br><span class="line">      &lt;/init-param&gt;</span><br><span class="line">  &lt;/filter&gt;</span><br><span class="line">  &lt;filter-mapping&gt;</span><br><span class="line">      &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;</span><br><span class="line">      &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</span><br><span class="line">  &lt;/filter-mapping&gt;</span><br><span class="line">  &lt;welcome-file-list&gt;</span><br><span class="line">    &lt;welcome-file&gt;welcome.jsp&lt;/welcome-file&gt;</span><br><span class="line">  &lt;/welcome-file-list&gt;</span><br><span class="line">&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+<p>看到配置文件中多了两块内容，一个是error page是用来友好的处理错误的，可以使用错误代码来区别并跳转到相应的处理页面。这段配置代码最好放到最前面，在前端控制器拦截之前处理。<br>还有一块内容是一个解决post乱码问题的过滤器，拦截post请求并编码为utf8。</p>
+<h1 id="2-springmvc-xml的配置"><a href="#2-springmvc-xml的配置" class="headerlink" title="2 springmvc.xml的配置"></a>2 springmvc.xml的配置</h1><p>视图解析器的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置视图解析器 --&gt;</span><br><span class="line">     &lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">         &lt;!-- 使用前缀和后缀 --&gt;</span><br><span class="line">         &lt;property name=&quot;prefix&quot; value=&quot;/&quot;&gt;&lt;/property&gt;</span><br><span class="line">         &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在Controller中设置视图名的时候会自动加上前缀和后缀。</p>
+<p>Controller的配置</p>
+<p>自动扫描方式，扫描包下面所有的Controller，可以使用注解来指定访问路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 使用组件扫描的方式可以一次扫描多个Controller --&gt;</span><br><span class="line">&lt;context:component-scan base-package=&quot;com.wxisme.ssm.controller&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用单个的配置方式，需要指定Controller的全限定名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean name=&quot;/queryUser.action&quot; class=&quot;com.wxisme.ssm.controller.Controller1&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置注解的处理器适配器和处理器映射器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 注解的处理器适配器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 注解的处理器映射器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用下面的简化配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置注解的处理器映射器和处理器适配器 --&gt;</span><br><span class="line">&lt;mvc:annotation-driven conversion-service=&quot;conversionService&quot;&gt;&lt;/mvc:annotation-driven&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置拦截器，可以直接定义拦截所有请求，也可以自定义拦截路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;mvc:interceptors&gt;</span><br><span class="line">    &lt;!-- 直接定义拦截所有请求 --&gt;</span><br><span class="line">    &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;!-- &lt;mvc:interceptor&gt;</span><br><span class="line">            拦截所有路径的请求   包括子路径</span><br><span class="line">            &lt;mvc:mapping path=&quot;/**&quot;/&gt;</span><br><span class="line">            &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;/mvc:interceptor&gt; --&gt;</span><br><span class="line">    &lt;/mvc:interceptors&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置全局异常处理器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 定义全局异常处理器 --&gt;</span><br><span class="line">    &lt;!-- 只有一个全局异常处理器起作用 --&gt;</span><br><span class="line">    &lt;bean id=&quot;exceptionResolver&quot; class=&quot;com.wxisme.ssm.exception.OverallExceptionResolver&quot;&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置文件上传数据解析器，在上传文件时需要配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--配置上传文件数据解析器  --&gt;</span><br><span class="line">    &lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;</span><br><span class="line">        &lt;property name=&quot;maxUploadSize&quot;&gt;</span><br><span class="line">            &lt;value&gt;9242880&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>还可以配置一些自定义的参数类型，以日期类型绑定为例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 自定义参数类型绑定 --&gt;</span><br><span class="line">    &lt;bean id=&quot;conversionService&quot; class=&quot;org.springframework.format.support.FormattingConversionServiceFactoryBean&quot;&gt;</span><br><span class="line">     &lt;property name=&quot;converters&quot;&gt;</span><br><span class="line">         &lt;list&gt;</span><br><span class="line">             &lt;!-- 日期类型绑定 --&gt;</span><br><span class="line">             &lt;bean class=&quot;com.wxisme.ssm.controller.converter.DateConverter&quot;/&gt;</span><br><span class="line">         &lt;/list&gt;</span><br><span class="line">     &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>上面提到过如果在配置前端控制器时拦截了所有的请求，不做特殊处理就会导致部分静态资源无法使用。如果是这种情况就可以使用下面的配置来访问静态资源文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line">&lt;mvc:resources mapping=&quot;/images/**&quot; location=&quot;/images/&quot; /&gt;</span><br><span class="line">&lt;mvc:resources mapping=&quot;/css/**&quot; location=&quot;/css/&quot; /&gt;  </span><br><span class="line">&lt;mvc:resources mapping=&quot;/js/**&quot; location=&quot;/js/&quot; /&gt;</span><br><span class="line">&lt;mvc:resources mapping=&quot;/imgdata/**&quot; location=&quot;/imgdata/&quot; /&gt;</span><br><span class="line">也可以使用默认，但是需要在web.xml中配置。</span><br><span class="line"></span><br><span class="line">&lt;!-- 访问静态资源文件 --&gt;</span><br><span class="line">&lt;!-- &lt;mvc:default-servlet-handler/&gt; 需要在web.xml中配置--&gt;</span><br><span class="line">完全可以不拦截所有路径，大可避免这个问题的发生。完整的配置大概是这样的，需要注意xml文件的命名空间，有时候会有影响的。</span><br><span class="line"></span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</span><br><span class="line">xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;</span><br><span class="line">xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;</span><br><span class="line">xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;</span><br><span class="line">xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;</span><br><span class="line">xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans </span><br><span class="line">http://www.springframework.org/schema/beans/spring-beans.xsd</span><br><span class="line">http://www.springframework.org/schema/context  </span><br><span class="line">http://www.springframework.org/schema/context/spring-context.xsd  </span><br><span class="line">http://www.springframework.org/schema/mvc  </span><br><span class="line">http://www.springframework.org/schema/mvc/spring-mvc.xsd  </span><br><span class="line">http://www.springframework.org/schema/tx  </span><br><span class="line">http://www.springframework.org/schema/tx/spring-tx.xsd </span><br><span class="line">http://www.springframework.org/schema/aop</span><br><span class="line">http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">     &lt;!-- 配置视图解析器 --&gt;</span><br><span class="line">     &lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">         &lt;!-- 使用前缀和后缀 --&gt;</span><br><span class="line">         &lt;property name=&quot;prefix&quot; value=&quot;/&quot;&gt;&lt;/property&gt;</span><br><span class="line">         &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;</span><br><span class="line">     &lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">     &lt;!-- 使用组件扫描的方式可以一次扫描多个Controller --&gt;</span><br><span class="line">     &lt;context:component-scan base-package=&quot;com.wxisme.ssm.controller&quot;&gt;</span><br><span class="line">     &lt;/context:component-scan&gt;</span><br><span class="line">     &lt;!-- 配置注解的处理器映射器和处理器适配器 --&gt;</span><br><span class="line">    &lt;mvc:annotation-driven conversion-service=&quot;conversionService&quot;&gt;&lt;/mvc:annotation-driven&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 自定义参数类型绑定 --&gt;</span><br><span class="line">    &lt;bean id=&quot;conversionService&quot; class=&quot;org.springframework.format.support.FormattingConversionServiceFactoryBean&quot;&gt;</span><br><span class="line">     &lt;property name=&quot;converters&quot;&gt;</span><br><span class="line">         &lt;list&gt;</span><br><span class="line">             &lt;!-- 日期类型绑定 --&gt;</span><br><span class="line">             &lt;bean class=&quot;com.wxisme.ssm.controller.converter.DateConverter&quot;/&gt;</span><br><span class="line">         &lt;/list&gt;</span><br><span class="line">     &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 访问静态资源文件 --&gt;</span><br><span class="line">    &lt;!-- &lt;mvc:default-servlet-handler/&gt; 需要在web.xml中配置--&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;mvc:resources mapping=&quot;/images/**&quot; location=&quot;/images/&quot; /&gt;</span><br><span class="line">    &lt;mvc:resources mapping=&quot;/css/**&quot; location=&quot;/css/&quot; /&gt;  </span><br><span class="line">    &lt;mvc:resources mapping=&quot;/js/**&quot; location=&quot;/js/&quot; /&gt;</span><br><span class="line">    &lt;mvc:resources mapping=&quot;/imgdata/**&quot; location=&quot;/imgdata/&quot; /&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 定义拦截器 --&gt;</span><br><span class="line">    &lt;mvc:interceptors&gt;</span><br><span class="line">    &lt;!-- 直接定义拦截所有请求 --&gt;</span><br><span class="line">    &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;!-- &lt;mvc:interceptor&gt;</span><br><span class="line">            拦截所有路径的请求   包括子路径</span><br><span class="line">            &lt;mvc:mapping path=&quot;/**&quot;/&gt;</span><br><span class="line">            &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;/mvc:interceptor&gt; --&gt;</span><br><span class="line">    &lt;/mvc:interceptors&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!--配置上传文件数据解析器  --&gt;</span><br><span class="line">    &lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;</span><br><span class="line">        &lt;property name=&quot;maxUploadSize&quot;&gt;</span><br><span class="line">            &lt;value&gt;9242880&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 定义全局异常处理器 --&gt;</span><br><span class="line">    &lt;!-- 只有一个全局异常处理器起作用 --&gt;</span><br><span class="line">    &lt;bean id=&quot;exceptionResolver&quot; class=&quot;com.wxisme.ssm.exception.OverallExceptionResolver&quot;&gt;&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;/beans&gt;</span><br></pre></td></tr></table></figure>
+
+<p>applicationContext-*.xml的配置</p>
+<p>applicationContext-*.xml包括三个配置文件，分别对应数据层控制、业务逻辑service控制和事务的控制。</p>
+<p>数据访问层的控制，applicationContext-dao.xml的配置：</p>
+<p>配置加载数据连接资源文件的配置，把数据库连接数据抽取到一个properties资源文件中方便管理。</p>
+<p>配置为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 加载数据库连接的资源文件 --&gt;</span><br><span class="line">&lt;context:property-placeholder location=&quot;/WEB-INF/classes/jdbc.properties&quot;/&gt;</span><br><span class="line">其中jdbc.properties文件的内容如下：配置内容如下：</span><br><span class="line"></span><br><span class="line">jdbc.driver=com.mysql.jdbc.Driver</span><br><span class="line">jdbc.url=jdbc:mysql://localhost:3306/database</span><br><span class="line">jdbc.username=root</span><br><span class="line">jdbc.password=root</span><br></pre></td></tr></table></figure>
+
+<p>配置数据库连接池，这里使用的是dbcp，别忘了添加jar包！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置数据源   dbcp数据库连接池 --&gt;</span><br><span class="line">&lt;bean id=&quot;dataSource&quot; class=&quot;org.apache.commons.dbcp2.BasicDataSource&quot; destroy-method=&quot;close&quot;&gt;</span><br><span class="line">    &lt;property name=&quot;driverClassName&quot; value=&quot;$&#123;jdbc.driver&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;url&quot; value=&quot;$&#123;jdbc.url&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;username&quot; value=&quot;$&#123;jdbc.username&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;password&quot; value=&quot;$&#123;jdbc.password&#125;&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-Spring和MyBatis整合配置，jar包由MyBatis提供"><a href="#3-Spring和MyBatis整合配置，jar包由MyBatis提供" class="headerlink" title="3 Spring和MyBatis整合配置，jar包由MyBatis提供"></a>3 Spring和MyBatis整合配置，jar包由MyBatis提供</h1><p>配置sqlSessionFactory</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置sqlSessionFactory --&gt;</span><br><span class="line">&lt;bean id=&quot;sqlSessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;!-- 数据库连接池 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">    &lt;!-- 加载Mybatis全局配置文件 --&gt;</span><br><span class="line">    &lt;property name=&quot;configLocation&quot; value=&quot;/WEB-INF/classes/mybatis/SqlMapConfig.xml&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>SqlMapConfig.xml文件是MyBatis的配置文件，后面会提到。<br>配置Mapper扫描器，扫描mapper包下的所有mapper文件和类，要求mapper配置文件和类名需要一致。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置mapper扫描器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;!-- 扫描包路径，如果需要扫描多个包中间用半角逗号隔开 --&gt;</span><br><span class="line">    &lt;property name=&quot;basePackage&quot; value=&quot;com.wxisme.ssm.mapper&quot;&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name=&quot;sqlSessionFactoryBeanName&quot; value=&quot;sqlSessionFactory&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>整个applicationContext-dao.xml配置文件应该是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</span><br><span class="line">xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;</span><br><span class="line">xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;</span><br><span class="line">xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;</span><br><span class="line">xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;</span><br><span class="line">xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans </span><br><span class="line">http://www.springframework.org/schema/beans/spring-beans.xsd</span><br><span class="line">http://www.springframework.org/schema/context</span><br><span class="line">http://www.springframework.org/schema/context/spring-context.xsd</span><br><span class="line">http://www.springframework.org/schema/mvc</span><br><span class="line">http://www.springframework.org/schema/mvc/spring-mvc.xsd</span><br><span class="line">http://www.springframework.org/schema/tx</span><br><span class="line">http://www.springframework.org/schema/tx/spring-tx.xsd</span><br><span class="line">http://www.springframework.org/schema/aop</span><br><span class="line">http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 加载数据库连接的资源文件 --&gt;</span><br><span class="line">&lt;context:property-placeholder location=&quot;/WEB-INF/classes/jdbc.properties&quot;/&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 配置数据源   dbcp数据库连接池 --&gt;</span><br><span class="line">&lt;bean id=&quot;dataSource&quot; class=&quot;org.apache.commons.dbcp2.BasicDataSource&quot; destroy-method=&quot;close&quot;&gt;</span><br><span class="line">    &lt;property name=&quot;driverClassName&quot; value=&quot;$&#123;jdbc.driver&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;url&quot; value=&quot;$&#123;jdbc.url&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;username&quot; value=&quot;$&#123;jdbc.username&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;password&quot; value=&quot;$&#123;jdbc.password&#125;&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 配置sqlSessionFactory --&gt;</span><br><span class="line">&lt;bean id=&quot;sqlSessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;!-- 数据库连接池 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">    &lt;!-- 加载Mybatis全局配置文件 --&gt;</span><br><span class="line">    &lt;property name=&quot;configLocation&quot; value=&quot;/WEB-INF/classes/mybatis/SqlMapConfig.xml&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 配置mapper扫描器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;!-- 扫描包路径，如果需要扫描多个包中间用半角逗号隔开 --&gt;</span><br><span class="line">    &lt;property name=&quot;basePackage&quot; value=&quot;com.wxisme.ssm.mapper&quot;&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name=&quot;sqlSessionFactoryBeanName&quot; value=&quot;sqlSessionFactory&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/beans&gt;</span><br><span class="line">业务逻辑控制，applicationContext-service.xml的配置：</span><br><span class="line"></span><br><span class="line">这个文件里暂时只需要定义service的实现类即可。</span><br><span class="line"></span><br><span class="line">&lt;!-- 定义service --&gt;</span><br><span class="line">&lt;bean id=&quot;userService&quot; class=&quot;com.wxisme.ssm.service.impl.UserServiceImpl&quot;/&gt;</span><br><span class="line">事务控制，applicationContext-transaction.xml的配置</span><br><span class="line"></span><br><span class="line">配置数据源，使用JDBC控制类。</span><br><span class="line"></span><br><span class="line">&lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;!-- 配置数据源 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line">配置通知，事务控制。</span><br><span class="line"></span><br><span class="line">&lt;!-- 通知 --&gt;</span><br><span class="line">    &lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;transactionManager&quot;&gt;</span><br><span class="line">        &lt;tx:attributes&gt;</span><br><span class="line">            &lt;!-- 传播行为 --&gt;</span><br><span class="line">            &lt;tx:method name=&quot;save*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;insert*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;update*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;delete*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;find*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;select*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line"> </span><br><span class="line">        &lt;/tx:attributes&gt;</span><br><span class="line">    &lt;/tx:advice&gt;</span><br><span class="line">配置AOP切面</span><br><span class="line"></span><br><span class="line">&lt;!-- 配置aop  --&gt;</span><br><span class="line">    &lt;aop:config&gt;</span><br><span class="line">        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut=&quot;execution(* com.wxisme.ssm.service.impl.*.*(..))&quot;/&gt;</span><br><span class="line">    &lt;/aop:config&gt;</span><br><span class="line">整个事务控制的配置是这样的：</span><br><span class="line"></span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</span><br><span class="line">xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;</span><br><span class="line">xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;</span><br><span class="line">xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;</span><br><span class="line">xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;</span><br><span class="line">xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans </span><br><span class="line">http://www.springframework.org/schema/beans/spring-beans.xsd </span><br><span class="line">http://www.springframework.org/schema/context  </span><br><span class="line">http://www.springframework.org/schema/context/spring-context.xsd  </span><br><span class="line">http://www.springframework.org/schema/mvc  </span><br><span class="line">http://www.springframework.org/schema/mvc/spring-mvc.xsd  </span><br><span class="line">http://www.springframework.org/schema/tx </span><br><span class="line">http://www.springframework.org/schema/tx/spring-tx.xsd  </span><br><span class="line">http://www.springframework.org/schema/aop  </span><br><span class="line">http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 事务控制  对MyBatis操作数据库  spring使用JDBC事务控制类 --&gt;</span><br><span class="line"> </span><br><span class="line">&lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;!-- 配置数据源 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 通知 --&gt;</span><br><span class="line">    &lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;transactionManager&quot;&gt;</span><br><span class="line">        &lt;tx:attributes&gt;</span><br><span class="line">            &lt;!-- 传播行为 --&gt;</span><br><span class="line">            &lt;tx:method name=&quot;save*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;insert*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;update*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;delete*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;find*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;select*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line"> </span><br><span class="line">        &lt;/tx:attributes&gt;</span><br><span class="line">    &lt;/tx:advice&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 配置aop  --&gt;</span><br><span class="line">    &lt;aop:config&gt;</span><br><span class="line">        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut=&quot;execution(* com.wxisme.ssm.service.impl.*.*(..))&quot;/&gt;</span><br><span class="line">    &lt;/aop:config&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-MyBatis的配置"><a href="#4-MyBatis的配置" class="headerlink" title="4 MyBatis的配置"></a>4 MyBatis的配置</h1><p>SqlMapConfig.xml的配置   全局setting配置这里省略，数据库连接池在spring整合文件中已经配置，具体setting配置参考官方文档。</p>
+<p>别名的定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;typeAliases&gt;</span><br><span class="line">    &lt;!-- 批量定义别名 ，指定包名，自动扫描包中的类，别名即为类名，首字母大小写无所谓--&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.po&quot;/&gt;</span><br><span class="line">&lt;/typeAliases&gt;</span><br></pre></td></tr></table></figure>
+
+<p>mapper映射文件的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;mappers&gt;</span><br><span class="line">    &lt;!-- 加载映射文件 --&gt;</span><br><span class="line">    &lt;!-- 这里也可以使用class来加载映射文件，前提是：使用mapper代理的方法，遵循规范，</span><br><span class="line">    并且两个文件必须同名且在同一目录</span><br><span class="line">    &lt;mapper class=&quot;com.wxisme.mybatis0100.mapper.UserMapper&quot;/&gt;</span><br><span class="line">    基于class加载，可以进行批量加载</span><br><span class="line">    --&gt;</span><br><span class="line">    &lt;!-- 通过扫描包的方式来进行批量加载映射文件 --&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.mapper&quot;/&gt;</span><br><span class="line">&lt;/mappers&gt;</span><br></pre></td></tr></table></figure>
+
+<p>整个文件的配置应该是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE configuration</span><br><span class="line">PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;</span><br><span class="line">&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">&lt;!-- 将数据库连接数据抽取到属性文件中方便测试 --&gt;</span><br><span class="line">&lt;!-- &lt;properties resource=&quot;/WEB-INF/classes/jdbc.properties&quot;&gt;&lt;/properties&gt; --&gt;</span><br><span class="line">&lt;!-- 别名的定义 --&gt;</span><br><span class="line">&lt;typeAliases&gt;</span><br><span class="line">    &lt;!-- 批量定义别名 ，指定包名，自动扫描包中的类，别名即为类名，首字母大小写无所谓--&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.po&quot;/&gt;</span><br><span class="line">&lt;/typeAliases&gt; </span><br><span class="line">&lt;!-- 数据库连接用数据库连接池 --&gt; </span><br><span class="line">&lt;mappers&gt;</span><br><span class="line">    &lt;!-- 通过扫描包的方式来进行批量加载映射文件 --&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.mapper&quot;/&gt;</span><br><span class="line">&lt;/mappers&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>具体mapper文件的配置，在使用mapper代理的方法时，命名空间需要是对应的Mapper类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span><br><span class="line">&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot; &gt;</span><br><span class="line">&lt;mapper namespace=&quot;com.wxisme.ssm.mapper.AlbumMapper&quot; &gt;</span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Spring、Spring MVC、MyBatis 整合文件配置详解</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<!-- 来必力City版安装代码 -->
+
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
+
+
+  
+    <article id="post-MySQL详细知识点总结" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/30/MySQL详细知识点总结/">MySQL详细知识点总结</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/30/MySQL详细知识点总结/" class="archive-article-date">
+  	<time datetime="2019-08-30T03:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-Windows服务"><a href="#1-Windows服务" class="headerlink" title="1 Windows服务"></a>1 Windows服务</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-- 启动MySQL</span><br><span class="line">    net start mysql</span><br><span class="line">-- 创建Windows服务</span><br><span class="line">    sc create mysql binPath= mysqld_bin_path(注意：等号与值之间有空格)</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-连接与断开服务器"><a href="#2-连接与断开服务器" class="headerlink" title="2 连接与断开服务器"></a>2 连接与断开服务器</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mysql -h 地址 -P 端口 -u 用户名 -p 密码</span><br><span class="line">SHOW PROCESSLIST -- 显示哪些线程正在运行</span><br><span class="line">SHOW VARIABLES -- 显示系统变量信息</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-数据库操作"><a href="#3-数据库操作" class="headerlink" title="3 数据库操作"></a>3 数据库操作</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">-- 查看当前数据库</span><br><span class="line">    SELECT DATABASE();</span><br><span class="line">-- 显示当前时间、用户名、数据库版本</span><br><span class="line">    SELECT now(), user(), version();</span><br><span class="line">-- 创建库</span><br><span class="line">    CREATE DATABASE[ IF NOT EXISTS] 数据库名 数据库选项</span><br><span class="line">    数据库选项：</span><br><span class="line">        CHARACTER SET charset_name</span><br><span class="line">        COLLATE collation_name</span><br><span class="line">-- 查看已有库</span><br><span class="line">    SHOW DATABASES[ LIKE &apos;PATTERN&apos;]</span><br><span class="line">-- 查看当前库信息</span><br><span class="line">    SHOW CREATE DATABASE 数据库名</span><br><span class="line">-- 修改库的选项信息</span><br><span class="line">    ALTER DATABASE 库名 选项信息</span><br><span class="line">-- 删除库</span><br><span class="line">    DROP DATABASE[ IF EXISTS] 数据库名</span><br><span class="line">        同时删除该数据库相关的目录及其目录内容</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-表的操作"><a href="#4-表的操作" class="headerlink" title="4 表的操作"></a>4 表的操作</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">-- 创建表</span><br><span class="line">    CREATE [TEMPORARY] TABLE[ IF NOT EXISTS] [库名.]表名 ( 表的结构定义 )[ 表选项]</span><br><span class="line">        每个字段必须有数据类型</span><br><span class="line">        最后一个字段后不能有逗号</span><br><span class="line">        TEMPORARY 临时表，会话结束时表自动消失</span><br><span class="line">        对于字段的定义：</span><br><span class="line">            字段名 数据类型 [NOT NULL | NULL] [DEFAULT default_value] [AUTO_INCREMENT] [UNIQUE [KEY] | [PRIMARY] KEY] [COMMENT &apos;string&apos;]</span><br><span class="line">-- 表选项</span><br><span class="line">    -- 字符集</span><br><span class="line">        CHARSET = charset_name</span><br><span class="line">        如果表没有设定，则使用数据库字符集</span><br><span class="line">    -- 存储引擎</span><br><span class="line">        ENGINE = engine_name</span><br><span class="line">        表在管理数据时采用的不同的数据结构，结构不同会导致处理方式、提供的特性操作等不同</span><br><span class="line">        常见的引擎：InnoDB MyISAM Memory/Heap BDB Merge Example CSV MaxDB Archive</span><br><span class="line">        不同的引擎在保存表的结构和数据时采用不同的方式</span><br><span class="line">        MyISAM表文件含义：.frm表定义，.MYD表数据，.MYI表索引</span><br><span class="line">        InnoDB表文件含义：.frm表定义，表空间数据和日志文件</span><br><span class="line">        SHOW ENGINES -- 显示存储引擎的状态信息</span><br><span class="line">        SHOW ENGINE 引擎名 &#123;LOGS|STATUS&#125; -- 显示存储引擎的日志或状态信息</span><br><span class="line">    -- 自增起始数</span><br><span class="line">        AUTO_INCREMENT = 行数</span><br><span class="line">    -- 数据文件目录</span><br><span class="line">        DATA DIRECTORY = &apos;目录&apos;</span><br><span class="line">    -- 索引文件目录</span><br><span class="line">        INDEX DIRECTORY = &apos;目录&apos;</span><br><span class="line">    -- 表注释</span><br><span class="line">        COMMENT = &apos;string&apos;</span><br><span class="line">    -- 分区选项</span><br><span class="line">        PARTITION BY ... (详细见手册)</span><br><span class="line">-- 查看所有表</span><br><span class="line">    SHOW TABLES[ LIKE &apos;pattern&apos;]</span><br><span class="line">    SHOW TABLES FROM 表名</span><br><span class="line">-- 查看表机构</span><br><span class="line">    SHOW CREATE TABLE 表名 （信息更详细）</span><br><span class="line">    DESC 表名 / DESCRIBE 表名 / EXPLAIN 表名 / SHOW COLUMNS FROM 表名 [LIKE &apos;PATTERN&apos;]</span><br><span class="line">    SHOW TABLE STATUS [FROM db_name] [LIKE &apos;pattern&apos;]</span><br><span class="line">-- 修改表</span><br><span class="line">    -- 修改表本身的选项</span><br><span class="line">        ALTER TABLE 表名 表的选项</span><br><span class="line">        eg: ALTER TABLE 表名 ENGINE=MYISAM;</span><br><span class="line">    -- 对表进行重命名</span><br><span class="line">        RENAME TABLE 原表名 TO 新表名</span><br><span class="line">        RENAME TABLE 原表名 TO 库名.表名 （可将表移动到另一个数据库）</span><br><span class="line">        -- RENAME可以交换两个表名</span><br><span class="line">    -- 修改表的字段机构（13.1.2. ALTER TABLE语法）</span><br><span class="line">        ALTER TABLE 表名 操作名</span><br><span class="line">        -- 操作名</span><br><span class="line">            ADD[ COLUMN] 字段定义       -- 增加字段</span><br><span class="line">                AFTER 字段名          -- 表示增加在该字段名后面</span><br><span class="line">                FIRST               -- 表示增加在第一个</span><br><span class="line">            ADD PRIMARY KEY(字段名)   -- 创建主键</span><br><span class="line">            ADD UNIQUE [索引名] (字段名)-- 创建唯一索引</span><br><span class="line">            ADD INDEX [索引名] (字段名) -- 创建普通索引</span><br><span class="line">            DROP[ COLUMN] 字段名      -- 删除字段</span><br><span class="line">            MODIFY[ COLUMN] 字段名 字段属性     -- 支持对字段属性进行修改，不能修改字段名(所有原有属性也需写上)</span><br><span class="line">            CHANGE[ COLUMN] 原字段名 新字段名 字段属性      -- 支持对字段名修改</span><br><span class="line">            DROP PRIMARY KEY    -- 删除主键(删除主键前需删除其AUTO_INCREMENT属性)</span><br><span class="line">            DROP INDEX 索引名 -- 删除索引</span><br><span class="line">            DROP FOREIGN KEY 外键    -- 删除外键</span><br><span class="line">-- 删除表</span><br><span class="line">    DROP TABLE[ IF EXISTS] 表名 ...</span><br><span class="line">-- 清空表数据</span><br><span class="line">    TRUNCATE [TABLE] 表名</span><br><span class="line">-- 复制表结构</span><br><span class="line">    CREATE TABLE 表名 LIKE 要复制的表名</span><br><span class="line">-- 复制表结构和数据</span><br><span class="line">    CREATE TABLE 表名 [AS] SELECT * FROM 要复制的表名</span><br><span class="line">-- 检查表是否有错误</span><br><span class="line">    CHECK TABLE tbl_name [, tbl_name] ... [option] ...</span><br><span class="line">-- 优化表</span><br><span class="line">    OPTIMIZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] ...</span><br><span class="line">-- 修复表</span><br><span class="line">    REPAIR [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] ... [QUICK] [EXTENDED] [USE_FRM]</span><br><span class="line">-- 分析表</span><br><span class="line">    ANALYZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] ...</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-数据操作"><a href="#5-数据操作" class="headerlink" title="5 数据操作"></a>5 数据操作</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">-- 增</span><br><span class="line">    INSERT [INTO] 表名 [(字段列表)] VALUES (值列表)[, (值列表), ...]</span><br><span class="line">        -- 如果要插入的值列表包含所有字段并且顺序一致，则可以省略字段列表。</span><br><span class="line">        -- 可同时插入多条数据记录！</span><br><span class="line">        REPLACE 与 INSERT 完全一样，可互换。</span><br><span class="line">    INSERT [INTO] 表名 SET 字段名=值[, 字段名=值, ...]</span><br><span class="line">-- 查</span><br><span class="line">    SELECT 字段列表 FROM 表名[ 其他子句]</span><br><span class="line">        -- 可来自多个表的多个字段</span><br><span class="line">        -- 其他子句可以不使用</span><br><span class="line">        -- 字段列表可以用*代替，表示所有字段</span><br><span class="line">-- 删</span><br><span class="line">    DELETE FROM 表名[ 删除条件子句]</span><br><span class="line">        没有条件子句，则会删除全部</span><br><span class="line">-- 改</span><br><span class="line">    UPDATE 表名 SET 字段名=新值[, 字段名=新值] [更新条件]</span><br></pre></td></tr></table></figure>
+
+<h1 id="6-字符集编码"><a href="#6-字符集编码" class="headerlink" title="6 字符集编码"></a>6 字符集编码</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">-- MySQL、数据库、表、字段均可设置编码</span><br><span class="line">-- 数据编码与客户端编码不需一致</span><br><span class="line">SHOW VARIABLES LIKE &apos;character_set_%&apos;   -- 查看所有字符集编码项</span><br><span class="line">    character_set_client        客户端向服务器发送数据时使用的编码</span><br><span class="line">    character_set_results       服务器端将结果返回给客户端所使用的编码</span><br><span class="line">    character_set_connection    连接层编码</span><br><span class="line">SET 变量名 = 变量值</span><br><span class="line">    SET character_set_client = gbk;</span><br><span class="line">    SET character_set_results = gbk;</span><br><span class="line">    SET character_set_connection = gbk;</span><br><span class="line">SET NAMES GBK;  -- 相当于完成以上三个设置</span><br><span class="line">-- 校对集</span><br><span class="line">    校对集用以排序</span><br><span class="line">    SHOW CHARACTER SET [LIKE &apos;pattern&apos;]/SHOW CHARSET [LIKE &apos;pattern&apos;]   查看所有字符集</span><br><span class="line">    SHOW COLLATION [LIKE &apos;pattern&apos;]     查看所有校对集</span><br><span class="line">    CHARSET 字符集编码     设置字符集编码</span><br><span class="line">    COLLATE 校对集编码     设置校对集编码</span><br></pre></td></tr></table></figure>
+
+<h1 id="7-数据类型（列类型）"><a href="#7-数据类型（列类型）" class="headerlink" title="7 数据类型（列类型）"></a>7 数据类型（列类型）</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br></pre></td><td class="code"><pre><span class="line">1. 数值类型</span><br><span class="line">-- a. 整型 ----------</span><br><span class="line">    类型         字节     范围（有符号位）</span><br><span class="line">    tinyint     1字节    -128 ~ 127      无符号位：0 ~ 255</span><br><span class="line">    smallint    2字节    -32768 ~ 32767</span><br><span class="line">    mediumint   3字节    -8388608 ~ 8388607</span><br><span class="line">    int         4字节</span><br><span class="line">    bigint      8字节</span><br><span class="line">    int(M)  M表示总位数</span><br><span class="line">    - 默认存在符号位，unsigned 属性修改</span><br><span class="line">    - 显示宽度，如果某个数不够定义字段时设置的位数，则前面以0补填，zerofill 属性修改</span><br><span class="line">        例：int(5)   插入一个数&apos;123&apos;，补填后为&apos;00123&apos;</span><br><span class="line">    - 在满足要求的情况下，越小越好。</span><br><span class="line">    - 1表示bool值真，0表示bool值假。MySQL没有布尔类型，通过整型0和1表示。常用tinyint(1)表示布尔型。</span><br><span class="line"></span><br><span class="line">-- b. 浮点型 ----------</span><br><span class="line">    类型             字节     范围</span><br><span class="line">    float(单精度)     4字节</span><br><span class="line">    double(双精度)    8字节</span><br><span class="line">    浮点型既支持符号位 unsigned 属性，也支持显示宽度 zerofill 属性。</span><br><span class="line">        不同于整型，前后均会补填0.</span><br><span class="line">    定义浮点型时，需指定总位数和小数位数。</span><br><span class="line">        float(M, D)     double(M, D)</span><br><span class="line">        M表示总位数，D表示小数位数。</span><br><span class="line">        M和D的大小会决定浮点数的范围。不同于整型的固定范围。</span><br><span class="line">        M既表示总位数（不包括小数点和正负号），也表示显示宽度（所有显示符号均包括）。</span><br><span class="line">        支持科学计数法表示。</span><br><span class="line">        浮点数表示近似值。</span><br><span class="line"></span><br><span class="line">-- c. 定点数 ----------</span><br><span class="line">    decimal -- 可变长度</span><br><span class="line">    decimal(M, D)   M也表示总位数，D表示小数位数。</span><br><span class="line">    保存一个精确的数值，不会发生数据的改变，不同于浮点数的四舍五入。</span><br><span class="line">    将浮点数转换为字符串来保存，每9位数字保存为4个字节。</span><br><span class="line"></span><br><span class="line">2. 字符串类型</span><br><span class="line">-- a. char, varchar ----------</span><br><span class="line">    char    定长字符串，速度快，但浪费空间</span><br><span class="line">    varchar 变长字符串，速度慢，但节省空间</span><br><span class="line">    M表示能存储的最大长度，此长度是字符数，非字节数。</span><br><span class="line">    不同的编码，所占用的空间不同。</span><br><span class="line">    char,最多255个字符，与编码无关。</span><br><span class="line">    varchar,最多65535字符，与编码有关。</span><br><span class="line">    一条有效记录最大不能超过65535个字节。</span><br><span class="line">        utf8 最大为21844个字符，gbk 最大为32766个字符，latin1 最大为65532个字符</span><br><span class="line">    varchar 是变长的，需要利用存储空间保存 varchar 的长度，如果数据小于255个字节，则采用一个字节来保存长度，反之需要两个字节来保存。</span><br><span class="line">    varchar 的最大有效长度由最大行大小和使用的字符集确定。</span><br><span class="line">    最大有效长度是65532字节，因为在varchar存字符串时，第一个字节是空的，不存在任何数据，然后还需两个字节来存放字符串的长度，所以有效长度是64432-1-2=65532字节。</span><br><span class="line">    例：若一个表定义为 CREATE TABLE tb(c1 int, c2 char(30), c3 varchar(N)) charset=utf8; 问N的最大值是多少？答：(65535-1-2-4-30*3)/3</span><br><span class="line"></span><br><span class="line">-- b. blob, text ----------</span><br><span class="line">    blob 二进制字符串（字节字符串）</span><br><span class="line">        tinyblob, blob, mediumblob, longblob</span><br><span class="line">    text 非二进制字符串（字符字符串）</span><br><span class="line">        tinytext, text, mediumtext, longtext</span><br><span class="line">    text 在定义时，不需要定义长度，也不会计算总长度。</span><br><span class="line">    text 类型在定义时，不可给default值</span><br><span class="line"></span><br><span class="line">-- c. binary, varbinary ----------</span><br><span class="line">    类似于char和varchar，用于保存二进制字符串，也就是保存字节字符串而非字符字符串。</span><br><span class="line">    char, varchar, text 对应 binary, varbinary, blob.</span><br><span class="line">3. 日期时间类型</span><br><span class="line">    一般用整型保存时间戳，因为PHP可以很方便的将时间戳进行格式化。</span><br><span class="line">    datetime    8字节    日期及时间     1000-01-01 00:00:00 到 9999-12-31 23:59:59</span><br><span class="line">    date        3字节    日期         1000-01-01 到 9999-12-31</span><br><span class="line">    timestamp   4字节    时间戳        19700101000000 到 2038-01-19 03:14:07</span><br><span class="line">    time        3字节    时间         -838:59:59 到 838:59:59</span><br><span class="line">    year        1字节    年份         1901 - 2155</span><br><span class="line">datetime    YYYY-MM-DD hh:mm:ss</span><br><span class="line">timestamp   YY-MM-DD hh:mm:ss</span><br><span class="line">            YYYYMMDDhhmmss</span><br><span class="line">            YYMMDDhhmmss</span><br><span class="line">            YYYYMMDDhhmmss</span><br><span class="line">            YYMMDDhhmmss</span><br><span class="line">date        YYYY-MM-DD</span><br><span class="line">            YY-MM-DD</span><br><span class="line">            YYYYMMDD</span><br><span class="line">            YYMMDD</span><br><span class="line">            YYYYMMDD</span><br><span class="line">            YYMMDD</span><br><span class="line">time        hh:mm:ss</span><br><span class="line">            hhmmss</span><br><span class="line">            hhmmss</span><br><span class="line">year        YYYY</span><br><span class="line">            YY</span><br><span class="line">            YYYY</span><br><span class="line">            YY</span><br><span class="line">4. 枚举和集合</span><br><span class="line">-- 枚举(enum) ----------</span><br><span class="line">enum(val1, val2, val3...)</span><br><span class="line">    在已知的值中进行单选。最大数量为65535.</span><br><span class="line">    枚举值在保存时，以2个字节的整型(smallint)保存。每个枚举值，按保存的位置顺序，从1开始逐一递增。</span><br><span class="line">    表现为字符串类型，存储却是整型。</span><br><span class="line">    NULL值的索引是NULL。</span><br><span class="line">    空字符串错误值的索引值是0。</span><br><span class="line"></span><br><span class="line">-- 集合（set） ----------</span><br><span class="line">set(val1, val2, val3...)</span><br><span class="line">    create table tab ( gender set(&apos;男&apos;, &apos;女&apos;, &apos;无&apos;) );</span><br><span class="line">    insert into tab values (&apos;男, 女&apos;);</span><br><span class="line">    最多可以有64个不同的成员。以bigint存储，共8个字节。采取位运算的形式。</span><br><span class="line">    当创建表时，SET成员值的尾部空格将自动被删除。</span><br><span class="line">8 选择类型</span><br><span class="line">-- PHP角度</span><br><span class="line">1. 功能满足</span><br><span class="line">2. 存储空间尽量小，处理效率更高</span><br><span class="line">3. 考虑兼容问题</span><br><span class="line"></span><br><span class="line">-- IP存储 ----------</span><br><span class="line">1. 只需存储，可用字符串</span><br><span class="line">2. 如果需计算，查找等，可存储为4个字节的无符号int，即unsigned</span><br><span class="line">    1) PHP函数转换</span><br><span class="line">        ip2long可转换为整型，但会出现携带符号问题。需格式化为无符号的整型。</span><br><span class="line">        利用sprintf函数格式化字符串</span><br><span class="line">        sprintf(&quot;%u&quot;, ip2long(&apos;192.168.3.134&apos;));</span><br><span class="line">        然后用long2ip将整型转回IP字符串</span><br><span class="line">    2) MySQL函数转换(无符号整型，UNSIGNED)</span><br><span class="line">        INET_ATON(&apos;127.0.0.1&apos;) 将IP转为整型</span><br><span class="line">        INET_NTOA(2130706433) 将整型转为IP</span><br><span class="line">9 列属性（列约束）</span><br><span class="line">1. PRIMARY 主键</span><br><span class="line">    - 能唯一标识记录的字段，可以作为主键。</span><br><span class="line">    - 一个表只能有一个主键。</span><br><span class="line">    - 主键具有唯一性。</span><br><span class="line">    - 声明字段时，用 primary key 标识。</span><br><span class="line">        也可以在字段列表之后声明</span><br><span class="line">            例：create table tab ( id int, stu varchar(10), primary key (id));</span><br><span class="line">    - 主键字段的值不能为null。</span><br><span class="line">    - 主键可以由多个字段共同组成。此时需要在字段列表后声明的方法。</span><br><span class="line">        例：create table tab ( id int, stu varchar(10), age int, primary key (stu, age));</span><br><span class="line">2. UNIQUE 唯一索引（唯一约束）</span><br><span class="line">    使得某字段的值也不能重复。</span><br><span class="line">3. NULL 约束</span><br><span class="line">    null不是数据类型，是列的一个属性。</span><br><span class="line">    表示当前列是否可以为null，表示什么都没有。</span><br><span class="line">    null, 允许为空。默认。</span><br><span class="line">    not null, 不允许为空。</span><br><span class="line">    insert into tab values (null, &apos;val&apos;);</span><br><span class="line">        -- 此时表示将第一个字段的值设为null, 取决于该字段是否允许为null</span><br><span class="line">4. DEFAULT 默认值属性</span><br><span class="line">    当前字段的默认值。</span><br><span class="line">    insert into tab values (default, &apos;val&apos;);    -- 此时表示强制使用默认值。</span><br><span class="line">    create table tab ( add_time timestamp default current_timestamp );</span><br><span class="line">        -- 表示将当前时间的时间戳设为默认值。</span><br><span class="line">        current_date, current_time</span><br><span class="line">5. AUTO_INCREMENT 自动增长约束</span><br><span class="line">    自动增长必须为索引（主键或unique）</span><br><span class="line">    只能存在一个字段为自动增长。</span><br><span class="line">    默认为1开始自动增长。可以通过表属性 auto_increment = x进行设置，或 alter table tbl auto_increment = x;</span><br><span class="line">6. COMMENT 注释</span><br><span class="line">    例：create table tab ( id int ) comment &apos;注释内容&apos;;</span><br><span class="line">7. FOREIGN KEY 外键约束</span><br><span class="line">    用于限制主表与从表数据完整性。</span><br><span class="line">    alter table t1 add constraint `t1_t2_fk` foreign key (t1_id) references t2(id);</span><br><span class="line">        -- 将表t1的t1_id外键关联到表t2的id字段。</span><br><span class="line">        -- 每个外键都有一个名字，可以通过 constraint 指定</span><br><span class="line">    存在外键的表，称之为从表（子表），外键指向的表，称之为主表（父表）。</span><br><span class="line">    作用：保持数据一致性，完整性，主要目的是控制存储在外键表（从表）中的数据。</span><br><span class="line">    MySQL中，可以对InnoDB引擎使用外键约束：</span><br><span class="line">    语法：</span><br><span class="line">    foreign key (外键字段） references 主表名 (关联字段) [主表记录删除时的动作] [主表记录更新时的动作]</span><br><span class="line">    此时需要检测一个从表的外键需要约束为主表的已存在的值。外键在没有关联的情况下，可以设置为null.前提是该外键列，没有not null。</span><br><span class="line">    可以不指定主表记录更改或更新时的动作，那么此时主表的操作被拒绝。</span><br><span class="line">    如果指定了 on update 或 on delete：在删除或更新时，有如下几个操作可以选择：</span><br><span class="line">    1. cascade，级联操作。主表数据被更新（主键值更新），从表也被更新（外键值更新）。主表记录被删除，从表相关记录也被删除。</span><br><span class="line">    2. set null，设置为null。主表数据被更新（主键值更新），从表的外键被设置为null。主表记录被删除，从表相关记录外键被设置成null。但注意，要求该外键列，没有not null属性约束。</span><br><span class="line">    3. restrict，拒绝父表删除和更新。</span><br><span class="line">    注意，外键只被InnoDB存储引擎所支持。其他引擎是不支持的。</span><br><span class="line">10 建表规范</span><br><span class="line">-- Normal Format, NF</span><br><span class="line">        - 每个表保存一个实体信息</span><br><span class="line">        - 每个具有一个ID字段作为主键</span><br><span class="line">        - ID主键 + 原子表</span><br><span class="line">    -- 1NF, 第一范式</span><br><span class="line">        字段不能再分，就满足第一范式。</span><br><span class="line">    -- 2NF, 第二范式</span><br><span class="line">        满足第一范式的前提下，不能出现部分依赖。</span><br><span class="line">        消除符合主键就可以避免部分依赖。增加单列关键字。</span><br><span class="line">    -- 3NF, 第三范式</span><br><span class="line">        满足第二范式的前提下，不能出现传递依赖。</span><br><span class="line">        某个字段依赖于主键，而有其他字段依赖于该字段。这就是传递依赖。</span><br><span class="line">        将一个实体信息的数据放在一个表内实现。</span><br><span class="line">11 SELECT</span><br><span class="line">SELECT [ALL|DISTINCT] select_expr FROM -&gt; WHERE -&gt; GROUP BY [合计函数] -&gt; HAVING -&gt; ORDER BY -&gt; LIMIT</span><br><span class="line">a. select_expr</span><br><span class="line">    -- 可以用 * 表示所有字段。</span><br><span class="line">        select * from tb;</span><br><span class="line">    -- 可以使用表达式（计算公式、函数调用、字段也是个表达式）</span><br><span class="line">        select stu, 29+25, now() from tb;</span><br><span class="line">    -- 可以为每个列使用别名。适用于简化列标识，避免多个列标识符重复。</span><br><span class="line">        - 使用 as 关键字，也可省略 as.</span><br><span class="line">        select stu+10 as add10 from tb;</span><br><span class="line">b. FROM 子句</span><br><span class="line">    用于标识查询来源。</span><br><span class="line">    -- 可以为表起别名。使用as关键字。</span><br><span class="line">        SELECT * FROM tb1 AS tt, tb2 AS bb;</span><br><span class="line">    -- from子句后，可以同时出现多个表。</span><br><span class="line">        -- 多个表会横向叠加到一起，而数据会形成一个笛卡尔积。</span><br><span class="line">        SELECT * FROM tb1, tb2;</span><br><span class="line">    -- 向优化符提示如何选择索引</span><br><span class="line">        USE INDEX、IGNORE INDEX、FORCE INDEX</span><br><span class="line">        SELECT * FROM table1 USE INDEX (key1,key2) WHERE key1=1 AND key2=2 AND key3=3;</span><br><span class="line">        SELECT * FROM table1 IGNORE INDEX (key3) WHERE key1=1 AND key2=2 AND key3=3;</span><br><span class="line">c. WHERE 子句</span><br><span class="line">    -- 从from获得的数据源中进行筛选。</span><br><span class="line">    -- 整型1表示真，0表示假。</span><br><span class="line">    -- 表达式由运算符和运算数组成。</span><br><span class="line">        -- 运算数：变量（字段）、值、函数返回值</span><br><span class="line">        -- 运算符：</span><br><span class="line">            =, &lt;=&gt;, &lt;&gt;, !=, &lt;=, &lt;, &gt;=, &gt;, !, &amp;&amp;, ||,</span><br><span class="line">            in (not) null, (not) like, (not) in, (not) between and, is (not), and, or, not, xor</span><br><span class="line">            is/is not 加上ture/false/unknown，检验某个值的真假</span><br><span class="line">            &lt;=&gt;与&lt;&gt;功能相同，&lt;=&gt;可用于null比较</span><br><span class="line">d. GROUP BY 子句, 分组子句</span><br><span class="line">    GROUP BY 字段/别名 [排序方式]</span><br><span class="line">    分组后会进行排序。升序：ASC，降序：DESC</span><br><span class="line">    以下[合计函数]需配合 GROUP BY 使用：</span><br><span class="line">    count 返回不同的非NULL值数目  count(*)、count(字段)</span><br><span class="line">    sum 求和</span><br><span class="line">    max 求最大值</span><br><span class="line">    min 求最小值</span><br><span class="line">    avg 求平均值</span><br><span class="line">    group_concat 返回带有来自一个组的连接的非NULL值的字符串结果。组内字符串连接。</span><br><span class="line">e. HAVING 子句，条件子句</span><br><span class="line">    与 where 功能、用法相同，执行时机不同。</span><br><span class="line">    where 在开始时执行检测数据，对原数据进行过滤。</span><br><span class="line">    having 对筛选出的结果再次进行过滤。</span><br><span class="line">    having 字段必须是查询出来的，where 字段必须是数据表存在的。</span><br><span class="line">    where 不可以使用字段的别名，having 可以。因为执行WHERE代码时，可能尚未确定列值。</span><br><span class="line">    where 不可以使用合计函数。一般需用合计函数才会用 having</span><br><span class="line">    SQL标准要求HAVING必须引用GROUP BY子句中的列或用于合计函数中的列。</span><br><span class="line">f. ORDER BY 子句，排序子句</span><br><span class="line">    order by 排序字段/别名 排序方式 [,排序字段/别名 排序方式]...</span><br><span class="line">    升序：ASC，降序：DESC</span><br><span class="line">    支持多个字段的排序。</span><br><span class="line">g. LIMIT 子句，限制结果数量子句</span><br><span class="line">    仅对处理好的结果进行数量限制。将处理好的结果的看作是一个集合，按照记录出现的顺序，索引从0开始。</span><br><span class="line">    limit 起始位置, 获取条数</span><br><span class="line">    省略第一个参数，表示从索引0开始。limit 获取条数</span><br><span class="line">h. DISTINCT, ALL 选项</span><br><span class="line">    distinct 去除重复记录</span><br><span class="line">    默认为 all, 全部记录</span><br><span class="line">12 UNION</span><br><span class="line"> 将多个select查询的结果组合成一个结果集合。</span><br><span class="line">    SELECT ... UNION [ALL|DISTINCT] SELECT ...</span><br><span class="line">    默认 DISTINCT 方式，即所有返回的行都是唯一的</span><br><span class="line">    建议，对每个SELECT查询加上小括号包裹。</span><br><span class="line">    ORDER BY 排序时，需加上 LIMIT 进行结合。</span><br><span class="line">    需要各select查询的字段数量一样。</span><br><span class="line">    每个select查询的字段列表(数量、类型)应一致，因为结果中的字段名以第一条select语句为准。</span><br><span class="line">13 子查询</span><br><span class="line">- 子查询需用括号包裹。</span><br><span class="line">-- from型</span><br><span class="line">    from后要求是一个表，必须给子查询结果取个别名。</span><br><span class="line">    - 简化每个查询内的条件。</span><br><span class="line">    - from型需将结果生成一个临时表格，可用以原表的锁定的释放。</span><br><span class="line">    - 子查询返回一个表，表型子查询。</span><br><span class="line">    select * from (select * from tb where id&gt;0) as subfrom where id&gt;1;</span><br><span class="line">-- where型</span><br><span class="line">    - 子查询返回一个值，标量子查询。</span><br><span class="line">    - 不需要给子查询取别名。</span><br><span class="line">    - where子查询内的表，不能直接用以更新。</span><br><span class="line">    select * from tb where money = (select max(money) from tb);</span><br><span class="line">    -- 列子查询</span><br><span class="line">        如果子查询结果返回的是一列。</span><br><span class="line">        使用 in 或 not in 完成查询</span><br><span class="line">        exists 和 not exists 条件</span><br><span class="line">            如果子查询返回数据，则返回1或0。常用于判断条件。</span><br><span class="line">            select column1 from t1 where exists (select * from t2);</span><br><span class="line">    -- 行子查询</span><br><span class="line">        查询条件是一个行。</span><br><span class="line">        select * from t1 where (id, gender) in (select id, gender from t2);</span><br><span class="line">        行构造符：(col1, col2, ...) 或 ROW(col1, col2, ...)</span><br><span class="line">        行构造符通常用于与对能返回两个或两个以上列的子查询进行比较。</span><br><span class="line">    -- 特殊运算符</span><br><span class="line">    != all()    相当于 not in</span><br><span class="line">    = some()    相当于 in。any 是 some 的别名</span><br><span class="line">    != some()   不等同于 not in，不等于其中某一个。</span><br><span class="line">    all, some 可以配合其他运算符一起使用。</span><br><span class="line">14 连接查询(join)</span><br><span class="line">将多个表的字段进行连接，可以指定连接条件。</span><br><span class="line">-- 内连接(inner join)</span><br><span class="line">    - 默认就是内连接，可省略inner。</span><br><span class="line">    - 只有数据存在时才能发送连接。即连接结果不能出现空行。</span><br><span class="line">    on 表示连接条件。其条件表达式与where类似。也可以省略条件（表示条件永远为真）</span><br><span class="line">    也可用where表示连接条件。</span><br><span class="line">    还有 using, 但需字段名相同。using(字段名)</span><br><span class="line">    -- 交叉连接 cross join</span><br><span class="line">        即，没有条件的内连接。</span><br><span class="line">        select * from tb1 cross join tb2;</span><br><span class="line">-- 外连接(outer join)</span><br><span class="line">    - 如果数据不存在，也会出现在连接结果中。</span><br><span class="line">    -- 左外连接 left join</span><br><span class="line">        如果数据不存在，左表记录会出现，而右表为null填充</span><br><span class="line">    -- 右外连接 right join</span><br><span class="line">        如果数据不存在，右表记录会出现，而左表为null填充</span><br><span class="line">-- 自然连接(natural join)</span><br><span class="line">    自动判断连接条件完成连接。</span><br><span class="line">    相当于省略了using，会自动查找相同字段名。</span><br><span class="line">    natural join</span><br><span class="line">    natural left join</span><br><span class="line">    natural right join</span><br><span class="line">    </span><br><span class="line">select info.id, info.name, info.stu_num, extra_info.hobby, extra_info.sex from info, extra_info where info.stu_num = extra_info.stu_id;</span><br></pre></td></tr></table></figure>
+
+<h1 id="15-导出"><a href="#15-导出" class="headerlink" title="15 导出"></a>15 导出</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">select * into outfile 文件地址 [控制格式] from 表名;   -- 导出表数据</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">load data [local] infile 文件地址 [replace|ignore] into table 表名 [控制格式]; -- 导入数据</span><br><span class="line">    生成的数据默认的分隔符是制表符</span><br><span class="line">    local未指定，则数据文件必须在服务器上</span><br><span class="line">    replace 和 ignore 关键词控制对现有的唯一键记录的重复的处理</span><br><span class="line">-- 控制格式</span><br><span class="line">fields  控制字段格式</span><br><span class="line">默认：fields terminated by &apos;  &apos; enclosed by &apos;&apos; escaped by &apos;\&apos;</span><br><span class="line">    terminated by &apos;string&apos;  -- 终止</span><br><span class="line">    enclosed by &apos;char&apos;      -- 包裹</span><br><span class="line">    escaped by &apos;char&apos;       -- 转义</span><br><span class="line">    -- 示例：</span><br><span class="line">        SELECT a,b,a+b INTO OUTFILE &apos;/tmp/result.text&apos;</span><br><span class="line">        FIELDS TERMINATED BY &apos;,&apos; OPTIONALLY ENCLOSED BY &apos;&quot;&apos;</span><br><span class="line">        LINES TERMINATED BY &apos;</span><br><span class="line">&apos;</span><br><span class="line">        FROM test_table;</span><br><span class="line">lines   控制行格式</span><br><span class="line">默认：lines terminated by &apos;</span><br><span class="line">&apos;</span><br><span class="line">    terminated by &apos;string&apos;  -- 终止</span><br></pre></td></tr></table></figure>
+
+<h1 id="16-INSERT"><a href="#16-INSERT" class="headerlink" title="16 INSERT"></a>16 INSERT</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">select语句获得的数据可以用insert插入。</span><br><span class="line">可以省略对列的指定，要求 values () 括号内，提供给了按照列顺序出现的所有字段的值。</span><br><span class="line">    或者使用set语法。</span><br><span class="line">    INSERT INTO tbl_name SET field=value,...；</span><br><span class="line">可以一次性使用多个值，采用(), (), ();的形式。</span><br><span class="line">    INSERT INTO tbl_name VALUES (), (), ();</span><br><span class="line">可以在列值指定时，使用表达式。</span><br><span class="line">    INSERT INTO tbl_name VALUES (field_value, 10+10, now());</span><br><span class="line">可以使用一个特殊值 DEFAULT，表示该列使用默认值。</span><br><span class="line">    INSERT INTO tbl_name VALUES (field_value, DEFAULT);</span><br><span class="line">可以通过一个查询的结果，作为需要插入的值。</span><br><span class="line">    INSERT INTO tbl_name SELECT ...;</span><br><span class="line">可以指定在插入的值出现主键（或唯一索引）冲突时，更新其他非主键列的信息。</span><br><span class="line">    INSERT INTO tbl_name VALUES/SET/SELECT ON DUPLICATE KEY UPDATE 字段=值, …;</span><br></pre></td></tr></table></figure>
+
+<h1 id="17-DELETE"><a href="#17-DELETE" class="headerlink" title="17 DELETE"></a>17 DELETE</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DELETE FROM tbl_name [WHERE where_definition] [ORDER BY ...] [LIMIT row_count]</span><br><span class="line">按照条件删除。where</span><br><span class="line">指定删除的最多记录数。limit</span><br><span class="line">可以通过排序条件删除。order by + limit</span><br><span class="line">支持多表删除，使用类似连接语法。</span><br><span class="line">delete from 需要删除数据多表1，表2 using 表连接操作 条件。</span><br></pre></td></tr></table></figure>
+
+<h1 id="18-TRUNCATE"><a href="#18-TRUNCATE" class="headerlink" title="18 TRUNCATE"></a>18 TRUNCATE</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">TRUNCATE [TABLE] tbl_name</span><br><span class="line">清空数据</span><br><span class="line">删除重建表</span><br><span class="line">区别：</span><br><span class="line">1，truncate 是删除表再创建，delete 是逐条删除</span><br><span class="line">2，truncate 重置auto_increment的值。而delete不会</span><br><span class="line">3，truncate 不知道删除了几条，而delete知道。</span><br><span class="line">4，当被用于带分区的表时，truncate 会保留分区</span><br></pre></td></tr></table></figure>
+
+<h1 id="19-备份与还原"><a href="#19-备份与还原" class="headerlink" title="19 备份与还原"></a>19 备份与还原</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">备份，将数据的结构与表内数据保存起来。</span><br><span class="line">利用 mysqldump 指令完成。</span><br><span class="line">-- 导出</span><br><span class="line">mysqldump [options] db_name [tables]</span><br><span class="line">mysqldump [options] ---database DB1 [DB2 DB3...]</span><br><span class="line">mysqldump [options] --all--database</span><br><span class="line">1. 导出一张表</span><br><span class="line">　　mysqldump -u用户名 -p密码 库名 表名 &gt; 文件名(D:/a.sql)</span><br><span class="line">2. 导出多张表</span><br><span class="line">　　mysqldump -u用户名 -p密码 库名 表1 表2 表3 &gt; 文件名(D:/a.sql)</span><br><span class="line">3. 导出所有表</span><br><span class="line">　　mysqldump -u用户名 -p密码 库名 &gt; 文件名(D:/a.sql)</span><br><span class="line">4. 导出一个库</span><br><span class="line">　　mysqldump -u用户名 -p密码 --lock-all-tables --database 库名 &gt; 文件名(D:/a.sql)</span><br><span class="line">可以-w携带WHERE条件</span><br><span class="line">-- 导入</span><br><span class="line">1. 在登录mysql的情况下：</span><br><span class="line">　　source  备份文件</span><br><span class="line">2. 在不登录的情况下</span><br><span class="line">　　mysql -u用户名 -p密码 库名 &lt; 备份文件</span><br></pre></td></tr></table></figure>
+
+<h1 id="20-视图"><a href="#20-视图" class="headerlink" title="20 视图"></a>20 视图</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">什么是视图：</span><br><span class="line">    视图是一个虚拟表，其内容由查询定义。同真实的表一样，视图包含一系列带有名称的列和行数据。但是，视图并不在数据库中以存储的数据值集形式存在。行和列数据来自由定义视图的查询所引用的表，并且在引用视图时动态生成。</span><br><span class="line">    视图具有表结构文件，但不存在数据文件。</span><br><span class="line">    对其中所引用的基础表来说，视图的作用类似于筛选。定义视图的筛选可以来自当前或其它数据库的一个或多个表，或者其它视图。通过视图进行查询没有任何限制，通过它们进行数据修改时的限制也很少。</span><br><span class="line">    视图是存储在数据库中的查询的sql语句，它主要出于两种原因：安全原因，视图可以隐藏一些数据，如：社会保险基金表，可以用视图只显示姓名，地址，而不显示社会保险号和工资数等，另一原因是可使复杂的查询易于理解和使用。</span><br><span class="line">-- 创建视图</span><br><span class="line">CREATE [OR REPLACE] [ALGORITHM = &#123;UNDEFINED | MERGE | TEMPTABLE&#125;] VIEW view_name [(column_list)] AS select_statement</span><br><span class="line">    - 视图名必须唯一，同时不能与表重名。</span><br><span class="line">    - 视图可以使用select语句查询到的列名，也可以自己指定相应的列名。</span><br><span class="line">    - 可以指定视图执行的算法，通过ALGORITHM指定。</span><br><span class="line">    - column_list如果存在，则数目必须等于SELECT语句检索的列数</span><br><span class="line">-- 查看结构</span><br><span class="line">    SHOW CREATE VIEW view_name</span><br><span class="line">-- 删除视图</span><br><span class="line">    - 删除视图后，数据依然存在。</span><br><span class="line">    - 可同时删除多个视图。</span><br><span class="line">    DROP VIEW [IF EXISTS] view_name ...</span><br><span class="line">-- 修改视图结构</span><br><span class="line">    - 一般不修改视图，因为不是所有的更新视图都会映射到表上。</span><br><span class="line">    ALTER VIEW view_name [(column_list)] AS select_statement</span><br><span class="line">-- 视图作用</span><br><span class="line">    1. 简化业务逻辑</span><br><span class="line">    2. 对客户端隐藏真实的表结构</span><br><span class="line">-- 视图算法(ALGORITHM)</span><br><span class="line">    MERGE       合并</span><br><span class="line">        将视图的查询语句，与外部查询需要先合并再执行！</span><br><span class="line">    TEMPTABLE   临时表</span><br><span class="line">        将视图执行完毕后，形成临时表，再做外层查询！</span><br><span class="line">    UNDEFINED   未定义(默认)，指的是MySQL自主去选择相应的算法。</span><br></pre></td></tr></table></figure>
+
+<h1 id="21-事务-transaction"><a href="#21-事务-transaction" class="headerlink" title="21 事务(transaction)"></a>21 事务(transaction)</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">事务是指逻辑上的一组操作，组成这组操作的各个单元，要不全成功要不全失败。</span><br><span class="line">    - 支持连续SQL的集体成功或集体撤销。</span><br><span class="line">    - 事务是数据库在数据晚自习方面的一个功能。</span><br><span class="line">    - 需要利用 InnoDB 或 BDB 存储引擎，对自动提交的特性支持完成。</span><br><span class="line">    - InnoDB被称为事务安全型引擎。</span><br><span class="line">-- 事务开启</span><br><span class="line">    START TRANSACTION; 或者 BEGIN;</span><br><span class="line">    开启事务后，所有被执行的SQL语句均被认作当前事务内的SQL语句。</span><br><span class="line">-- 事务提交</span><br><span class="line">    COMMIT;</span><br><span class="line">-- 事务回滚</span><br><span class="line">    ROLLBACK;</span><br><span class="line">    如果部分操作发生问题，映射到事务开启前。</span><br><span class="line">-- 事务的特性</span><br><span class="line">    1. 原子性（Atomicity）</span><br><span class="line">        事务是一个不可分割的工作单位，事务中的操作要么都发生，要么都不发生。</span><br><span class="line">    2. 一致性（Consistency）</span><br><span class="line">        事务前后数据的完整性必须保持一致。</span><br><span class="line">        - 事务开始和结束时，外部数据一致</span><br><span class="line">        - 在整个事务过程中，操作是连续的</span><br><span class="line">    3. 隔离性（Isolation）</span><br><span class="line">        多个用户并发访问数据库时，一个用户的事务不能被其它用户的事物所干扰，多个并发事务之间的数据要相互隔离。</span><br><span class="line">    4. 持久性（Durability）</span><br><span class="line">        一个事务一旦被提交，它对数据库中的数据改变就是永久性的。</span><br><span class="line">-- 事务的实现</span><br><span class="line">    1. 要求是事务支持的表类型</span><br><span class="line">    2. 执行一组相关的操作前开启事务</span><br><span class="line">    3. 整组操作完成后，都成功，则提交；如果存在失败，选择回滚，则会回到事务开始的备份点。</span><br><span class="line">-- 事务的原理</span><br><span class="line">    利用InnoDB的自动提交(autocommit)特性完成。</span><br><span class="line">    普通的MySQL执行语句后，当前的数据提交操作均可被其他客户端可见。</span><br><span class="line">    而事务是暂时关闭“自动提交”机制，需要commit提交持久化数据操作。</span><br><span class="line">-- 注意</span><br><span class="line">    1. 数据定义语言（DDL）语句不能被回滚，比如创建或取消数据库的语句，和创建、取消或更改表或存储的子程序的语句。</span><br><span class="line">    2. 事务不能被嵌套</span><br><span class="line">-- 保存点</span><br><span class="line">    SAVEPOINT 保存点名称 -- 设置一个事务保存点</span><br><span class="line">    ROLLBACK TO SAVEPOINT 保存点名称 -- 回滚到保存点</span><br><span class="line">    RELEASE SAVEPOINT 保存点名称 -- 删除保存点</span><br><span class="line">-- InnoDB自动提交特性设置</span><br><span class="line">    SET autocommit = 0|1;   0表示关闭自动提交，1表示开启自动提交。</span><br><span class="line">    - 如果关闭了，那普通操作的结果对其他客户端也不可见，需要commit提交后才能持久化数据操作。</span><br><span class="line">    - 也可以关闭自动提交来开启事务。但与START TRANSACTION不同的是，</span><br><span class="line">        SET autocommit是永久改变服务器的设置，直到下次再次修改该设置。(针对当前连接)</span><br><span class="line">        而START TRANSACTION记录开启前的状态，而一旦事务提交或回滚后就需要再次开启事务。(针对当前事务)</span><br></pre></td></tr></table></figure>
+
+<h1 id="22-锁表"><a href="#22-锁表" class="headerlink" title="22 锁表"></a>22 锁表</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">表锁定只用于防止其它客户端进行不正当地读取和写入</span><br><span class="line">MyISAM 支持表锁，InnoDB 支持行锁</span><br><span class="line">-- 锁定</span><br><span class="line">    LOCK TABLES tbl_name [AS alias]</span><br><span class="line">-- 解锁</span><br><span class="line">    UNLOCK TABLES</span><br></pre></td></tr></table></figure>
+
+<h1 id="23-触发器"><a href="#23-触发器" class="headerlink" title="23 触发器"></a>23 触发器</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line">触发程序是与表有关的命名数据库对象，当该表出现特定事件时，将激活该对象</span><br><span class="line">    监听：记录的增加、修改、删除。</span><br><span class="line">-- 创建触发器</span><br><span class="line">CREATE TRIGGER trigger_name trigger_time trigger_event ON tbl_name FOR EACH ROW trigger_stmt</span><br><span class="line">    参数：</span><br><span class="line">    trigger_time是触发程序的动作时间。它可以是 before 或 after，以指明触发程序是在激活它的语句之前或之后触发。</span><br><span class="line">    trigger_event指明了激活触发程序的语句的类型</span><br><span class="line">        INSERT：将新行插入表时激活触发程序</span><br><span class="line">        UPDATE：更改某一行时激活触发程序</span><br><span class="line">        DELETE：从表中删除某一行时激活触发程序</span><br><span class="line">    tbl_name：监听的表，必须是永久性的表，不能将触发程序与TEMPORARY表或视图关联起来。</span><br><span class="line">    trigger_stmt：当触发程序激活时执行的语句。执行多个语句，可使用BEGIN...END复合语句结构</span><br><span class="line">-- 删除</span><br><span class="line">DROP TRIGGER [schema_name.]trigger_name</span><br><span class="line">可以使用old和new代替旧的和新的数据</span><br><span class="line">    更新操作，更新前是old，更新后是new.</span><br><span class="line">    删除操作，只有old.</span><br><span class="line">    增加操作，只有new.</span><br><span class="line">-- 注意</span><br><span class="line">    1. 对于具有相同触发程序动作时间和事件的给定表，不能有两个触发程序。</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">-- 字符连接函数</span><br><span class="line"></span><br><span class="line">concat(str1,str2,...])</span><br><span class="line">concat_ws(separator,str1,str2,...)</span><br><span class="line">-- 分支语句</span><br><span class="line">if 条件 then</span><br><span class="line">    执行语句</span><br><span class="line">elseif 条件 then</span><br><span class="line">    执行语句</span><br><span class="line">else</span><br><span class="line">    执行语句</span><br><span class="line">end if;</span><br><span class="line">-- 修改最外层语句结束符</span><br><span class="line">delimiter 自定义结束符号</span><br><span class="line">    SQL语句</span><br><span class="line">自定义结束符号</span><br><span class="line">delimiter ;     -- 修改回原来的分号</span><br><span class="line"></span><br><span class="line">-- 语句块包裹</span><br><span class="line">begin</span><br><span class="line">    语句块</span><br><span class="line">end</span><br><span class="line"></span><br><span class="line">-- 特殊的执行</span><br><span class="line">1. 只要添加记录，就会触发程序。</span><br><span class="line">2. Insert into on duplicate key update 语法会触发：</span><br><span class="line">    如果没有重复记录，会触发 before insert, after insert;</span><br><span class="line">    如果有重复记录并更新，会触发 before insert, before update, after update;</span><br><span class="line">    如果有重复记录但是没有发生更新，则触发 before insert, before update</span><br><span class="line">3. Replace 语法 如果有记录，则执行 before insert, before delete, after delete, after insert</span><br></pre></td></tr></table></figure>
+
+<p>#24 SQL编程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br></pre></td><td class="code"><pre><span class="line">--// 局部变量 ----------</span><br><span class="line">-- 变量声明</span><br><span class="line">    declare var_name[,...] type [default value]</span><br><span class="line">    这个语句被用来声明局部变量。要给变量提供一个默认值，请包含一个default子句。值可以被指定为一个表达式，不需要为一个常数。如果没有default子句，初始值为null。</span><br><span class="line">-- 赋值</span><br><span class="line">    使用 set 和 select into 语句为变量赋值。</span><br><span class="line">    - 注意：在函数内是可以使用全局变量（用户自定义的变量）</span><br><span class="line">--// 全局变量 ----------</span><br><span class="line">-- 定义、赋值</span><br><span class="line">set 语句可以定义并为变量赋值。</span><br><span class="line">set @var = value;</span><br><span class="line">也可以使用select into语句为变量初始化并赋值。这样要求select语句只能返回一行，但是可以是多个字段，就意味着同时为多个变量进行赋值，变量的数量需要与查询的列数一致。</span><br><span class="line">还可以把赋值语句看作一个表达式，通过select执行完成。此时为了避免=被当作关系运算符看待，使用:=代替。（set语句可以使用= 和 :=）。</span><br><span class="line">select @var:=20;</span><br><span class="line">select @v1:=id, @v2=name from t1 limit 1;</span><br><span class="line">select * from tbl_name where @var:=30;</span><br><span class="line">select into 可以将表中查询获得的数据赋给变量。</span><br><span class="line">    -| select max(height) into @max_height from tb;</span><br><span class="line">-- 自定义变量名</span><br><span class="line">为了避免select语句中，用户自定义的变量与系统标识符（通常是字段名）冲突，用户自定义变量在变量名前使用@作为开始符号。</span><br><span class="line">@var=10;</span><br><span class="line">    - 变量被定义后，在整个会话周期都有效（登录到退出）</span><br><span class="line">--// 控制结构 ----------</span><br><span class="line">-- if语句</span><br><span class="line">if search_condition then</span><br><span class="line">    statement_list  </span><br><span class="line">[elseif search_condition then</span><br><span class="line">    statement_list]</span><br><span class="line">...</span><br><span class="line">[else</span><br><span class="line">    statement_list]</span><br><span class="line">end if;</span><br><span class="line">-- case语句</span><br><span class="line">CASE value WHEN [compare-value] THEN result</span><br><span class="line">[WHEN [compare-value] THEN result ...]</span><br><span class="line">[ELSE result]</span><br><span class="line">END</span><br><span class="line">-- while循环</span><br><span class="line">[begin_label:] while search_condition do</span><br><span class="line">    statement_list</span><br><span class="line">end while [end_label];</span><br><span class="line">- 如果需要在循环内提前终止 while循环，则需要使用标签；标签需要成对出现。</span><br><span class="line">    -- 退出循环</span><br><span class="line">        退出整个循环 leave</span><br><span class="line">        退出当前循环 iterate</span><br><span class="line">        通过退出的标签决定退出哪个循环</span><br><span class="line">--// 内置函数 ----------</span><br><span class="line">-- 数值函数</span><br><span class="line">abs(x)          -- 绝对值 abs(-10.9) = 10</span><br><span class="line">format(x, d)    -- 格式化千分位数值 format(1234567.456, 2) = 1,234,567.46</span><br><span class="line">ceil(x)         -- 向上取整 ceil(10.1) = 11</span><br><span class="line">floor(x)        -- 向下取整 floor (10.1) = 10</span><br><span class="line">round(x)        -- 四舍五入去整</span><br><span class="line">mod(m, n)       -- m%n m mod n 求余 10%3=1</span><br><span class="line">pi()            -- 获得圆周率</span><br><span class="line">pow(m, n)       -- m^n</span><br><span class="line">sqrt(x)         -- 算术平方根</span><br><span class="line">rand()          -- 随机数</span><br><span class="line">truncate(x, d)  -- 截取d位小数</span><br><span class="line">-- 时间日期函数</span><br><span class="line">now(), current_timestamp();     -- 当前日期时间</span><br><span class="line">current_date();                 -- 当前日期</span><br><span class="line">current_time();                 -- 当前时间</span><br><span class="line">date(&apos;yyyy-mm-dd hh:ii:ss&apos;);    -- 获取日期部分</span><br><span class="line">time(&apos;yyyy-mm-dd hh:ii:ss&apos;);    -- 获取时间部分</span><br><span class="line">date_format(&apos;yyyy-mm-dd hh:ii:ss&apos;, &apos;%d %y %a %d %m %b %j&apos;); -- 格式化时间</span><br><span class="line">unix_timestamp();               -- 获得unix时间戳</span><br><span class="line">from_unixtime();                -- 从时间戳获得时间</span><br><span class="line">-- 字符串函数</span><br><span class="line">length(string)          -- string长度，字节</span><br><span class="line">char_length(string)     -- string的字符个数</span><br><span class="line">substring(str, position [,length])      -- 从str的position开始,取length个字符</span><br><span class="line">replace(str ,search_str ,replace_str)   -- 在str中用replace_str替换search_str</span><br><span class="line">instr(string ,substring)    -- 返回substring首次在string中出现的位置</span><br><span class="line">concat(string [,...])   -- 连接字串</span><br><span class="line">charset(str)            -- 返回字串字符集</span><br><span class="line">lcase(string)           -- 转换成小写</span><br><span class="line">left(string, length)    -- 从string2中的左边起取length个字符</span><br><span class="line">load_file(file_name)    -- 从文件读取内容</span><br><span class="line">locate(substring, string [,start_position]) -- 同instr,但可指定开始位置</span><br><span class="line">lpad(string, length, pad)   -- 重复用pad加在string开头,直到字串长度为length</span><br><span class="line">ltrim(string)           -- 去除前端空格</span><br><span class="line">repeat(string, count)   -- 重复count次</span><br><span class="line">rpad(string, length, pad)   --在str后用pad补充,直到长度为length</span><br><span class="line">rtrim(string)           -- 去除后端空格</span><br><span class="line">strcmp(string1 ,string2)    -- 逐字符比较两字串大小</span><br><span class="line">-- 流程函数</span><br><span class="line">case when [condition] then result [when [condition] then result ...] [else result] end   多分支</span><br><span class="line">if(expr1,expr2,expr3)  双分支。</span><br><span class="line">-- 聚合函数</span><br><span class="line">count()</span><br><span class="line">sum();</span><br><span class="line">max();</span><br><span class="line">min();</span><br><span class="line">avg();</span><br><span class="line">group_concat()</span><br><span class="line">-- 其他常用函数</span><br><span class="line">md5();</span><br><span class="line">default();</span><br><span class="line">--// 存储函数，自定义函数 ----------</span><br><span class="line">-- 新建</span><br><span class="line">    CREATE FUNCTION function_name (参数列表) RETURNS 返回值类型</span><br><span class="line">        函数体</span><br><span class="line">    - 函数名，应该合法的标识符，并且不应该与已有的关键字冲突。</span><br><span class="line">    - 一个函数应该属于某个数据库，可以使用db_name.funciton_name的形式执行当前函数所属数据库，否则为当前数据库。</span><br><span class="line">    - 参数部分，由&quot;参数名&quot;和&quot;参数类型&quot;组成。多个参数用逗号隔开。</span><br><span class="line">    - 函数体由多条可用的mysql语句，流程控制，变量声明等语句构成。</span><br><span class="line">    - 多条语句应该使用 begin...end 语句块包含。</span><br><span class="line">    - 一定要有 return 返回值语句。</span><br><span class="line">-- 删除</span><br><span class="line">    DROP FUNCTION [IF EXISTS] function_name;</span><br><span class="line">-- 查看</span><br><span class="line">    SHOW FUNCTION STATUS LIKE &apos;partten&apos;</span><br><span class="line">    SHOW CREATE FUNCTION function_name;</span><br><span class="line">-- 修改</span><br><span class="line">    ALTER FUNCTION function_name 函数选项</span><br><span class="line">--// 存储过程，自定义功能 ----------</span><br><span class="line">-- 定义</span><br><span class="line">存储存储过程 是一段代码（过程），存储在数据库中的sql组成。</span><br><span class="line">一个存储过程通常用于完成一段业务逻辑，例如报名，交班费，订单入库等。</span><br><span class="line">而一个函数通常专注与某个功能，视为其他程序服务的，需要在其他语句中调用函数才可以，而存储过程不能被其他调用，是自己执行 通过call执行。</span><br><span class="line">-- 创建</span><br><span class="line">CREATE PROCEDURE sp_name (参数列表)</span><br><span class="line">    过程体</span><br><span class="line">参数列表：不同于函数的参数列表，需要指明参数类型</span><br><span class="line">IN，表示输入型</span><br><span class="line">OUT，表示输出型</span><br><span class="line">INOUT，表示混合型</span><br><span class="line">注意，没有返回值。</span><br><span class="line"></span><br><span class="line">/* 存储过程 */ ------------------</span><br><span class="line">存储过程是一段可执行性代码的集合。相比函数，更偏向于业务逻辑。</span><br><span class="line">调用：CALL 过程名</span><br><span class="line">-- 注意</span><br><span class="line">- 没有返回值。</span><br><span class="line">- 只能单独调用，不可夹杂在其他语句中</span><br><span class="line">-- 参数</span><br><span class="line">IN|OUT|INOUT 参数名 数据类型</span><br><span class="line">IN      输入：在调用过程中，将数据输入到过程体内部的参数</span><br><span class="line">OUT     输出：在调用过程中，将过程体处理完的结果返回到客户端</span><br><span class="line">INOUT   输入输出：既可输入，也可输出</span><br><span class="line">-- 语法</span><br><span class="line">CREATE PROCEDURE 过程名 (参数列表)</span><br><span class="line">BEGIN</span><br><span class="line">    过程体</span><br><span class="line">END</span><br></pre></td></tr></table></figure>
+
+<h1 id="25-用户和权限管理"><a href="#25-用户和权限管理" class="headerlink" title="25 用户和权限管理"></a>25 用户和权限管理</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line">-- root密码重置</span><br><span class="line">1. 停止MySQL服务</span><br><span class="line">2.  [Linux] /usr/local/mysql/bin/safe_mysqld --skip-grant-tables &amp;</span><br><span class="line">    [Windows] mysqld --skip-grant-tables</span><br><span class="line">3. use mysql;</span><br><span class="line">4. UPDATE `user` SET PASSWORD=PASSWORD(&quot;密码&quot;) WHERE `user` = &quot;root&quot;;</span><br><span class="line">5. FLUSH PRIVILEGES;</span><br><span class="line">用户信息表：mysql.user</span><br><span class="line">-- 刷新权限</span><br><span class="line">FLUSH PRIVILEGES;</span><br><span class="line">-- 增加用户</span><br><span class="line">CREATE USER 用户名 IDENTIFIED BY [PASSWORD] 密码(字符串)</span><br><span class="line">    - 必须拥有mysql数据库的全局CREATE USER权限，或拥有INSERT权限。</span><br><span class="line">    - 只能创建用户，不能赋予权限。</span><br><span class="line">    - 用户名，注意引号：如 &apos;user_name&apos;@&apos;192.168.1.1&apos;</span><br><span class="line">    - 密码也需引号，纯数字密码也要加引号</span><br><span class="line">    - 要在纯文本中指定密码，需忽略PASSWORD关键词。要把密码指定为由PASSWORD()函数返回的混编值，需包含关键字PASSWORD</span><br><span class="line">-- 重命名用户</span><br><span class="line">RENAME USER old_user TO new_user</span><br><span class="line">-- 设置密码</span><br><span class="line">SET PASSWORD = PASSWORD(&apos;密码&apos;)  -- 为当前用户设置密码</span><br><span class="line">SET PASSWORD FOR 用户名 = PASSWORD(&apos;密码&apos;) -- 为指定用户设置密码</span><br><span class="line">-- 删除用户</span><br><span class="line">DROP USER 用户名</span><br><span class="line">-- 分配权限/添加用户</span><br><span class="line">GRANT 权限列表 ON 表名 TO 用户名 [IDENTIFIED BY [PASSWORD] &apos;password&apos;]</span><br><span class="line">    - all privileges 表示所有权限</span><br><span class="line">    - *.* 表示所有库的所有表</span><br><span class="line">    - 库名.表名 表示某库下面的某表</span><br><span class="line">    GRANT ALL PRIVILEGES ON `pms`.* TO &apos;pms&apos;@&apos;%&apos; IDENTIFIED BY &apos;pms0817&apos;;</span><br><span class="line">-- 查看权限</span><br><span class="line">SHOW GRANTS FOR 用户名</span><br><span class="line">    -- 查看当前用户权限</span><br><span class="line">    SHOW GRANTS; 或 SHOW GRANTS FOR CURRENT_USER; 或 SHOW GRANTS FOR CURRENT_USER();</span><br><span class="line">-- 撤消权限</span><br><span class="line">REVOKE 权限列表 ON 表名 FROM 用户名</span><br><span class="line">REVOKE ALL PRIVILEGES, GRANT OPTION FROM 用户名   -- 撤销所有权限</span><br><span class="line">-- 权限层级</span><br><span class="line">-- 要使用GRANT或REVOKE，您必须拥有GRANT OPTION权限，并且您必须用于您正在授予或撤销的权限。</span><br><span class="line">全局层级：全局权限适用于一个给定服务器中的所有数据库，mysql.user</span><br><span class="line">    GRANT ALL ON *.*和 REVOKE ALL ON *.*只授予和撤销全局权限。</span><br><span class="line">数据库层级：数据库权限适用于一个给定数据库中的所有目标，mysql.db, mysql.host</span><br><span class="line">    GRANT ALL ON db_name.*和REVOKE ALL ON db_name.*只授予和撤销数据库权限。</span><br><span class="line">表层级：表权限适用于一个给定表中的所有列，mysql.talbes_priv</span><br><span class="line">    GRANT ALL ON db_name.tbl_name和REVOKE ALL ON db_name.tbl_name只授予和撤销表权限。</span><br><span class="line">列层级：列权限适用于一个给定表中的单一列，mysql.columns_priv</span><br><span class="line">    当使用REVOKE时，您必须指定与被授权列相同的列。</span><br><span class="line">-- 权限列表</span><br><span class="line">ALL [PRIVILEGES]    -- 设置除GRANT OPTION之外的所有简单权限</span><br><span class="line">ALTER   -- 允许使用ALTER TABLE</span><br><span class="line">ALTER ROUTINE   -- 更改或取消已存储的子程序</span><br><span class="line">CREATE  -- 允许使用CREATE TABLE</span><br><span class="line">CREATE ROUTINE  -- 创建已存储的子程序</span><br><span class="line">CREATE TEMPORARY TABLES     -- 允许使用CREATE TEMPORARY TABLE</span><br><span class="line">CREATE USER     -- 允许使用CREATE USER, DROP USER, RENAME USER和REVOKE ALL PRIVILEGES。</span><br><span class="line">CREATE VIEW     -- 允许使用CREATE VIEW</span><br><span class="line">DELETE  -- 允许使用DELETE</span><br><span class="line">DROP    -- 允许使用DROP TABLE</span><br><span class="line">EXECUTE     -- 允许用户运行已存储的子程序</span><br><span class="line">FILE    -- 允许使用SELECT...INTO OUTFILE和LOAD DATA INFILE</span><br><span class="line">INDEX   -- 允许使用CREATE INDEX和DROP INDEX</span><br><span class="line">INSERT  -- 允许使用INSERT</span><br><span class="line">LOCK TABLES     -- 允许对您拥有SELECT权限的表使用LOCK TABLES</span><br><span class="line">PROCESS     -- 允许使用SHOW FULL PROCESSLIST</span><br><span class="line">REFERENCES  -- 未被实施</span><br><span class="line">RELOAD  -- 允许使用FLUSH</span><br><span class="line">REPLICATION CLIENT  -- 允许用户询问从属服务器或主服务器的地址</span><br><span class="line">REPLICATION SLAVE   -- 用于复制型从属服务器（从主服务器中读取二进制日志事件）</span><br><span class="line">SELECT  -- 允许使用SELECT</span><br><span class="line">SHOW DATABASES  -- 显示所有数据库</span><br><span class="line">SHOW VIEW   -- 允许使用SHOW CREATE VIEW</span><br><span class="line">SHUTDOWN    -- 允许使用mysqladmin shutdown</span><br><span class="line">SUPER   -- 允许使用CHANGE MASTER, KILL, PURGE MASTER LOGS和SET GLOBAL语句，mysqladmin debug命令；允许您连接（一次），即使已达到max_connections。</span><br><span class="line">UPDATE  -- 允许使用UPDATE</span><br><span class="line">USAGE   -- “无权限”的同义词</span><br><span class="line">GRANT OPTION    -- 允许授予权限</span><br></pre></td></tr></table></figure>
+
+<h1 id="26-表维护"><a href="#26-表维护" class="headerlink" title="26 表维护"></a>26 表维护</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">-- 分析和存储表的关键字分布</span><br><span class="line">ANALYZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE 表名 ...</span><br><span class="line">-- 检查一个或多个表是否有错误</span><br><span class="line">CHECK TABLE tbl_name [, tbl_name] ... [option] ...</span><br><span class="line">option = &#123;QUICK | FAST | MEDIUM | EXTENDED | CHANGED&#125;</span><br><span class="line">-- 整理数据文件的碎片</span><br><span class="line">OPTIMIZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] ...</span><br></pre></td></tr></table></figure>
+
+<h1 id="27-杂项"><a href="#27-杂项" class="headerlink" title="27 杂项"></a>27 杂项</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">1. 可用反引号（`）为标识符（库名、表名、字段名、索引、别名）包裹，以避免与关键字重名！中文也可以作为标识符！</span><br><span class="line">2. 每个库目录存在一个保存当前数据库的选项文件db.opt。</span><br><span class="line">3. 注释：</span><br><span class="line">    单行注释 # 注释内容</span><br><span class="line">    多行注释 /* 注释内容 */</span><br><span class="line">    单行注释 -- 注释内容     (标准SQL注释风格，要求双破折号后加一空格符（空格、TAB、换行等）)</span><br><span class="line">4. 模式通配符：</span><br><span class="line">    _   任意单个字符</span><br><span class="line">    %   任意多个字符，甚至包括零字符</span><br><span class="line">    单引号需要进行转义 &apos;</span><br><span class="line">5. CMD命令行内的语句结束符可以为 &quot;;&quot;, &quot;G&quot;, &quot;g&quot;，仅影响显示结果。其他地方还是用分号结束。delimiter 可修改当前对话的语句结束符。</span><br><span class="line">6. SQL对大小写不敏感</span><br><span class="line">7. 清除已有语句：c</span><br></pre></td></tr></table></figure>
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">MySQL详细知识点总结</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/2019/08/30/MySQL详细知识点总结/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+
+<!-- 来必力City版安装代码 -->
+
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
+
+
+  
+    <article id="post-真Java实战" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/08/28/真Java实战/">真Java实战</a>
+    </h1>
+  
+
+        
+        <a href="/2019/08/28/真Java实战/" class="archive-article-date">
   	<time datetime="2019-08-28T07:30:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-28</time>
 </a>
         
@@ -229,7 +537,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">面试题</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">真Java实战</a>
         		</li>
       		
 		</ul>
@@ -239,7 +547,7 @@
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/08/28/真面试题/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/08/28/真Java实战/">展开全文 >></a>
         </p>
       
 
@@ -291,19 +599,19 @@
 
 
   
-    <article id="post-Java面试" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Java基础" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/28/Java面试/">Java面试</a>
+      <a class="article-title" href="/2019/08/28/Java基础/">Java基础</a>
     </h1>
   
 
         
-        <a href="/2019/08/28/Java面试/" class="archive-article-date">
+        <a href="/2019/08/28/Java基础/" class="archive-article-date">
   	<time datetime="2019-08-28T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-28</time>
 </a>
         
@@ -611,7 +919,7 @@ xftp
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java面试</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java基础</a>
         		</li>
       		
 		</ul>
@@ -621,7 +929,7 @@ xftp
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/08/28/Java面试/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/08/28/Java基础/">展开全文 >></a>
         </p>
       
 
@@ -673,19 +981,19 @@ xftp
 
 
   
-    <article id="post-Mvc相关及Mysql" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-MVC入门" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/27/Mvc相关及Mysql/">Mvc相关及Mysql</a>
+      <a class="article-title" href="/2019/08/27/MVC入门/">MVC入门</a>
     </h1>
   
 
         
-        <a href="/2019/08/27/Mvc相关及Mysql/" class="archive-article-date">
+        <a href="/2019/08/27/MVC入门/" class="archive-article-date">
   	<time datetime="2019-08-27T12:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
 </a>
         
@@ -743,7 +1051,7 @@ xftp
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Mvc相关及Mysql</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">MVC入门</a>
         		</li>
       		
 		</ul>
@@ -753,7 +1061,7 @@ xftp
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/08/27/Mvc相关及Mysql/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/08/27/MVC入门/">展开全文 >></a>
         </p>
       
 
@@ -805,19 +1113,19 @@ xftp
 
 
   
-    <article id="post-面试题汇总" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-Java精选题目" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/27/面试题汇总/">面试题汇总</a>
+      <a class="article-title" href="/2019/08/27/Java精选题目/">Java精选题目</a>
     </h1>
   
 
         
-        <a href="/2019/08/27/面试题汇总/" class="archive-article-date">
+        <a href="/2019/08/27/Java精选题目/" class="archive-article-date">
   	<time datetime="2019-08-27T03:16:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
 </a>
         
@@ -901,7 +1209,7 @@ xftp
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">面试题汇总</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java精选题目</a>
         		</li>
       		
 		</ul>
@@ -911,7 +1219,7 @@ xftp
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/08/27/面试题汇总/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/08/27/Java精选题目/">展开全文 >></a>
         </p>
       
 
@@ -963,19 +1271,19 @@ xftp
 
 
   
-    <article id="post-JavaEE面试题" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-JavaEE实战" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/08/27/JavaEE面试题/">JavaEE面试题</a>
+      <a class="article-title" href="/2019/08/27/JavaEE实战/">JavaEE实战</a>
     </h1>
   
 
         
-        <a href="/2019/08/27/JavaEE面试题/" class="archive-article-date">
+        <a href="/2019/08/27/JavaEE实战/" class="archive-article-date">
   	<time datetime="2019-08-27T03:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
 </a>
         
@@ -983,7 +1291,7 @@ xftp
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920038303&di=7685ecdb4c925b9b6451e6f735f30049&imgtype=0&src=http%3A%2F%2Fimg0.pconline.com.cn%2Fpconline%2F1709%2F14%2F9962264_b0ebff3eeffac41_thumb.jpg" alt="JavaEE"><br> Java EE面试题<br>第一部分：Servlet/JSP快速入门<br>1.请列举至少6种javaEE技术，并简述其作用。<br>解析：<br>javaEE是一系列的技术，主要包扩13种。对于开发人员来说，了解几种主要的技术是非常必要的，例如JDBC、JSP、Servlet、XML、JNDI、JMS、JTA等。<br>参考答案：<br>(1)JDBC(Java Database Connectivity):用来访问数据库的API。<br>(2)JavaServlet :是一种小型的Java程序，扩展了web服务器的功能。<br>(3)JSP(Java Server Pages):JSP页面由HTM代码和嵌入其中的Java代码组成，用来实现动态视图。<br>(4)JNDI(Java Name and Directory Interface): JNDI API被用于访问名字和目录服务。<br>(5)EJB(Enterprise JavaBean):实现业务逻辑的组件，可以构成分布式系统。<br>(6)RMI(Remote Method Invoke):调用远程对象方法。<br>(7)Java IDL/CORBA:将Java和CORBA集成在一起。<br>(8)XML(Extensible Markup Language):可以用它来定义其他标记语言的语言。<br>(9)JMS(Java Message Service):用于和消息中间件相互通信的API。<br>(10)JTA(Java Transaction Achitecture):一种标准的API，可以访问各种事务管理器。<br>(11)JTS(Java Transaction Service):是CORBA OTS事务监控的基本实现。<br>(12)JavaMail:用于存取邮件服务的API。<br>(13)JAF(JavaBeans Activation Framework):JavaMail利用JAF来处理MIME编码的邮件附件。<br>2.在web.xml文件中配置Servlet时，主要配置哪些信息？<br>解析：  使用IDE开发Servlet时，配置信息可以通过可视化方式定义。然而对于web应用开发员来说，了解Servlet的配置非常必要，能够在必要的时候手动进行修改。</p>
+        <p><img src="https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1566920038303&di=7685ecdb4c925b9b6451e6f735f30049&imgtype=0&src=http%3A%2F%2Fimg0.pconline.com.cn%2Fpconline%2F1709%2F14%2F9962264_b0ebff3eeffac41_thumb.jpg" alt="JavaEE"><br>第一部分：Servlet/JSP快速入门<br>1.请列举至少6种javaEE技术，并简述其作用。<br>解析：<br>javaEE是一系列的技术，主要包扩13种。对于开发人员来说，了解几种主要的技术是非常必要的，例如JDBC、JSP、Servlet、XML、JNDI、JMS、JTA等。<br>参考答案：<br>(1)JDBC(Java Database Connectivity):用来访问数据库的API。<br>(2)JavaServlet :是一种小型的Java程序，扩展了web服务器的功能。<br>(3)JSP(Java Server Pages):JSP页面由HTM代码和嵌入其中的Java代码组成，用来实现动态视图。<br>(4)JNDI(Java Name and Directory Interface): JNDI API被用于访问名字和目录服务。<br>(5)EJB(Enterprise JavaBean):实现业务逻辑的组件，可以构成分布式系统。<br>(6)RMI(Remote Method Invoke):调用远程对象方法。<br>(7)Java IDL/CORBA:将Java和CORBA集成在一起。<br>(8)XML(Extensible Markup Language):可以用它来定义其他标记语言的语言。<br>(9)JMS(Java Message Service):用于和消息中间件相互通信的API。<br>(10)JTA(Java Transaction Achitecture):一种标准的API，可以访问各种事务管理器。<br>(11)JTS(Java Transaction Service):是CORBA OTS事务监控的基本实现。<br>(12)JavaMail:用于存取邮件服务的API。<br>(13)JAF(JavaBeans Activation Framework):JavaMail利用JAF来处理MIME编码的邮件附件。<br>2.在web.xml文件中配置Servlet时，主要配置哪些信息？<br>解析：  使用IDE开发Servlet时，配置信息可以通过可视化方式定义。然而对于web应用开发员来说，了解Servlet的配置非常必要，能够在必要的时候手动进行修改。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">参考答案：  配置Servlet时，主要配置&lt;servlet&gt;以及&lt; servlet -mapping&gt;，如下所示：</span><br><span class="line">		&lt;servlet&gt;</span><br><span class="line">    		&lt;servlet-name&gt;IndexServlet&lt;/servlet-name&gt;</span><br><span class="line">    		&lt;servlet-class&gt;com.oracle.servlet.IndexServlet&lt;/servlet-class&gt;</span><br><span class="line">  	&lt;/servlet&gt;</span><br><span class="line">		&lt;servlet-mapping&gt;</span><br><span class="line">    		&lt;servlet-name&gt;IndexServlet&lt;/servlet-name&gt;</span><br><span class="line">    		&lt;url-pattern&gt;/IndexServlet&lt;/url-pattern&gt;</span><br><span class="line"> 	 &lt;/servlet-mapping&gt;</span><br><span class="line">其中&lt;servlet-class&gt;是Servlet源文件的名字，&lt;servlet-name&gt;是自定义的名字，往往使用类名。&lt;url-pattern&gt;是其中非常重要的信息，用来配置访问Servlet的逻辑路径。必须以/开头。</span><br><span class="line">&lt;servlet-class&gt;com.oracle.FirstServlet&lt;/servlet-class&gt;</span><br><span class="line">&lt;/servlet&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br><span class="line">&lt;servlet-name&gt;FristServlet&lt;/servlet-name&gt;</span><br><span class="line">&lt;url-pattern&gt;/frist&lt;url-pattern&gt;</span><br><span class="line">&lt;servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
 
 <p>其中，<servlet-class>是Servlet源文件的名字，<servlet-name>是自定义的名字，往往使用类名。<url-pattern>是非常重要的信息，用来配置访问Servlet的逻辑路径，必须以/开头。</url-pattern></servlet-name></servlet-class></p>
@@ -1055,7 +1363,7 @@ Respose.soracleontentType(“text/htmllcharset=gb2312”);</code></pre>上述代
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">JavaEE面试题</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JavaEE实战</a>
         		</li>
       		
 		</ul>
@@ -1065,7 +1373,7 @@ Respose.soracleontentType(“text/htmllcharset=gb2312”);</code></pre>上述代
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/08/27/JavaEE面试题/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/08/27/JavaEE实战/">展开全文 >></a>
         </p>
       
 
@@ -1117,19 +1425,19 @@ Respose.soracleontentType(“text/htmllcharset=gb2312”);</code></pre>上述代
 
 
   
-    <article id="post-SprintBoot" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+    <article id="post-SprintBoot实战" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/31/SprintBoot/">SpringBoot</a>
+      <a class="article-title" href="/2019/07/31/SprintBoot实战/">SpringBoot实战</a>
     </h1>
   
 
         
-        <a href="/2019/07/31/SprintBoot/" class="archive-article-date">
+        <a href="/2019/07/31/SprintBoot实战/" class="archive-article-date">
   	<time datetime="2019-07-31T02:11:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-31</time>
 </a>
         
@@ -2509,7 +2817,7 @@ public void addInterceptors(InterceptorRegistry registry) {
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">SpringBoot</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">SpringBoot实战</a>
         		</li>
       		
 		</ul>
@@ -2519,7 +2827,7 @@ public void addInterceptors(InterceptorRegistry registry) {
 
       
         <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/31/SprintBoot/">展开全文 >></a>
+          <a class="article-more-a" href="/2019/07/31/SprintBoot实战/">展开全文 >></a>
         </p>
       
 
@@ -4041,400 +4349,10 @@ pattern        规定验证input域的模式（正则表达式）
 
 
   
-    <article id="post-Linux安装插件" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/13/Linux安装插件/">Linux安装插件</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/13/Linux安装插件/" class="archive-article-date">
-  	<time datetime="2019-07-13T06:30:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-13</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2651731524,3339854291&fm=11&gp=0.jpg" alt="Linux"><br>  1.安装Nginx<br>  下载nginx：</p>
-<p>官方网站：<br><a href="http://nginx.org/" target="_blank" rel="noopener">http://nginx.org/</a><br>使用的版本是1.8.0版本。</p>
-<p>Nginx提供的源码。<br>4.1.要求的安装环境<br>1、需要安装gcc的环境。yum install gcc-c++<br>2、第三方的开发包。<br>PCRE<br>    PCRE(Perl Compatible Regular Expressions)是一个Perl库，包括 perl 兼容的正则表达式库。nginx的http模块使用pcre来解析正则表达式，所以需要在linux上安装pcre库。<br>yum install -y pcre pcre-devel<br>注：pcre-devel是使用pcre开发的一个二次开发库。nginx也需要此库。<br>zlib<br>    zlib库提供了很多种压缩和解压缩的方式，nginx使用zlib对http包的内容进行gzip，所以需要在linux上安装zlib库。<br>yum install -y zlib zlib-devel</p>
-<p>openssl<br>    OpenSSL 是一个强大的安全套接字层密码库，囊括主要的密码算法、常用的密钥和证书封装管理功能及SSL协议，并提供丰富的应用程序供测试或其它目的使用。<br>    nginx不仅支持http协议，还支持https（即在ssl协议上传输http），所以需要在linux安装openssl库。<br>yum install -y openssl openssl-devel</p>
-<p>4.2.安装步骤</p>
-<p>第一步：把nginx的源码包上传到linux系统<br>第二步：解压缩<br>[root@localhost ~]# tar zxf nginx-1.8.0.tar.gz<br>第三步：使用configure命令创建一makeFile文件。<br>./configure <br>–prefix=/usr/local/nginx <br>–pid-path=/var/run/nginx/nginx.pid <br>–lock-path=/var/lock/nginx.lock <br>–error-log-path=/var/log/nginx/error.log <br>–http-log-path=/var/log/nginx/access.log <br>–with-http_gzip_static_module <br>–http-client-body-temp-path=/var/temp/nginx/client <br>–http-proxy-temp-path=/var/temp/nginx/proxy <br>–http-fastcgi-temp-path=/var/temp/nginx/fastcgi <br>–http-uwsgi-temp-path=/var/temp/nginx/uwsgi <br>–http-scgi-temp-path=/var/temp/nginx/scgi<br>注意：启动nginx之前，上边将临时文件目录指定为/var/temp/nginx，需要在/var下创建temp及nginx目录<br>[root@localhost sbin]# mkdir  -p  /var/temp/nginx/client<br>第四步：make<br>第五步：make install</p>
-<p>4.3.启动nginx<br>进入sbin目录<br>[root@localhost sbin]# ./nginx </p>
-<p>关闭nginx：<br>[root@localhost sbin]# ./nginx -s stop<br>推荐使用：<br>[root@localhost sbin]# ./nginx -s quit</p>
-<p>重启nginx：<br>1、先关闭后启动。<br>2、刷新配置文件：<br>[root@localhost sbin]# ./nginx -s reload</p>
-<p>4.4.访问nginx</p>
-<p>默认是80端口。<br>注意：是否关闭防火墙。<br>1.linux下开放端口<br>/sbin/iptables -I INPUT -p tcp –dport 80 -j ACCEPT<br>/etc/rc.d/init.d/iptables save<br>/etc/rc.d/init.d/iptables restart</p>
-<p>5.配置虚拟主机<br>就是在一台服务器启动多个网站。<br>如何区分不同的网站：<br>1、域名不同<br>2、端口不同</p>
-<p>5.1.通过端口区分不同虚拟机<br>Nginx的配置文件：<br>/usr/local/nginx/conf/nginx.conf</p>
-<p>#user  nobody;<br>worker_processes  1;</p>
-<p>#error_log  logs/error.log;</p>
-<p>#error_log  logs/error.log  notice;</p>
-<p>#error_log  logs/error.log  info;</p>
-<p>#pid        logs/nginx.pid;</p>
-<p>events {<br>    worker_connections  1024;<br>}</p>
-<p>http {<br>    include       mime.types;<br>    default_type  application/octet-stream;</p>
-<pre><code>#log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;
-#                  &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;
-#                  &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;
-
-#access_log  logs/access.log  main;
-
-sendfile        on;
-#tcp_nopush     on;
-
-#keepalive_timeout  0;
-keepalive_timeout  65;
-
-#gzip  on;
-
-server {
-    listen       80;
-    server_name  localhost;
-
-    #charset koi8-r;
-
-    #access_log  logs/host.access.log  main;
-
-    location / {
-        root   html;
-        index  index.html index.htm;
-    }
-}</code></pre><p>}</p>
-<p>可以配置多个server，配置了多个虚拟主机。</p>
-<p>添加虚拟主机：</p>
-<p>#user  nobody;<br>worker_processes  1;</p>
-<p>#error_log  logs/error.log;</p>
-<p>#error_log  logs/error.log  notice;</p>
-<p>#error_log  logs/error.log  info;</p>
-<p>#pid        logs/nginx.pid;</p>
-<p>events {<br>    worker_connections  1024;<br>}</p>
-<p>http {<br>    include       mime.types;<br>    default_type  application/octet-stream;</p>
-<pre><code>#log_format  main  &apos;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &apos;
-#                  &apos;$status $body_bytes_sent &quot;$http_referer&quot; &apos;
-#                  &apos;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&apos;;
-
-#access_log  logs/access.log  main;
-
-sendfile        on;
-#tcp_nopush     on;
-
-#keepalive_timeout  0;
-keepalive_timeout  65;
-
-#gzip  on;
-
-server {
-    listen       80;
-    server_name  localhost;(域名)
-
-    #charset koi8-r;
-
-    #access_log  logs/host.access.log  main;
-
-    Location / {
-        root   html;
-        index  index.html index.htm;
-    }
-}
-server {
-    listen       81;
-    server_name  localhost;
-
-    #charset koi8-r;
-
-    #access_log  logs/host.access.log  main;
-
-    location / {
-        root   html-81;
-        index  index.html index.htm;
-    }
-}</code></pre><p>}</p>
-<p>重新加载配置文件<br>[root@localhost nginx]# sbin/nginx -s reload</p>
-<p>################################################################################################# </p>
-<p>   2.安装jdk和tomcat和mysql<br>   1、JDK安装<br>1、查询系统是否安装过jdk<br>rpm -qa |grep jdk</p>
-<p>2、卸掉自带的jdk<br>rpm -e –nodeps  java-1.6.0-openjdk-1.6.0.0-1.50.1.11.5.el6_3.x86_64<br>rpm -e –nodeps  java-1.7.0-openjdk-1.7.0.9-2.3.4.1.el6_3.x86_64<br>3、安装jdk<br>①通过终端在/usr/local目录下新建java文件夹，命令行<br>   mkdir /usr/local/java<br>②然后将下载到压缩包拷贝到java文件夹中并解压压缩包<br>  cp jdk-7u45-linux-x64.tar.gz /usr/local/java<br>  tar zxvf jdk-7u55-linux-i586.tar.gz<br>③解压之后，直接进入/usr/local/java/jdk1.7.0_45/bin下敲java </p>
-<p>④把jdk写入linux环境变量文件/etc/profile，开机自运行，不需要每次进入bin目录下运行<br>[root@texun3 ~]#vim /etc/profile<br>打开之后在文件末尾添加，注意：红色部分可以不要（也可以）<br>export JAVA_HOME=/usr/local/java/jdk1.7.0_45<br>export JRE_HOME=/usr/local/java/jdk1.7.0_45/jre<br>export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib:$CLASSPATH<br>export PATH=$JAVA_HOME/bin:$PATH</p>
-<p>⑤保存修改，让profile文件生效<br>[root@texun3 ~]#source /etc/profile<br>重启虚拟机，测试是否成功</p>
-<p>2、Tomcat安装<br>1、直接把脚本包，上传到linux任何目录即可，包名：apache-tomcat-7.0.47.tar.gz<br>2、然后解压<br>   [root@texun3 /] tar -zxvf apache-tomcat-7.0.47.tar.gz<br>3、找到bin文件夹下的 startup.sh 执行即可,切换到bin目录，<br>   [root@texun3 bin]#./startup.sh<br>   是否启动成功，可以在查找jdk或者tomcat是否有进程id或者8080端口<br>   [root@texun3 /] # ps –ef |grep jdk<br>   [root@texun3 /] # ps –ef |grep tomcat<br>   [root@texun3 /] # netstat -tlpn     查看8080端口是否启动<br>4、开启8080端口，让外部能访问<br>   [root@texun3 /] #/sbin/iptables -I INPUT -p tcp –dport 8080 -j ACCEPT<br>   [root@texun3 /] #/etc/rc.d/init.d/iptables save<br>   [root@texun3 /] #/etc/rc.d/init.d/iptables restart<br>5、查看tomcat日志</p>
-<p>3、Mysql安装<br>1、光盘作为本地yum源安装（方法一）<br>1）、检查linux是否安装过mysql<br>[root@texun3 /] #rpm –qa |grep mysql  如果安装，则有信息打印，否则就不会打印输出</p>
-<p>可见已经安装了库文件，应该先卸载，不然到时候安装会出现覆盖错误。<br>[root@texun3 /] #rpm -e mysql-libs-5.1.66-2.el6_3.x86_64 –nodeps<br>卸载：使用了–nodeps选项，忽略了依赖关系，其实我们还可以进一步查看系统安装mysql-libs-5.1.66-2.el6_3.x86_64安装的具体位置</p>
-<p>2）、卸载完之后，首先挂载本地光盘，然后查找是否有mysql的二进制包，在光盘的Packages里面查找 mysql的rpm包<br>[root@texun3 Packages]#ls |grep mysql</p>
-<p>这里列出所有关于mysql的包和依赖包<br>注意：<br>没有mysql的client包，所以不建议用光盘安装。如果非要用光盘作为本地yum源进行安装，如下步骤<br>①挂载光盘，上面步骤已实现，修改yum源<br>[root@texun3 Packages]#cd /etc/yum.repos.d</p>
-<p>②默认使用base，也就是网络yum源，如果要使用本地光盘作为yum，选择CentOS-Media.repo第三个就是光盘的yum源文件，把1 2 4文件名改名</p>
-<p>③打开CentOS-Media.repo文件<br>[root@texun3 Packages]#vim CentOS-Media.repo</p>
-<p>④[root@texun3 Packages]#yum list |grep mysql</p>
-<p>⑤安装<br>2、下载mysql的rpm包安装<br>1、下载<br><a href="http://dev.mysql.com/downloads/mysql/" target="_blank" rel="noopener">http://dev.mysql.com/downloads/mysql/</a></p>
-<p>或者使用wget下载：<br>wget <a href="http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-5.6.22-1.el6.i686.rpm-bundle.tar" target="_blank" rel="noopener">http://dev.mysql.com/get/Downloads/MySQL-5.6/MySQL-5.6.22-1.el6.i686.rpm-bundle.tar</a><br>2、检测是否已经安装了mysql<br>[root@texun3 /]#rpm -qa | grep mysql<br>如果已经安装了，将其卸载，如：<br>[root@texun3 /]#rpm -e –nodeps  mysql-libs-5.1.71-1.el6.x86_64  或者<br>[root@texun3 /]#请先执行卸载命令：rpm -e –nodeps  mysql-libs<br>3、安装mysql<br>1、[root@texun3 /]#tar -xvf MySQL-5.6.22-1.el6.i686.rpm-bundle.tar</p>
-<p>2 、先安装服务server端<br>[root@texun3 /]#rpm -ivh MySQL-server-5.6.22-1.el6.i686.rpm</p>
-<p>3、安装依赖<br>1）、[root@texun3 /]#yum -y install libaio.so.1 libgcc_s.so.1 libstdc++.so.6<br>注意：<br>libgcc_s.so.1 libstdc++.so.6 这2个如果不能安装，先执行 yum -y install gcc-c++,然后再装</p>
-<p>2）、需要升级libstdc++-4.4.7-4.el6.x86_64<br>[root@texun3 /]#yum  update libstdc++-4.4.7-4.el6.x86_64<br>注意：这个包在6.4版本里面不需要升级<br>4、再次安装<br>1）、[root@texun3 /]#rpm -ivh MySQL-server-5.6.22-1.el6.i686.rpm</p>
-<p>2）、安装client<br>[root@texun3 /]#rpm -ivh MySQL-client-5.6.22-1.el6.i686.rpm</p>
-<p>3）、安装客户端的依赖<br>[root@texun3 /]# yum -y install libncurses.so.5 libtinfo.so.5<br>[root@texun3 /]#rpm -ivh MySQL-client-5.6.22-1.el6.i686.rpm<br>5、启动mysql的服务<br>[root@texun3 /]# service mysql start<br>6、mysql的登陆<br>方式1：<br>[root@texun3 /]# mysql  -uroot -p  #这个密码是多少呢？     </p>
-<p>注意：在安装mysql server时有句提示</p>
-<p>可以打开/root/.mysql_secret这个文件，找到root的初始密码，然后登陆<br>[root@texun3 /]# mysql  -uroot -p  初始密码<br>登陆进去之后，SET PASSWORD = PASSWORD(‘123456’);</p>
-<p>方式2：在mysql首次登录前要给 root 账号设置密码<br>[root@texun3 /]#/usr/bin/mysqladmin -u root  password ‘123123’<br>然后通过 mysql -uroot -p123123进行登录<br>4、系统启动时自动启动mysql服务<br>加入到系统服务：<br>[root@texun3 /]#chkconfig –add mysql<br>自动启动：<br>[root@texun3 /]#chkconfig mysql on<br>查询列表：<br>[root@texun3 /]#chkconfig –list<br>说明：都没关闭（off）时是没有自动启动。<br>5、开启远程访问<br>[root@texun3 /]#mysql -uroot –p123456<br>1）、设置远程访问（使用root密码）：<br>mysql&gt;grant all privileges on <em>.</em> to ‘root’ @’%’ identified by ‘root’;<br>flush privileges;<br>2）、防火墙打开3306端口<br>/sbin/iptables -I INPUT -p tcp –dport 3306 -j ACCEPT<br>/etc/rc.d/init.d/iptables save<br>/etc/init.d/iptables status<br>3、mysql的安装目录<br>在linux下查看安装目录<br>[root@texun3 /]# ps -ef|grep mysql<br>参数路径解释<br>–basedir：/usr/bin 相关命令目录mysqladmin mysqldump等命令<br>–datadir：/var/lib/mysql/ mysql数据库文件的存放路径<br>–plugin-dir：/usr/lib64/mysql/pluginmysql插件存放路径<br>–log-error：/var/lib/mysql/jack.atguigu.errmysql错误日志路径<br>–pid-file：/var/lib/mysql/jack.atguigu.pid进程pid文件<br>–socket：/var/lib/mysql/mysql.sock本地连接时用的unix套接字文件<br>/usr/share/mysql 配置文件目录mysql脚本及配置文件<br>/etc/init.d/mysql服务启停相关脚本<br>4、mysql修改字符集<br>1 、查看字符集<br>mysql&gt;show variables like ‘character%’;<br>mysql&gt;show variables like ‘%char%’;<br>默认的是客户端和服务器都用了latin1，所以会乱码<br>2、修改my.cnf<br>在/usr/share/mysql/ 中找到my.cnf的配置文件,拷贝到 /etc/下并命名为my.cnf<br>mysql 优先选中 /etc/ 下的配置文件<br>然后修改my.cnf:<br>[client]<br>default-character-set=utf8<br>[mysqld]<br>character_set_server=utf8<br>character_set_client=utf8<br>collation-server=utf8_general_ci<br>[mysql]<br>default-character-set=utf8<br> 3、重新启动mysql<br>但是原库的设定不会发生变化，参数修改之对新建的数据库生效<br>4、已生成的库表字符集如何变更<br>修改数据库的字符集<br>mysql&gt; alter database mytest character set ‘utf8’;<br>修改数据表的字符集<br>mysql&gt; alter table user convert to  character set ‘utf8’;</p>
-<p> 但是原有的数据如果是用非’utf8’编码的话，数据本身不会发生改变。</p>
-<p>#################################################################################################<br>   3.Redis的安装<br>Redis是c语言开发的。<br>安装redis需要c语言的编译环境。如果没有gcc需要在线安装。yum install gcc-c++</p>
-<p>安装步骤：<br>第一步：redis的源码包上传到linux系统。<br>第二步：解压缩redis。<br>第三步：编译。进入redis源码目录。make<br>第四步：安装。make install PREFIX=/usr/local/redis<br>PREFIX参数指定redis的安装目录。一般软件安装到/usr目录下<br>3.2.连接redis<br>3.2.1.redis的启动：<br>前端启动：在redis的安装目录下直接启动redis-server<br>[root@localhost bin]# ./redis-server </p>
-<p>后台启动：<br>把/root/redis-3.0.0/redis.conf复制到/usr/local/redis/bin目录下<br>[root@localhost redis-3.0.0]# cp redis.conf /usr/local/redis/bin/<br>修改配置文件：</p>
-<p>[root@localhost bin]# ./redis-server redis.conf<br>查看redis进程：<br>[root@localhost bin]# ps aux|grep redis<br>root      5190  0.1  0.3  33936  1712 ?        Ssl  18:23   0:00 ./redis-server *:6379<br>root      5196  0.0  0.1   4356   728 pts/0    S+   18:24   0:00 grep redis<br>杀死所有 redis进程: killall -9 redis-server<br>[root@localhost bin]# </p>
-<p>3.2.2.Redis-cli<br>[root@localhost bin]# ./redis-cli<br>默认连接localhost运行在6379端口的redis服务。<br>[root@localhost bin]# ./redis-cli -h 192.168.25.153 -p 6379<br>-h：连接的服务器的地址<br>-p：服务的端口号</p>
-<p>关闭redis：[root@localhost bin]# ./redis-cli shutdown</p>
-<p>3.3.Redis五种数据类型<br>String：key-value（做缓存）<br>Redis中所有的数据都是字符串。命令不区分大小写，key是区分大小写的。Redis是单线程的。Redis中不适合保存内容大的数据。<br>get、set、<br>incr：加一（生成id）<br>Decr：减一</p>
-<p>Hash：key-fields-values（做缓存）<br>相当于一个key对于一个map，map中还有key-value<br>使用hash对key进行归类。<br>Hset：向hash中添加内容<br>Hget：从hash中取内容</p>
-<p>List：有顺序可重复<br>192.168.25.153:6379&gt; lpush list1 a b c d<br>(integer) 4<br>192.168.25.153:6379&gt; lrange list1 0 -1<br>1) “d”<br>2) “c”<br>3) “b”<br>4) “a”<br>192.168.25.153:6379&gt; rpush list1 1 2 3 4<br>(integer) 8<br>192.168.25.153:6379&gt; lrange list1 0 -1<br>1) “d”<br>2) “c”<br>3) “b”<br>4) “a”<br>5) “1”<br>6) “2”<br>7) “3”<br>8) “4”<br>192.168.25.153:6379&gt;<br>192.168.25.153:6379&gt; lpop list1<br>“d”<br>192.168.25.153:6379&gt; lrange list1 0 -1<br>1) “c”<br>2) “b”<br>3) “a”<br>4) “1”<br>5) “2”<br>6) “3”<br>7) “4”<br>192.168.25.153:6379&gt; rpop list1<br>“4”<br>192.168.25.153:6379&gt; lrange list1 0 -1<br>1) “c”<br>2) “b”<br>3) “a”<br>4) “1”<br>5) “2”<br>6) “3”<br>192.168.25.153:6379&gt; </p>
-<p>Set：元素无顺序，不能重复<br>192.168.25.153:6379&gt; sadd set1 a b c c c d<br>(integer) 4<br>192.168.25.153:6379&gt; smembers set1<br>1) “b”<br>2) “c”<br>3) “d”<br>4) “a”<br>192.168.25.153:6379&gt; srem set1 a<br>(integer) 1<br>192.168.25.153:6379&gt; smembers set1<br>1) “b”<br>2) “c”<br>3) “d”<br>192.168.25.153:6379&gt;<br>还有集合运算命令，自学。</p>
-<p>SortedSet（zset）：有顺序，不能重复<br>192.168.25.153:6379&gt; zadd zset1 2 a 5 b 1 c 6 d<br>(integer) 4<br>192.168.25.153:6379&gt; zrange zset1 0 -1<br>1) “c”<br>2) “a”<br>3) “b”<br>4) “d”<br>192.168.25.153:6379&gt; zrem zset1 a<br>(integer) 1<br>192.168.25.153:6379&gt; zrange zset1 0 -1<br>1) “c”<br>2) “b”<br>3) “d”<br>192.168.25.153:6379&gt; zrevrange zset1 0 -1<br>1) “d”<br>2) “b”<br>3) “c”<br>192.168.25.153:6379&gt; zrange zset1 0 -1 withscores<br>1) “c”<br>2) “1”<br>3) “b”<br>4) “5”<br>5) “d”<br>6) “6”<br>192.168.25.153:6379&gt; zrevrange zset1 0 -1 withscores<br>1) “d”<br>2) “6”<br>3) “b”<br>4) “5”<br>5) “c”<br>6) “1”<br>192.168.25.153:6379&gt; </p>
-<p>3.4.Key命令<br>设置key的过期时间。<br>Expire key second：设置key的过期时间<br>Ttl key：查看key的有效期<br>Persist key：清除key的过期时间。Key持久化。</p>
-<p>192.168.25.153:6379&gt; expire Hello 100<br>(integer) 1<br>192.168.25.153:6379&gt; ttl Hello<br>(integer) 77<br>4.Redis的持久化方案<br>Redis的所有数据都是保存到内存中的。<br>Rdb：快照形式，定期把内存中当前时刻的数据保存到磁盘。Redis默认支持的持久化方案。<br>aof形式：append only file。把所有对redis数据库操作的命令，增删改操作的命令。保存到文件中。数据库恢复时把所有的命令执行一遍即可。</p>
-<p>在redis.conf配置文件中配置。<br>Rdb：</p>
-<p>Aof的配置：</p>
-<p>两种持久化方案同时开启使用aof文件来恢复数据库。</p>
-<ol start="5">
-<li>Redis集群的搭建</li>
-<li>1.redis-cluster架构图</li>
-</ol>
-<p>redis-cluster投票:容错</p>
-<p>架构细节:<br>(1)所有的redis节点彼此互联(PING-PONG机制),内部使用二进制协议优化传输速度和带宽.<br>(2)节点的fail是通过集群中超过半数的节点检测失效时才生效.<br>(3)客户端与redis节点直连,不需要中间proxy层.客户端不需要连接集群所有节点,连接集群中任何一个可用节点即可<br>(4)redis-cluster把所有的物理节点映射到[0-16383]slot上,cluster 负责维护node&lt;-&gt;slot&lt;-&gt;value<br>Redis 集群中内置了 16384 个哈希槽，当需要在 Redis 集群中放置一个 key-value 时，redis 先对 key 使用 crc16 算法算出一个结果，然后把结果对 16384 求余数，这样每个 key 都会对应一个编号在 0-16383 之间的哈希槽，redis 会根据节点数量大致均等的将哈希槽映射到不同的节点</p>
-<p>5.2.Redis集群的搭建<br>Redis集群中至少应该有三个节点。要保证集群的高可用，需要每个节点有一个备份机。<br>Redis集群至少需要6台服务器。<br>搭建伪分布式。可以使用一台虚拟机运行6个redis实例。需要修改redis的端口号7001-7006<br>1.创建一个新的目录 mkdir redis-cluster<br>2.将安装好的redis目录复制到新创建的文件夹内 cp –r redis01/bin redis=cluster/redis01<br>3.进入新创建的文件夹内将dump.rdb删掉 rm –rg dump.rdb<br>4.修改此文件内的redis.conf里面的端口号 改成7001,将cluster-enabledyes<br>5.以此类推一共创建6个文件夹,并改变相同的东西<br>6.创建一个批处理文件start-all.sh<br>cd redis01 ./redis-server redis.conf cd..<br>cd redis02 ./redis-server redis.conf cd..<br>cd redis03 ./redis-server redis.conf cd..<br>cd redis04 ./redis-server redis.conf cd..<br>cd redis05 ./redis-server redis.conf cd..<br>cd redis06 ./redis-server redis.conf cd..<br>启动批处理文件 ./start-all.sh(启动之前修改权限 chmod +x start-all.sh)<br>查看是否启动 ps aux|grep redis<br>5.2.1.集群搭建环境<br>1、使用ruby脚本搭建集群。需要ruby的运行环境。<br>安装ruby<br>yum install ruby<br>yum install rubygems</p>
-<p>2、安装ruby脚本运行使用的包。<br>[root@localhost ~]# gem install redis-3.0.0.gem<br>Successfully installed redis-3.0.0<br>1 gem installed<br>Installing ri documentation for redis-3.0.0…<br>Installing RDoc documentation for redis-3.0.0…<br>[root@localhost ~]# </p>
-<p>[root@localhost ~]# cd redis-3.0.0/src<br>[root@localhost src]# ll *.rb<br>cp *.rb /usr/local/redis-cluster/ </p>
-<p>5.2.2.搭建步骤<br>需要6台redis服务器。搭建伪分布式。<br>需要6个redis实例。<br>需要运行在不同的端口7001-7006</p>
-<p>第一步：创建redis-cluster,并将之前安装的redis复制到redis-cluster中,创建6个redis实例，每个实例运行在不同的端口。需要修改redis.conf配置文件。配置文件中还需要把cluster-enabled yes前的注释去掉。</p>
-<p>第二步：启动每个redis实例。<br>可以创建一个start-all.sh文件,redis的各个redis.conf配置文件放进去统一执行<br>但是执行前要修改权限 chmod  +x start-all.sh<br>第三步：使用ruby脚本搭建集群。Yum install ruby<br>./redis-trib.rb create –replicas 1 192.168.128.128:7001 192.168.1.128:7002 192.168.25.128:7003 192.168.25.128:7004 192.168.25.128:7005 192.168.25.128:7006</p>
-<p>创建关闭集群的脚本：<br>[root@localhost redis-cluster]# vim shutdow-all.sh<br>redis01/redis-cli -p 7001 shutdown<br>redis02/redis-cli -p 7002 shutdown<br>redis03/redis-cli -p 7003 shutdown<br>redis04/redis-cli -p 7004 shutdown<br>redis05/redis-cli -p 7005 shutdown<br>redis01/redis-cli -p 7006 shutdown<br>[root@localhost redis-cluster]# chmod u+x shutdow-all.sh </p>
-<p>[root@localhost redis-cluster]# ./redis-trib.rb create –replicas 1 192.168.25.128:7001 192.168.25.128:7002 192.168.25.128:7003 192.168.25.128:7004 192.168.25.128:7005 192.168.25.128:7006</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>Creating cluster<br>Connecting to node 192.168.25.153:7001: OK<br>Connecting to node 192.168.25.153:7002: OK<br>Connecting to node 192.168.25.153:7003: OK<br>Connecting to node 192.168.25.153:7004: OK<br>Connecting to node 192.168.25.153:7005: OK<br>Connecting to node 192.168.25.153:7006: OK<br>Performing hash slots allocation on 6 nodes…<br>Using 3 masters:<br>192.168.25.153:7001<br>192.168.25.153:7002<br>192.168.25.153:7003<br>Adding replica 192.168.25.153:7004 to 192.168.25.153:7001<br>Adding replica 192.168.25.153:7005 to 192.168.25.153:7002<br>Adding replica 192.168.25.153:7006 to 192.168.25.153:7003<br>M: 2e48ae301e9c32b04a7d4d92e15e98e78de8c1f3 192.168.25.153:7001<br>   slots:0-5460 (5461 slots) master<br>M: 8cd93a9a943b4ef851af6a03edd699a6061ace01 192.168.25.153:7002<br>   slots:5461-10922 (5462 slots) master<br>M: 2935007902d83f20b1253d7f43dae32aab9744e6 192.168.25.153:7003<br>   slots:10923-16383 (5461 slots) master<br>S: 74f9d9706f848471583929fc8bbde3c8e99e211b 192.168.25.153:7004<br>   replicates 2e48ae301e9c32b04a7d4d92e15e98e78de8c1f3<br>S: 42cc9e25ebb19dda92591364c1df4b3a518b795b 192.168.25.153:7005<br>   replicates 8cd93a9a943b4ef851af6a03edd699a6061ace01<br>S: 8b1b11d509d29659c2831e7a9f6469c060dfcd39 192.168.25.153:7006<br>   replicates 2935007902d83f20b1253d7f43dae32aab9744e6<br>Can I set the above configuration? (type ‘yes’ to accept): yes<br>Nodes configuration updated<br>Assign a different config epoch to each node<br>Sending CLUSTER MEET messages to join the cluster<br>Waiting for the cluster to join…..<br>Performing Cluster Check (using node 192.168.25.153:7001)<br>M: 2e48ae301e9c32b04a7d4d92e15e98e78de8c1f3 192.168.25.153:7001<br>   slots:0-5460 (5461 slots) master<br>M: 8cd93a9a943b4ef851af6a03edd699a6061ace01 192.168.25.153:7002<br>   slots:5461-10922 (5462 slots) master<br>M: 2935007902d83f20b1253d7f43dae32aab9744e6 192.168.25.153:7003<br>   slots:10923-16383 (5461 slots) master<br>M: 74f9d9706f848471583929fc8bbde3c8e99e211b 192.168.25.153:7004<br>   slots: (0 slots) master<br>   replicates 2e48ae301e9c32b04a7d4d92e15e98e78de8c1f3<br>M: 42cc9e25ebb19dda92591364c1df4b3a518b795b 192.168.25.153:7005<br>   slots: (0 slots) master<br>   replicates 8cd93a9a943b4ef851af6a03edd699a6061ace01<br>M: 8b1b11d509d29659c2831e7a9f6469c060dfcd39 192.168.25.153:7006<br>   slots: (0 slots) master<br>   replicates 2935007902d83f20b1253d7f43dae32aab9744e6<br>[OK] All nodes agree about slots configuration.<br>Check for open slots…<br>Check slots coverage…<br>[OK] All 16384 slots covered.<br>[root@localhost redis-cluster]# </p>
-</blockquote>
-</blockquote>
-</blockquote>
-<p>5.3.集群的使用方法<br>Redis-cli连接集群。<br>[root@localhost redis-cluster]# redis01/redis-cli -p 7002 -c<br>-c：代表连接的是redis集群<br>cluster  info 查看集群信息<br>cluster  nodes  查看节点</p>
-<p>#############################################################################################<br>  4.8.Solr服务搭建<br>  8.1.Solr的环境<br>Solr是java开发。<br>需要安装jdk。<br>安装环境Linux。<br>需要安装Tomcat。<br>8.2.搭建步骤<br>第一步：把solr 的压缩包上传到Linux系统<br>第二步：解压solr。<br>第三步：安装Tomcat，解压缩即可。<br>第四步：把solr部署到Tomcat下。<br>第五步：解压缩war包。启动Tomcat解压。<br>第六步：把/root/solr-4.10.3/example/lib/ext目录下的所有的jar包，添加到solr工程中。<br>[root@localhost ext]# pwd<br>/root/solr-4.10.3/example/lib/ext<br>[root@localhost ext]# cp * /usr/local/solr/tomcat/webapps/solr/WEB-INF/lib/<br>第七步：创建一个solrhome。/example/solr目录就是一个solrhome。复制此目录到/usr/local/solr/solrhome<br>[root@localhost example]# pwd<br>/root/solr-4.10.3/example<br>[root@localhost example]# cp -r solr /usr/local/solr/solrhome<br>[root@localhost example]#<br>第八步：关联solr及solrhome。需要修改solr工程的web.xml文件。</p>
-<p>第九步：启动Tomcat<br><a href="http://192.168.25.154:8080/solr/" target="_blank" rel="noopener">http://192.168.25.154:8080/solr/</a><br>和windows下的配置完全一样。</p>
-<p>8.3.配置业务域<br>schema.xml中定义<br>1、商品Id<br>2、商品标题<br>3、商品卖点<br>4、商品价格<br>5、商品图片<br>6、分类名称<br>7、商品描述</p>
-<p>创建对应的业务域。需要制定中文分析器。</p>
-<p>创建步骤：<br>第一步：把中文分析器添加到工程中。<br>1、把IKAnalyzer2012FF_u1.jar添加到solr工程的lib目录下<br>2、把扩展词典、配置文件放到solr工程的WEB-INF/classes目录下。<br>第二步：配置一个FieldType，制定使用IKAnalyzer<br>修改schema.xml文件<br>修改Solr的schema.xml文件，添加FieldType：<br><fieldtype name="text_ik" class="solr.TextField"><br>  <analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"><br></analyzer></fieldtype></p>
-<p>第三步：配置业务域，type制定使用自定义的FieldType。<br>设置业务系统Field<br><field name="item_title" type="text_ik" indexed="true" stored="true"><br><field name="item_sell_point" type="text_ik" indexed="true" stored="true"><br><field name="item_price" type="long" indexed="true" stored="true"><br><field name="item_image" type="string" indexed="false" stored="true"><br><field name="item_category_name" type="string" indexed="true" stored="true"><br><field name="item_desc" type="text_ik" indexed="true" stored="false"></field></field></field></field></field></field></p>
-<field name="item_keywords" type="text_ik" indexed="true" stored="false" multivalued="true">
-<copyfield source="item_title" dest="item_keywords">
-<copyfield source="item_sell_point" dest="item_keywords">
-<copyfield source="item_category_name" dest="item_keywords">
-<copyfield source="item_desc" dest="item_keywords">
-
-<p>第四步：重启tomcat</p>
-<p>####################################################################################################<br>  5.ActiveMQ的安装<br>  进入<a href="http://activemq.apache.org/下载ActiveMQ" target="_blank" rel="noopener">http://activemq.apache.org/下载ActiveMQ</a></p>
-<p>使用的版本是5.12.0</p>
-<p>4.1.安装环境：<br>1、需要jdk<br>2、安装Linux系统。生产环境都是Linux系统。</p>
-<p>4.2.安装步骤<br>第一步： 把ActiveMQ 的压缩包上传到Linux系统。<br>第二步：解压缩。<br>第三步：启动。<br>使用bin目录下的activemq命令启动：<br>[root@localhost bin]# ./activemq start<br>关闭：<br>[root@localhost bin]# ./activemq stop<br>查看状态：<br>[root@localhost bin]# ./activemq status</p>
-<p>注意：如果ActiveMQ整合spring使用不要使用activemq-all-5.12.0.jar包。建议使用5.11.2</p>
-<p>进入管理后台：<br><a href="http://192.168.25.168:8161/admin" target="_blank" rel="noopener">http://192.168.25.168:8161/admin</a><br>用户名：admin<br>密码：admin</p>
-<p>503错误解决:<br>1、查看机器名<br>[root@qingniao bin]# cat /etc/sysconfig/network<br>NETWORKING=yes<br>HOSTNAME=qingniao<br>GATEWAY=192.168.128.2</p>
-<p>2、修改host文件<br>[root@qingniao bin]# cat /etc/hosts<br>127.0.0.1   localhost localhost.localdomain localhost4 localhost4.localdomain4 qingniao<br>::1         localhost localhost.localdomain localhost6 localhost6.localdomain6 </p>
-<p>3、重启Activemq服务<br>5.ActiveMQ的使用方法</p>
-<p>5.1.Queue<br>5.1.1.Producer<br>生产者：生产消息，发送端。<br>把jar包添加到工程中。使用5.11.2版本的jar包。<br>第一步：创建ConnectionFactory对象，需要指定服务端ip及端口号。<br>第二步：使用ConnectionFactory对象创建一个Connection对象。<br>第三步：开启连接，调用Connection对象的start方法。<br>第四步：使用Connection对象创建一个Session对象。<br>第五步：使用Session对象创建一个Destination对象（topic、queue），此处创建一个Queue对象。<br>第六步：使用Session对象创建一个Producer对象。<br>第七步：创建一个Message对象，创建一个TextMessage对象。<br>第八步：使用Producer对象发送消息。<br>第九步：关闭资源。<br>@Test<br>    public void testQueueProducer() throws Exception {<br>        // 第一步：创建ConnectionFactory对象，需要指定服务端ip及端口号。<br>        //brokerURL服务器的ip及端口号<br>        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(“tcp://192.168.25.168:61616”);<br>        // 第二步：使用ConnectionFactory对象创建一个Connection对象。<br>        Connection connection = connectionFactory.createConnection();<br>        // 第三步：开启连接，调用Connection对象的start方法。<br>        connection.start();<br>        // 第四步：使用Connection对象创建一个Session对象。<br>        //第一个参数：是否开启事务。true：开启事务，第二个参数忽略。<br>        //第二个参数：当第一个参数为false时，才有意义。消息的应答模式。1、自动应答2、手动应答。一般是自动应答。<br>        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);<br>        // 第五步：使用Session对象创建一个Destination对象（topic、queue），此处创建一个Queue对象。<br>        //参数：队列的名称。<br>        Queue queue = session.createQueue(“test-queue”);<br>        // 第六步：使用Session对象创建一个Producer对象。<br>        MessageProducer producer = session.createProducer(queue);<br>        // 第七步：创建一个Message对象，创建一个TextMessage对象。<br>        /<em>TextMessage message = new ActiveMQTextMessage();<br>        message.setText(“hello activeMq,this is my first test.”);</em>/<br>        TextMessage textMessage = session.createTextMessage(“hello activeMq,this is my first test.”);<br>        // 第八步：使用Producer对象发送消息。<br>        producer.send(textMessage);<br>        // 第九步：关闭资源。<br>        producer.close();<br>        session.close();<br>        connection.close();<br>    }</p>
-<p>  5.1.2.Consumer<br>消费者：接收消息。<br>第一步：创建一个ConnectionFactory对象。<br>第二步：从ConnectionFactory对象中获得一个Connection对象。<br>第三步：开启连接。调用Connection对象的start方法。<br>第四步：使用Connection对象创建一个Session对象。<br>第五步：使用Session对象创建一个Destination对象。和发送端保持一致queue，并且队列的名称一致。<br>第六步：使用Session对象创建一个Consumer对象。<br>第七步：接收消息。<br>第八步：打印消息。<br>第九步：关闭资源<br>  @Test<br>    public void testQueueConsumer() throws Exception {<br>        // 第一步：创建一个ConnectionFactory对象。<br>        ConnectionFactory connectionFactory = new ActiveMQConnectionFactory(“tcp://192.168.25.168:61616”);<br>        // 第二步：从ConnectionFactory对象中获得一个Connection对象。<br>        Connection connection = connectionFactory.createConnection();<br>        // 第三步：开启连接。调用Connection对象的start方法。<br>        connection.start();<br>        // 第四步：使用Connection对象创建一个Session对象。<br>        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);<br>        // 第五步：使用Session对象创建一个Destination对象。和发送端保持一致queue，并且队列的名称一致。<br>        Queue queue = session.createQueue(“test-queue”);<br>        // 第六步：使用Session对象创建一个Consumer对象。<br>        MessageConsumer consumer = session.createConsumer(queue);<br>        // 第七步：接收消息。<br>        consumer.setMessageListener(new MessageListener() {</p>
-<pre><code>        @Override
-        public void onMessage(Message message) {
-            try {
-                TextMessage textMessage = (TextMessage) message;
-                String text = null;
-                //取消息的内容
-                text = textMessage.getText();
-                // 第八步：打印消息。
-                System.out.println(text);
-            } catch (JMSException e) {
-                e.printStackTrace();
-            }
-        }
-    });
-    //等待键盘输入
-    System.in.read();
-    // 第九步：关闭资源
-    consumer.close();
-    session.close();
-    connection.close();
-}</code></pre></copyfield></copyfield></copyfield></copyfield></field>
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Linux安装插件</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/13/Linux安装插件/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<!-- 来必力City版安装代码 -->
-
-  <!-- 这一句是适配样式 -->
-  <section class="duoshuo" id="comments">
-    <!-- 以下是 来必力City版安装代码 -->
-    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
-      <script type="text/javascript">
-       (function(d, s) {
-           var j, e = d.getElementsByTagName(s)[0];
-           if (typeof LivereTower === 'function') { return; }
-           j = d.createElement(s);
-           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-           j.async = true;
-           e.parentNode.insertBefore(j, e);
-       })(document, 'script');
-      </script>
-    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
-    </div>
-  </section>
-
-
-  
-    <article id="post-快乐真的很重要" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/07/11/快乐真的很重要/">快乐真的很重要</a>
-    </h1>
-  
-
-        
-        <a href="/2019/07/11/快乐真的很重要/" class="archive-article-date">
-  	<time datetime="2019-07-11T13:26:52.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-07-11</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>  如果一个人他连快乐都没有，那他真的就什么都没有了，人一生，快乐很重要，一定要及时行乐，要把成就放在第二位，这样人生才会过得很圆满。<br>  因为，人的一生，其实就是过的一个心情，没有了心情，你的动力也就会跟着消失。你的心情还在的话，你干什么都是开心的，你就算看到一个十分<br>  让你讨厌，让你厌恶的人，你都是很开心的。有的人会认为，这个人是个傻子吧，看到，别人欺负她，她还这么开心，她是不是有自虐证啊？让人很<br>  不可思议，也许这就是每个人的心情的变化的过程吧。当一个人认为快乐很重要的时候，他就会活得很开心，当开始，发现，什么都可以放下的时候，<br>  你就是成长了，你就是有了快乐。因为，只有你放下了，不再去想一些不开心的事情，你就会，把自己放在一个，更高的境界，让自己，开开心心的<br>  活在这个世界上，不管是遇到再大的事情，你都会，让自己活得开心，然而，成就，在成就这方面，我认为，是可以往后面排一排的。因为，不是，<br>  每个人都是可以成为马云，成为王健林的。他们为什么会有那样的成就呢？因为，他们的身后都有放开的事情。为何成就要排在第二位，成就是一个<br>  人很重要的部分。但是，我认为，快乐心情是人生当中的重中之重，只要有了快乐心情，你才会发现。原来，成功不成功就是其次。因为有了好心情<br>  才是最好的成功。比如说：你去打一场比赛，每个教练都会在前一天，或者是前几天，前几个小时，告诉你，你不要激动，只要你拿出你的正常的水<br>  平就行，因为人一旦有了，骄傲之心，就会发现，本来能成功的事情，却只能排在第二位。所以，不管是面对任何的比赛，还是面对任何的考试。不<br>  要着急，因为，你的幸运一定不会比你的努力多。及时行乐，在人的一生中也是很重要的，因为，对别人的快乐，对别人的帮助，你会比自己成功了<br>  还要快乐。比如，今天，要去考试，你在过马路的时候，帮助了一下走路不方便的老婆婆，你今天的考试就一定不会不开心，不会着急，因为，你自<br>  己的内心，就会认为，不管今天考得好不好，你只会在意你今天帮助了老奶奶的成就。这样，你的紧张感就会不自觉的降低，让自己也许会比平时考<br>  的更好。所以人一定要及时行乐所以人的一生快乐很重要，及时行乐，机会和成功才会围绕这你！</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">快乐真的很重要</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/2019/07/11/快乐真的很重要/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-
-<!-- 来必力City版安装代码 -->
-
-  <!-- 这一句是适配样式 -->
-  <section class="duoshuo" id="comments">
-    <!-- 以下是 来必力City版安装代码 -->
-    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
-      <script type="text/javascript">
-       (function(d, s) {
-           var j, e = d.getElementsByTagName(s)[0];
-           if (typeof LivereTower === 'function') { return; }
-           j = d.createElement(s);
-           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
-           j.async = true;
-           e.parentNode.insertBefore(j, e);
-       })(document, 'script');
-      </script>
-    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
-    </div>
-  </section>
-
-
-  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/">Next &raquo;</a>
+    </nav>
   
 
 
@@ -4528,27 +4446,27 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">快乐真的很重要</a>
+                <a href="javascript:void(0)" class="js-tag color1">MVC入门</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Mvc相关及Mysql</a>
+                <a href="javascript:void(0)" class="js-tag color4">Java精选题目</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">面试题</a>
+                <a href="javascript:void(0)" class="js-tag color3">Linux安装插件及应用</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">面试题汇总</a>
+                <a href="javascript:void(0)" class="js-tag color3">真Java实战</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Linux安装插件</a>
+                <a href="javascript:void(0)" class="js-tag color5">Spring、Spring MVC、MyBatis 整合文件配置详解</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JavaEE面试题</a>
+                <a href="javascript:void(0)" class="js-tag color4">JavaEE实战</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -4556,15 +4474,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">MySQL详细知识点总结</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">JavaJQuery相关</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Java面试</a>
+                <a href="javascript:void(0)" class="js-tag color2">Java基础</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">SpringBoot</a>
+                <a href="javascript:void(0)" class="js-tag color3">SpringBoot实战</a>
               </li>
             
             <div class="clearfix"></div>

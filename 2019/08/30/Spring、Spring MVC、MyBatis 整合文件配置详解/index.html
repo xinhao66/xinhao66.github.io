@@ -6,15 +6,20 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="dns-prefetch" href="http://yoursite.com">
-  <title>Archives: 2019/8 | 阿浩的博客~</title>
+  <title>Spring、Spring MVC、MyBatis 整合文件配置详解 | 阿浩的博客~</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="阿浩的博客~">
-<meta property="og:url" content="http://yoursite.com/archives/2019/08/index.html">
+  <meta name="description" content="1 web.xml的配置web.xml应该是整个项目最重要的配置文件了，不过servlet3.0中已经支持注解配置方式了。在servlet3.0以前每个servlet必须要在web.xml中配置servlet及其映射关系。但是在spring框架中就不用了，因为Spring中是依赖注入（Dependency Injection）的也叫控制反转（Inversion of Control）。但是也要配置">
+<meta name="keywords" content="Spring、Spring MVC、MyBatis 整合文件配置详解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring、Spring MVC、MyBatis 整合文件配置详解">
+<meta property="og:url" content="http://yoursite.com/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/index.html">
 <meta property="og:site_name" content="阿浩的博客~">
+<meta property="og:description" content="1 web.xml的配置web.xml应该是整个项目最重要的配置文件了，不过servlet3.0中已经支持注解配置方式了。在servlet3.0以前每个servlet必须要在web.xml中配置servlet及其映射关系。但是在spring框架中就不用了，因为Spring中是依赖注入（Dependency Injection）的也叫控制反转（Inversion of Control）。但是也要配置">
 <meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2019-08-30T03:23:39.214Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="阿浩的博客~">
+<meta name="twitter:title" content="Spring、Spring MVC、MyBatis 整合文件配置详解">
+<meta name="twitter:description" content="1 web.xml的配置web.xml应该是整个项目最重要的配置文件了，不过servlet3.0中已经支持注解配置方式了。在servlet3.0以前每个servlet必须要在web.xml中配置servlet及其映射关系。但是在spring框架中就不用了，因为Spring中是依赖注入（Dependency Injection）的也叫控制反转（Inversion of Control）。但是也要配置">
   
     <link rel="alternative" href="/atom.xml" title="阿浩的博客~" type="application/atom+xml">
   
@@ -154,36 +159,144 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="post-Spring、Spring MVC、MyBatis 整合文件配置详解" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2019" class="archive-year">2019</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/" class="archive-article-date">
-  	<time datetime="2019-08-30T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-30</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/">Spring、Spring MVC、MyBatis 整合文件配置详解</a>
+    <h1 class="article-title" itemprop="name">
+      Spring、Spring MVC、MyBatis 整合文件配置详解
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/" class="archive-article-date">
+  	<time datetime="2019-08-30T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-30</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="1-web-xml的配置"><a href="#1-web-xml的配置" class="headerlink" title="1 web.xml的配置"></a>1 web.xml的配置</h1><p>web.xml应该是整个项目最重要的配置文件了，不过servlet3.0中已经支持注解配置方式了。在servlet3.0以前每个servlet必须要在web.xml中配置servlet及其映射关系。但是在spring框架中就不用了，因为Spring中是依赖注入（Dependency Injection）的也叫控制反转（Inversion of Control）。但是也要配置一个重要的servlet，就是前端控制器（DispatcherServlet）。配置方式与普通的servlet基本相似。<br>配置内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置前端控制器 --&gt;</span><br><span class="line">  &lt;servlet&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</span><br><span class="line">      &lt;init-param&gt;</span><br><span class="line">          &lt;!-- ContextconfigLocation配置springmvc加载的配置文件</span><br><span class="line">          适配器、处理映射器等</span><br><span class="line">           --&gt;</span><br><span class="line">          &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">          &lt;param-value&gt;WEB-INF/classes/spring/springmvc.xml&lt;/param-value&gt;</span><br><span class="line">  &lt;/init-param&gt;</span><br><span class="line">  &lt;/servlet&gt;</span><br><span class="line">  &lt;servlet-mapping&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;!-- 1、.action访问以.action结尾的  由DispatcherServlet进行解析</span><br><span class="line">           2、/,所有访问都由DispatcherServlet进行解析</span><br><span class="line">       --&gt;</span><br><span class="line">      &lt;url-pattern&gt;/&lt;/url-pattern&gt;</span><br><span class="line">  &lt;/servlet-mapping&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这里需要注意，springmvc.xml是spring配置文件，将在后面讨论。在<servlet-mapping>中url如果是.action，前端控制器就只会拦截以.action结尾的请求，并不会理会静态的文件。对静态页面的控制就要通过其他的手段。以/作为url的话就会拦截所有的请求，包括静态页面的请求。这样的话就可以拦截任何想要处理的请求，但是有一个问题。如果拦截了所有的请求，如果不在拦截器中做出相应的处理那么所有静态的js、css以及页面中用到的图片就会访问不到造成页面无法正常显示。但这可以通过静态资源的配置来解决这个问题。后面会提到。</servlet-mapping></p>
+<p>配置spring容器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;context-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">        &lt;param-value&gt;WEB-INF/classes/spring/applicationContext-*.xml&lt;/param-value&gt;</span><br><span class="line">&lt;/context-param&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其中applicationContext-*.xml包含3个配置文件，是springIoC容器的具体配置。后面会提到。</p>
+<p>配置一个监听器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;listener&gt;</span><br><span class="line">        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;</span><br><span class="line">&lt;/listener&gt;</span><br></pre></td></tr></table></figure>
+
+<p>web.xml的完整配置是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;web-app version=&quot;3.0&quot;</span><br><span class="line">    xmlns=&quot;http://java.sun.com/xml/ns/javaee&quot;</span><br><span class="line">    xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">    xsi:schemaLocation=&quot;http://java.sun.com/xml/ns/javaee </span><br><span class="line"> </span><br><span class="line">http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;display-name&gt;&lt;/display-name&gt;    </span><br><span class="line"> </span><br><span class="line">  &lt;!-- 404错误拦截 --&gt;</span><br><span class="line">  &lt;error-page&gt;</span><br><span class="line">    &lt;error-code&gt;404&lt;/error-code&gt;</span><br><span class="line">    &lt;location&gt;/error404.jsp&lt;/location&gt;</span><br><span class="line">  &lt;/error-page&gt;</span><br><span class="line">  &lt;!-- 500错误拦截 --&gt;</span><br><span class="line">  &lt;error-page&gt;</span><br><span class="line">    &lt;error-code&gt;500&lt;/error-code&gt;</span><br><span class="line">    &lt;location&gt;/error500.jsp&lt;/location&gt;</span><br><span class="line">  &lt;/error-page&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;!-- 加载spring容器 --&gt;</span><br><span class="line">    &lt;context-param&gt;</span><br><span class="line">        &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">        &lt;param-value&gt;WEB-INF/classes/spring/applicationContext-*.xml&lt;/param-value&gt;</span><br><span class="line">    &lt;/context-param&gt;</span><br><span class="line">    &lt;listener&gt;</span><br><span class="line">        &lt;listener-class&gt;org.springframework.web.context.ContextLoaderListener&lt;/listener-class&gt;</span><br><span class="line">    &lt;/listener&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;!-- 配置前端控制器 --&gt;</span><br><span class="line">  &lt;servlet&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;servlet-class&gt;org.springframework.web.servlet.DispatcherServlet&lt;/servlet-class&gt;</span><br><span class="line">      &lt;init-param&gt;</span><br><span class="line">          &lt;!-- ContextconfigLocation配置springmvc加载的配置文件</span><br><span class="line">          适配器、处理映射器等</span><br><span class="line">           --&gt;</span><br><span class="line">          &lt;param-name&gt;contextConfigLocation&lt;/param-name&gt;</span><br><span class="line">          &lt;param-value&gt;WEB-INF/classes/spring/springmvc.xml&lt;/param-value&gt;</span><br><span class="line">  &lt;/init-param&gt;</span><br><span class="line">  &lt;/servlet&gt;</span><br><span class="line">  &lt;servlet-mapping&gt;</span><br><span class="line">      &lt;servlet-name&gt;spring&lt;/servlet-name&gt;</span><br><span class="line">      &lt;!-- 1、.action访问以.action结尾的  由DispatcherServlet进行解析</span><br><span class="line">           2、/,所有访问都由DispatcherServlet进行解析</span><br><span class="line">       --&gt;</span><br><span class="line">      &lt;url-pattern&gt;/&lt;/url-pattern&gt;</span><br><span class="line">  &lt;/servlet-mapping&gt;</span><br><span class="line"> </span><br><span class="line">  &lt;!-- 解决post乱码问题的过滤器 --&gt;</span><br><span class="line">  &lt;filter&gt;</span><br><span class="line">      &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;</span><br><span class="line">      &lt;filter-class&gt;org.springframework.web.filter.CharacterEncodingFilter&lt;/filter-class&gt;</span><br><span class="line">      &lt;init-param&gt;</span><br><span class="line">          &lt;param-name&gt;encoding&lt;/param-name&gt;</span><br><span class="line">          &lt;param-value&gt;utf-8&lt;/param-value&gt;</span><br><span class="line">      &lt;/init-param&gt;</span><br><span class="line">  &lt;/filter&gt;</span><br><span class="line">  &lt;filter-mapping&gt;</span><br><span class="line">      &lt;filter-name&gt;CharacterEncodingFilter&lt;/filter-name&gt;</span><br><span class="line">      &lt;url-pattern&gt;/*&lt;/url-pattern&gt;</span><br><span class="line">  &lt;/filter-mapping&gt;</span><br><span class="line">  &lt;welcome-file-list&gt;</span><br><span class="line">    &lt;welcome-file&gt;welcome.jsp&lt;/welcome-file&gt;</span><br><span class="line">  &lt;/welcome-file-list&gt;</span><br><span class="line">&lt;/web-app&gt;</span><br></pre></td></tr></table></figure>
+
+<p>看到配置文件中多了两块内容，一个是error page是用来友好的处理错误的，可以使用错误代码来区别并跳转到相应的处理页面。这段配置代码最好放到最前面，在前端控制器拦截之前处理。<br>还有一块内容是一个解决post乱码问题的过滤器，拦截post请求并编码为utf8。</p>
+<h1 id="2-springmvc-xml的配置"><a href="#2-springmvc-xml的配置" class="headerlink" title="2 springmvc.xml的配置"></a>2 springmvc.xml的配置</h1><p>视图解析器的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置视图解析器 --&gt;</span><br><span class="line">     &lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">         &lt;!-- 使用前缀和后缀 --&gt;</span><br><span class="line">         &lt;property name=&quot;prefix&quot; value=&quot;/&quot;&gt;&lt;/property&gt;</span><br><span class="line">         &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在Controller中设置视图名的时候会自动加上前缀和后缀。</p>
+<p>Controller的配置</p>
+<p>自动扫描方式，扫描包下面所有的Controller，可以使用注解来指定访问路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 使用组件扫描的方式可以一次扫描多个Controller --&gt;</span><br><span class="line">&lt;context:component-scan base-package=&quot;com.wxisme.ssm.controller&quot;&gt;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用单个的配置方式，需要指定Controller的全限定名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean name=&quot;/queryUser.action&quot; class=&quot;com.wxisme.ssm.controller.Controller1&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置注解的处理器适配器和处理器映射器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 注解的处理器适配器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 注解的处理器映射器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping&quot;/&gt;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用下面的简化配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置注解的处理器映射器和处理器适配器 --&gt;</span><br><span class="line">&lt;mvc:annotation-driven conversion-service=&quot;conversionService&quot;&gt;&lt;/mvc:annotation-driven&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置拦截器，可以直接定义拦截所有请求，也可以自定义拦截路径。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;mvc:interceptors&gt;</span><br><span class="line">    &lt;!-- 直接定义拦截所有请求 --&gt;</span><br><span class="line">    &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;!-- &lt;mvc:interceptor&gt;</span><br><span class="line">            拦截所有路径的请求   包括子路径</span><br><span class="line">            &lt;mvc:mapping path=&quot;/**&quot;/&gt;</span><br><span class="line">            &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;/mvc:interceptor&gt; --&gt;</span><br><span class="line">    &lt;/mvc:interceptors&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置全局异常处理器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 定义全局异常处理器 --&gt;</span><br><span class="line">    &lt;!-- 只有一个全局异常处理器起作用 --&gt;</span><br><span class="line">    &lt;bean id=&quot;exceptionResolver&quot; class=&quot;com.wxisme.ssm.exception.OverallExceptionResolver&quot;&gt;&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>配置文件上传数据解析器，在上传文件时需要配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--配置上传文件数据解析器  --&gt;</span><br><span class="line">    &lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;</span><br><span class="line">        &lt;property name=&quot;maxUploadSize&quot;&gt;</span><br><span class="line">            &lt;value&gt;9242880&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>还可以配置一些自定义的参数类型，以日期类型绑定为例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 自定义参数类型绑定 --&gt;</span><br><span class="line">    &lt;bean id=&quot;conversionService&quot; class=&quot;org.springframework.format.support.FormattingConversionServiceFactoryBean&quot;&gt;</span><br><span class="line">     &lt;property name=&quot;converters&quot;&gt;</span><br><span class="line">         &lt;list&gt;</span><br><span class="line">             &lt;!-- 日期类型绑定 --&gt;</span><br><span class="line">             &lt;bean class=&quot;com.wxisme.ssm.controller.converter.DateConverter&quot;/&gt;</span><br><span class="line">         &lt;/list&gt;</span><br><span class="line">     &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>上面提到过如果在配置前端控制器时拦截了所有的请求，不做特殊处理就会导致部分静态资源无法使用。如果是这种情况就可以使用下面的配置来访问静态资源文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line">&lt;mvc:resources mapping=&quot;/images/**&quot; location=&quot;/images/&quot; /&gt;</span><br><span class="line">&lt;mvc:resources mapping=&quot;/css/**&quot; location=&quot;/css/&quot; /&gt;  </span><br><span class="line">&lt;mvc:resources mapping=&quot;/js/**&quot; location=&quot;/js/&quot; /&gt;</span><br><span class="line">&lt;mvc:resources mapping=&quot;/imgdata/**&quot; location=&quot;/imgdata/&quot; /&gt;</span><br><span class="line">也可以使用默认，但是需要在web.xml中配置。</span><br><span class="line"></span><br><span class="line">&lt;!-- 访问静态资源文件 --&gt;</span><br><span class="line">&lt;!-- &lt;mvc:default-servlet-handler/&gt; 需要在web.xml中配置--&gt;</span><br><span class="line">完全可以不拦截所有路径，大可避免这个问题的发生。完整的配置大概是这样的，需要注意xml文件的命名空间，有时候会有影响的。</span><br><span class="line"></span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</span><br><span class="line">xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;</span><br><span class="line">xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;</span><br><span class="line">xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;</span><br><span class="line">xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;</span><br><span class="line">xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans </span><br><span class="line">http://www.springframework.org/schema/beans/spring-beans.xsd</span><br><span class="line">http://www.springframework.org/schema/context  </span><br><span class="line">http://www.springframework.org/schema/context/spring-context.xsd  </span><br><span class="line">http://www.springframework.org/schema/mvc  </span><br><span class="line">http://www.springframework.org/schema/mvc/spring-mvc.xsd  </span><br><span class="line">http://www.springframework.org/schema/tx  </span><br><span class="line">http://www.springframework.org/schema/tx/spring-tx.xsd </span><br><span class="line">http://www.springframework.org/schema/aop</span><br><span class="line">http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">     &lt;!-- 配置视图解析器 --&gt;</span><br><span class="line">     &lt;bean class=&quot;org.springframework.web.servlet.view.InternalResourceViewResolver&quot;&gt;</span><br><span class="line">         &lt;!-- 使用前缀和后缀 --&gt;</span><br><span class="line">         &lt;property name=&quot;prefix&quot; value=&quot;/&quot;&gt;&lt;/property&gt;</span><br><span class="line">         &lt;property name=&quot;suffix&quot; value=&quot;.jsp&quot;&gt;&lt;/property&gt;</span><br><span class="line">     &lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">     &lt;!-- 使用组件扫描的方式可以一次扫描多个Controller --&gt;</span><br><span class="line">     &lt;context:component-scan base-package=&quot;com.wxisme.ssm.controller&quot;&gt;</span><br><span class="line">     &lt;/context:component-scan&gt;</span><br><span class="line">     &lt;!-- 配置注解的处理器映射器和处理器适配器 --&gt;</span><br><span class="line">    &lt;mvc:annotation-driven conversion-service=&quot;conversionService&quot;&gt;&lt;/mvc:annotation-driven&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 自定义参数类型绑定 --&gt;</span><br><span class="line">    &lt;bean id=&quot;conversionService&quot; class=&quot;org.springframework.format.support.FormattingConversionServiceFactoryBean&quot;&gt;</span><br><span class="line">     &lt;property name=&quot;converters&quot;&gt;</span><br><span class="line">         &lt;list&gt;</span><br><span class="line">             &lt;!-- 日期类型绑定 --&gt;</span><br><span class="line">             &lt;bean class=&quot;com.wxisme.ssm.controller.converter.DateConverter&quot;/&gt;</span><br><span class="line">         &lt;/list&gt;</span><br><span class="line">     &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 访问静态资源文件 --&gt;</span><br><span class="line">    &lt;!-- &lt;mvc:default-servlet-handler/&gt; 需要在web.xml中配置--&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;mvc:resources mapping=&quot;/images/**&quot; location=&quot;/images/&quot; /&gt;</span><br><span class="line">    &lt;mvc:resources mapping=&quot;/css/**&quot; location=&quot;/css/&quot; /&gt;  </span><br><span class="line">    &lt;mvc:resources mapping=&quot;/js/**&quot; location=&quot;/js/&quot; /&gt;</span><br><span class="line">    &lt;mvc:resources mapping=&quot;/imgdata/**&quot; location=&quot;/imgdata/&quot; /&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 定义拦截器 --&gt;</span><br><span class="line">    &lt;mvc:interceptors&gt;</span><br><span class="line">    &lt;!-- 直接定义拦截所有请求 --&gt;</span><br><span class="line">    &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;!-- &lt;mvc:interceptor&gt;</span><br><span class="line">            拦截所有路径的请求   包括子路径</span><br><span class="line">            &lt;mvc:mapping path=&quot;/**&quot;/&gt;</span><br><span class="line">            &lt;bean class=&quot;com.wxisme.ssm.interceptor.IdentityInterceptor&quot;&gt;&lt;/bean&gt;</span><br><span class="line">        &lt;/mvc:interceptor&gt; --&gt;</span><br><span class="line">    &lt;/mvc:interceptors&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!--配置上传文件数据解析器  --&gt;</span><br><span class="line">    &lt;bean id=&quot;multipartResolver&quot; class=&quot;org.springframework.web.multipart.commons.CommonsMultipartResolver&quot;&gt;</span><br><span class="line">        &lt;property name=&quot;maxUploadSize&quot;&gt;</span><br><span class="line">            &lt;value&gt;9242880&lt;/value&gt;</span><br><span class="line">        &lt;/property&gt;</span><br><span class="line">    &lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 定义全局异常处理器 --&gt;</span><br><span class="line">    &lt;!-- 只有一个全局异常处理器起作用 --&gt;</span><br><span class="line">    &lt;bean id=&quot;exceptionResolver&quot; class=&quot;com.wxisme.ssm.exception.OverallExceptionResolver&quot;&gt;&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line"> &lt;/beans&gt;</span><br></pre></td></tr></table></figure>
+
+<p>applicationContext-*.xml的配置</p>
+<p>applicationContext-*.xml包括三个配置文件，分别对应数据层控制、业务逻辑service控制和事务的控制。</p>
+<p>数据访问层的控制，applicationContext-dao.xml的配置：</p>
+<p>配置加载数据连接资源文件的配置，把数据库连接数据抽取到一个properties资源文件中方便管理。</p>
+<p>配置为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 加载数据库连接的资源文件 --&gt;</span><br><span class="line">&lt;context:property-placeholder location=&quot;/WEB-INF/classes/jdbc.properties&quot;/&gt;</span><br><span class="line">其中jdbc.properties文件的内容如下：配置内容如下：</span><br><span class="line"></span><br><span class="line">jdbc.driver=com.mysql.jdbc.Driver</span><br><span class="line">jdbc.url=jdbc:mysql://localhost:3306/database</span><br><span class="line">jdbc.username=root</span><br><span class="line">jdbc.password=root</span><br></pre></td></tr></table></figure>
+
+<p>配置数据库连接池，这里使用的是dbcp，别忘了添加jar包！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置数据源   dbcp数据库连接池 --&gt;</span><br><span class="line">&lt;bean id=&quot;dataSource&quot; class=&quot;org.apache.commons.dbcp2.BasicDataSource&quot; destroy-method=&quot;close&quot;&gt;</span><br><span class="line">    &lt;property name=&quot;driverClassName&quot; value=&quot;$&#123;jdbc.driver&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;url&quot; value=&quot;$&#123;jdbc.url&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;username&quot; value=&quot;$&#123;jdbc.username&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;password&quot; value=&quot;$&#123;jdbc.password&#125;&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-Spring和MyBatis整合配置，jar包由MyBatis提供"><a href="#3-Spring和MyBatis整合配置，jar包由MyBatis提供" class="headerlink" title="3 Spring和MyBatis整合配置，jar包由MyBatis提供"></a>3 Spring和MyBatis整合配置，jar包由MyBatis提供</h1><p>配置sqlSessionFactory</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置sqlSessionFactory --&gt;</span><br><span class="line">&lt;bean id=&quot;sqlSessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;!-- 数据库连接池 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">    &lt;!-- 加载Mybatis全局配置文件 --&gt;</span><br><span class="line">    &lt;property name=&quot;configLocation&quot; value=&quot;/WEB-INF/classes/mybatis/SqlMapConfig.xml&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>SqlMapConfig.xml文件是MyBatis的配置文件，后面会提到。<br>配置Mapper扫描器，扫描mapper包下的所有mapper文件和类，要求mapper配置文件和类名需要一致。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 配置mapper扫描器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;!-- 扫描包路径，如果需要扫描多个包中间用半角逗号隔开 --&gt;</span><br><span class="line">    &lt;property name=&quot;basePackage&quot; value=&quot;com.wxisme.ssm.mapper&quot;&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name=&quot;sqlSessionFactoryBeanName&quot; value=&quot;sqlSessionFactory&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br></pre></td></tr></table></figure>
+
+<p>整个applicationContext-dao.xml配置文件应该是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</span><br><span class="line">xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;</span><br><span class="line">xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;</span><br><span class="line">xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;</span><br><span class="line">xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;</span><br><span class="line">xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans </span><br><span class="line">http://www.springframework.org/schema/beans/spring-beans.xsd</span><br><span class="line">http://www.springframework.org/schema/context</span><br><span class="line">http://www.springframework.org/schema/context/spring-context.xsd</span><br><span class="line">http://www.springframework.org/schema/mvc</span><br><span class="line">http://www.springframework.org/schema/mvc/spring-mvc.xsd</span><br><span class="line">http://www.springframework.org/schema/tx</span><br><span class="line">http://www.springframework.org/schema/tx/spring-tx.xsd</span><br><span class="line">http://www.springframework.org/schema/aop</span><br><span class="line">http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 加载数据库连接的资源文件 --&gt;</span><br><span class="line">&lt;context:property-placeholder location=&quot;/WEB-INF/classes/jdbc.properties&quot;/&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 配置数据源   dbcp数据库连接池 --&gt;</span><br><span class="line">&lt;bean id=&quot;dataSource&quot; class=&quot;org.apache.commons.dbcp2.BasicDataSource&quot; destroy-method=&quot;close&quot;&gt;</span><br><span class="line">    &lt;property name=&quot;driverClassName&quot; value=&quot;$&#123;jdbc.driver&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;url&quot; value=&quot;$&#123;jdbc.url&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;username&quot; value=&quot;$&#123;jdbc.username&#125;&quot;/&gt;</span><br><span class="line">    &lt;property name=&quot;password&quot; value=&quot;$&#123;jdbc.password&#125;&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 配置sqlSessionFactory --&gt;</span><br><span class="line">&lt;bean id=&quot;sqlSessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&gt;</span><br><span class="line">    &lt;!-- 数据库连接池 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">    &lt;!-- 加载Mybatis全局配置文件 --&gt;</span><br><span class="line">    &lt;property name=&quot;configLocation&quot; value=&quot;/WEB-INF/classes/mybatis/SqlMapConfig.xml&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 配置mapper扫描器 --&gt;</span><br><span class="line">&lt;bean class=&quot;org.mybatis.spring.mapper.MapperScannerConfigurer&quot;&gt;</span><br><span class="line">    &lt;!-- 扫描包路径，如果需要扫描多个包中间用半角逗号隔开 --&gt;</span><br><span class="line">    &lt;property name=&quot;basePackage&quot; value=&quot;com.wxisme.ssm.mapper&quot;&gt;&lt;/property&gt;</span><br><span class="line">    &lt;property name=&quot;sqlSessionFactoryBeanName&quot; value=&quot;sqlSessionFactory&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/beans&gt;</span><br><span class="line">业务逻辑控制，applicationContext-service.xml的配置：</span><br><span class="line"></span><br><span class="line">这个文件里暂时只需要定义service的实现类即可。</span><br><span class="line"></span><br><span class="line">&lt;!-- 定义service --&gt;</span><br><span class="line">&lt;bean id=&quot;userService&quot; class=&quot;com.wxisme.ssm.service.impl.UserServiceImpl&quot;/&gt;</span><br><span class="line">事务控制，applicationContext-transaction.xml的配置</span><br><span class="line"></span><br><span class="line">配置数据源，使用JDBC控制类。</span><br><span class="line"></span><br><span class="line">&lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;!-- 配置数据源 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line">配置通知，事务控制。</span><br><span class="line"></span><br><span class="line">&lt;!-- 通知 --&gt;</span><br><span class="line">    &lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;transactionManager&quot;&gt;</span><br><span class="line">        &lt;tx:attributes&gt;</span><br><span class="line">            &lt;!-- 传播行为 --&gt;</span><br><span class="line">            &lt;tx:method name=&quot;save*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;insert*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;update*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;delete*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;find*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;select*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line"> </span><br><span class="line">        &lt;/tx:attributes&gt;</span><br><span class="line">    &lt;/tx:advice&gt;</span><br><span class="line">配置AOP切面</span><br><span class="line"></span><br><span class="line">&lt;!-- 配置aop  --&gt;</span><br><span class="line">    &lt;aop:config&gt;</span><br><span class="line">        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut=&quot;execution(* com.wxisme.ssm.service.impl.*.*(..))&quot;/&gt;</span><br><span class="line">    &lt;/aop:config&gt;</span><br><span class="line">整个事务控制的配置是这样的：</span><br><span class="line"></span><br><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns=&quot;http://www.springframework.org/schema/beans&quot;</span><br><span class="line">xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span><br><span class="line">xmlns:context=&quot;http://www.springframework.org/schema/context&quot;</span><br><span class="line">xmlns:mvc=&quot;http://www.springframework.org/schema/mvc&quot;</span><br><span class="line">xmlns:jdbc=&quot;http://www.springframework.org/schema/jdbc&quot;</span><br><span class="line">xmlns:jee=&quot;http://www.springframework.org/schema/jee&quot;</span><br><span class="line">xmlns:aop=&quot;http://www.springframework.org/schema/aop&quot;</span><br><span class="line">xmlns:tx=&quot;http://www.springframework.org/schema/tx&quot;</span><br><span class="line">xsi:schemaLocation=&quot;http://www.springframework.org/schema/beans </span><br><span class="line">http://www.springframework.org/schema/beans/spring-beans.xsd </span><br><span class="line">http://www.springframework.org/schema/context  </span><br><span class="line">http://www.springframework.org/schema/context/spring-context.xsd  </span><br><span class="line">http://www.springframework.org/schema/mvc  </span><br><span class="line">http://www.springframework.org/schema/mvc/spring-mvc.xsd  </span><br><span class="line">http://www.springframework.org/schema/tx </span><br><span class="line">http://www.springframework.org/schema/tx/spring-tx.xsd  </span><br><span class="line">http://www.springframework.org/schema/aop  </span><br><span class="line">http://www.springframework.org/schema/aop/spring-aop.xsd&quot;&gt;</span><br><span class="line"> </span><br><span class="line">&lt;!-- 事务控制  对MyBatis操作数据库  spring使用JDBC事务控制类 --&gt;</span><br><span class="line"> </span><br><span class="line">&lt;bean id=&quot;transactionManager&quot; class=&quot;org.springframework.jdbc.datasource.DataSourceTransactionManager&quot;&gt;</span><br><span class="line">    &lt;!-- 配置数据源 --&gt;</span><br><span class="line">    &lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&gt;</span><br><span class="line">&lt;/bean&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 通知 --&gt;</span><br><span class="line">    &lt;tx:advice id=&quot;txAdvice&quot; transaction-manager=&quot;transactionManager&quot;&gt;</span><br><span class="line">        &lt;tx:attributes&gt;</span><br><span class="line">            &lt;!-- 传播行为 --&gt;</span><br><span class="line">            &lt;tx:method name=&quot;save*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;insert*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;update*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;delete*&quot; propagation=&quot;REQUIRED&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;find*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line">            &lt;tx:method name=&quot;select*&quot; propagation=&quot;SUPPORTS&quot; read-only=&quot;true&quot;/&gt;</span><br><span class="line"> </span><br><span class="line">        &lt;/tx:attributes&gt;</span><br><span class="line">    &lt;/tx:advice&gt;</span><br><span class="line"> </span><br><span class="line">    &lt;!-- 配置aop  --&gt;</span><br><span class="line">    &lt;aop:config&gt;</span><br><span class="line">        &lt;aop:advisor advice-ref=&quot;txAdvice&quot; pointcut=&quot;execution(* com.wxisme.ssm.service.impl.*.*(..))&quot;/&gt;</span><br><span class="line">    &lt;/aop:config&gt;</span><br><span class="line"> </span><br><span class="line">&lt;/beans&gt;</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-MyBatis的配置"><a href="#4-MyBatis的配置" class="headerlink" title="4 MyBatis的配置"></a>4 MyBatis的配置</h1><p>SqlMapConfig.xml的配置   全局setting配置这里省略，数据库连接池在spring整合文件中已经配置，具体setting配置参考官方文档。</p>
+<p>别名的定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;typeAliases&gt;</span><br><span class="line">    &lt;!-- 批量定义别名 ，指定包名，自动扫描包中的类，别名即为类名，首字母大小写无所谓--&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.po&quot;/&gt;</span><br><span class="line">&lt;/typeAliases&gt;</span><br></pre></td></tr></table></figure>
+
+<p>mapper映射文件的配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;mappers&gt;</span><br><span class="line">    &lt;!-- 加载映射文件 --&gt;</span><br><span class="line">    &lt;!-- 这里也可以使用class来加载映射文件，前提是：使用mapper代理的方法，遵循规范，</span><br><span class="line">    并且两个文件必须同名且在同一目录</span><br><span class="line">    &lt;mapper class=&quot;com.wxisme.mybatis0100.mapper.UserMapper&quot;/&gt;</span><br><span class="line">    基于class加载，可以进行批量加载</span><br><span class="line">    --&gt;</span><br><span class="line">    &lt;!-- 通过扫描包的方式来进行批量加载映射文件 --&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.mapper&quot;/&gt;</span><br><span class="line">&lt;/mappers&gt;</span><br></pre></td></tr></table></figure>
+
+<p>整个文件的配置应该是这样的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;!DOCTYPE configuration</span><br><span class="line">PUBLIC &quot;-//mybatis.org//DTD Config 3.0//EN&quot;</span><br><span class="line">&quot;http://mybatis.org/dtd/mybatis-3-config.dtd&quot;&gt;</span><br><span class="line">&lt;configuration&gt;</span><br><span class="line">&lt;!-- 将数据库连接数据抽取到属性文件中方便测试 --&gt;</span><br><span class="line">&lt;!-- &lt;properties resource=&quot;/WEB-INF/classes/jdbc.properties&quot;&gt;&lt;/properties&gt; --&gt;</span><br><span class="line">&lt;!-- 别名的定义 --&gt;</span><br><span class="line">&lt;typeAliases&gt;</span><br><span class="line">    &lt;!-- 批量定义别名 ，指定包名，自动扫描包中的类，别名即为类名，首字母大小写无所谓--&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.po&quot;/&gt;</span><br><span class="line">&lt;/typeAliases&gt; </span><br><span class="line">&lt;!-- 数据库连接用数据库连接池 --&gt; </span><br><span class="line">&lt;mappers&gt;</span><br><span class="line">    &lt;!-- 通过扫描包的方式来进行批量加载映射文件 --&gt;</span><br><span class="line">    &lt;package name=&quot;com.wxisme.ssm.mapper&quot;/&gt;</span><br><span class="line">&lt;/mappers&gt;</span><br><span class="line">&lt;/configuration&gt;</span><br></pre></td></tr></table></figure>
+
+<p>具体mapper文件的配置，在使用mapper代理的方法时，命名空间需要是对应的Mapper类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;</span><br><span class="line">&lt;!DOCTYPE mapper PUBLIC &quot;-//mybatis.org//DTD Mapper 3.0//EN&quot; &quot;http://mybatis.org/dtd/mybatis-3-mapper.dtd&quot; &gt;</span><br><span class="line">&lt;mapper namespace=&quot;com.wxisme.ssm.mapper.AlbumMapper&quot; &gt;</span><br><span class="line">&lt;/mapper&gt;</span><br></pre></td></tr></table></figure>
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃糖果<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/img/zhifubao.jpg">
+                      <span class="reward-type">支付宝</span>
+                    </div>
+                    
+                    
+                    <div class="reward-box-item">
+                      <img class="reward-img" src="/img/weixin.png">
+                      <span class="reward-type">微信</span>
+                    </div>
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -195,247 +308,141 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://yoursite.com/2019/08/30/Spring、Spring MVC、MyBatis 整合文件配置详解/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/30/MySQL详细知识点总结/" class="archive-article-date">
-  	<time datetime="2019-08-30T03:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-30</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/2019/08/30/MySQL详细知识点总结/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">MySQL详细知识点总结</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/30/MySQL详细知识点总结/">MySQL详细知识点总结</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">MySQL详细知识点总结</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
+        
+        
+        <div class="toc-container tooltip-left">
+            <i class="icon-font icon-category"></i>
+            <div class="tooltip tooltip-east">
+                <span class="tooltip-item">
+                </span>
+                <span class="tooltip-content">
+                    <div class="toc-article">
+                    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-web-xml的配置"><span class="toc-number">1.</span> <span class="toc-text">1 web.xml的配置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-springmvc-xml的配置"><span class="toc-number">2.</span> <span class="toc-text">2 springmvc.xml的配置</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-Spring和MyBatis整合配置，jar包由MyBatis提供"><span class="toc-number">3.</span> <span class="toc-text">3 Spring和MyBatis整合配置，jar包由MyBatis提供</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-MyBatis的配置"><span class="toc-number">4.</span> <span class="toc-text">4 MyBatis的配置</span></a></li></ol>
+                    </div>
+                </span>
+            </div>
         </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
+        
+    </div>
+</aside>
+
+
+
   
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/28/真Java实战/" class="archive-article-date">
-  	<time datetime="2019-08-28T07:30:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-28</time>
-</a>
-        </div>
-    	 
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/28/真Java实战/">真Java实战</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">真Java实战</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/28/Java基础/" class="archive-article-date">
-  	<time datetime="2019-08-28T04:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-28</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/28/Java基础/">Java基础</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Java基础</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/27/MVC入门/" class="archive-article-date">
-  	<time datetime="2019-08-27T12:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/27/MVC入门/">MVC入门</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">MVC入门</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/27/Java精选题目/" class="archive-article-date">
-  	<time datetime="2019-08-27T03:16:11.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/27/Java精选题目/">Java精选题目</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">Java精选题目</a>
-        		</li>
-      		
-		</ul>
-	</div>
 
-          
 
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/2019/08/27/JavaEE实战/" class="archive-article-date">
-  	<time datetime="2019-08-27T03:00:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-27</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2019/08/27/JavaEE实战/">JavaEE实战</a>
-    </h1>
-  
+<!-- 来必力City版安装代码 -->
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">JavaEE实战</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
+  <!-- 这一句是适配样式 -->
+  <section class="duoshuo" id="comments">
+    <!-- 以下是 来必力City版安装代码 -->
+    <div id="lv-container" data-id="city" data-uid="MTAyMC8zMTQ5MS84MDU1">
+      <script type="text/javascript">
+       (function(d, s) {
+           var j, e = d.getElementsByTagName(s)[0];
+           if (typeof LivereTower === 'function') { return; }
+           j = d.createElement(s);
+           j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+           j.async = true;
+           e.parentNode.insertBefore(j, e);
+       })(document, 'script');
+      </script>
+    <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+    </div>
+  </section>
 
 
           </div>
@@ -458,8 +465,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
